@@ -394,7 +394,7 @@ var COLLAGE = (function () {
             var x = cx - ancho * 0.42 + (i * 131) % Math.round(ancho * 0.84), y = cy + 520 - Math.floor(i / 6) * 85 - (i * 31) % 36, t0 = t + 0.6 + i * 0.05;
             P(Lp).expression = exprTab(s, 1, "[" + x + "," + y + "-Math.max(0,1-(time-" + t0 + ")/0.22)*300]"); dentro(Lp); vida(Lp, t0, v[1]);
         }
-        var bw = c.layers.add(ri); bw.name = "retrato en Multiply"; S(bw).setValue([e, e]); tab(bw, cx, cy, s, 1); foto(bw, 70); if (fondoOscuro()) { O(bw).setValue(55); } else mult(bw, 88);   // en fondo oscuro el retrato va encima a media opacidad para que se vean las piezas debajo dentro(bw); vida(bw, t, v[1]);
+        var bw = c.layers.add(ri); bw.name = "retrato en Multiply"; S(bw).setValue([e, e]); tab(bw, cx, cy, s, 1); foto(bw, 70); if (fondoOscuro()) { O(bw).setValue(55); } else mult(bw, 88); dentro(bw); vida(bw, t, v[1]);   // en fondo oscuro el retrato va encima a media opacidad para que se vean las piezas debajo
     }
     // silueta de papel blanca sobre bloque oscuro, llena de la obra que sube (la mano del referente 81-85 s)
     function manoPapel(s, q, x, y, ancho) {
@@ -531,24 +531,24 @@ var COLLAGE = (function () {
         registro(s);
     }
     function cita(s, q) {   // v10c (revision 2026-11-05: "la cita esta muy basica, deberia tener mas fuerza"): tipografia grande que entra palabra a palabra con la voz
-        var v = viva(s), t0 = q.ini;
+        var v = viva(s), t0 = q.ini, tE = Math.max(v[0] + 0.15, t0 - 0.9);   // tE: the set dresses itself as the slide lands; the words keep the voice timing
         var bk = shp("bloque oscuro"), bg = grp(bk, "b"); rect(bg, 1200, 2040, 0); fill(bg, "#151919"); tab(bk, 540, 960, s, 1); vida(bk, v[0], v[1]);
         var tx = c.layers.add(imp("imagenes/texturas/concrete_floor_worn_001_2k.jpg", false)); tab(tx, 540, 960, s, 1); tx.blendingMode = BlendingMode.SCREEN; O(tx).setValue(20); vida(tx, v[0], v[1]);
         // losa magenta en diagonal que cruza detras del texto
         var mg = shp("losa cita"), mgg = grp(mg, "m"); rect(mgg, 1500, 760, 0); fill(mgg, MAG); R(mg).setValue(-9); tab(mg, 540, 980, s, 0.97); O(mg).setValue(92); vida(mg, v[0], v[1]);
-        var mp = P(mg).expression; P(mg).expression = "var e=ease(time," + (t0 - 0.05) + "," + (t0 + 0.45) + ",-1500,0); " + mp.replace("value-d", "value+[e,0]-d");
+        var mp = P(mg).expression; P(mg).expression = "var e=ease(time," + tE + "," + (tE + 0.5) + ",-1500,0); " + mp.replace("value-d", "value+[e,0]-d");
         // v10c (revision: "le faltaban detallitos del estilo base"): borde rasgado, semitono y papel dentro de la losa, cintas, mano de papel y lapiz
         aspero(mg, 14, 70, 6);
         var mm = shp("MATE losa cita"), mmg = grp(mm, "m"); rect(mmg, 1500, 760, 0); fill(mmg, "#FFFFFF"); R(mm).setValue(-9); tab(mm, 540, 980, s, 0.97); P(mm).expression = P(mg).expression; aspero(mm, 14, 70, 6); mm.enabled = false; vida(mm, v[0], v[1]);
-        var se = imp("componentes_ae/mates_png/semitono_parejo_4K_alfa.png", true); if (se) { var hs = c.layers.add(se); S(hs).setValue([40, 40]); tab(hs, 760, 1060, s, 0.97); mult(hs, 40); hs.setTrackMatte(mm, TrackMatteType.ALPHA); vida(hs, t0, v[1]); }
-        var pq = c.layers.add(imp("imagenes/texturas/Paper001_2k.jpg", false)); S(pq).setValue([80, 80]); tab(pq, 540, 980, s, 0.97); mult(pq, 45); pq.setTrackMatte(mm, TrackMatteType.ALPHA); vida(pq, t0, v[1]);
+        var se = imp("componentes_ae/mates_png/semitono_parejo_4K_alfa.png", true); if (se) { var hs = c.layers.add(se); S(hs).setValue([40, 40]); tab(hs, 760, 1060, s, 0.97); mult(hs, 40); hs.setTrackMatte(mm, TrackMatteType.ALPHA); vida(hs, tE, v[1]); }
+        var pq = c.layers.add(imp("imagenes/texturas/Paper001_2k.jpg", false)); S(pq).setValue([80, 80]); tab(pq, 540, 980, s, 0.97); mult(pq, 45); pq.setTrackMatte(mm, TrackMatteType.ALPHA); vida(pq, tE, v[1]);
         var cin = [[120, 690, -32], [985, 1230, 28]];
-        for (var ci = 0; ci < cin.length; ci++) { var cl = pon(G + "alfa3/cinta.png", s, cin[ci][0], cin[ci][1], 190, 0.97, cin[ci][2]); if (cl) { mult(cl, 90); vida(cl, t0 + 0.45 + ci * 0.08, v[1]); caer(cl, t0 + 0.45 + ci * 0.08); } }
+        for (var ci = 0; ci < cin.length; ci++) { var cl = pon(G + "alfa3/cinta.png", s, cin[ci][0], cin[ci][1], 190, 0.97, cin[ci][2]); if (cl) { mult(cl, 90); vida(cl, tE + 0.45 + ci * 0.08, v[1]); caer(cl, tE + 0.45 + ci * 0.08); } }
         var mi = imp(G + "alfa3/mano_yeso.png", true);
         if (mi) { var ea = 380 / mi.width * 100, mh = c.layers.add(mi); mh.name = "MATE mano cita"; S(mh).setValue([ea, ea]); R(mh).setValue(-14); tab(mh, 905, 1770, s, 1.03); mh.enabled = false; vida(mh, v[0], v[1]);
-            var pa = c.layers.add(imp("imagenes/texturas/Paper001_2k.jpg", false)); S(pa).setValue([60, 60]); tab(pa, 905, 1770, s, 1.03); fx(pa, "ADBE Brightness & Contrast 2").property(1).setValue(60); pa.setTrackMatte(mh, TrackMatteType.ALPHA); vida(pa, t0 + 0.2, v[1]);
-            var tl = shp("teal mano cita"), tlg = grp(tl, "t"); rect(tlg, 600, 150, 0); fill(tlg, TEAL); R(tl).setValue(-10); tab(tl, 905, 1830, s, 1.03); mult(tl, 80); tl.setTrackMatte(mh, TrackMatteType.ALPHA); vida(tl, t0 + 0.2, v[1]);
-            caer(pa, t0 + 0.2); }
+            var pa = c.layers.add(imp("imagenes/texturas/Paper001_2k.jpg", false)); S(pa).setValue([60, 60]); tab(pa, 905, 1770, s, 1.03); fx(pa, "ADBE Brightness & Contrast 2").property(1).setValue(60); pa.setTrackMatte(mh, TrackMatteType.ALPHA); vida(pa, tE + 0.2, v[1]);
+            var tl = shp("teal mano cita"), tlg = grp(tl, "t"); rect(tlg, 600, 150, 0); fill(tlg, TEAL); R(tl).setValue(-10); tab(tl, 905, 1830, s, 1.03); mult(tl, 80); tl.setTrackMatte(mh, TrackMatteType.ALPHA); vida(tl, tE + 0.2, v[1]);
+            caer(pa, tE + 0.2); }
         var pg = c.layers.add(imp("imagenes/texturas/Paper002_2k.jpg", false)); S(pg).setValue([H * 1.05 / pg.source.height * 100, H * 1.05 / pg.source.height * 100]); tab(pg, 540, 960, s, 1); pg.blendingMode = BlendingMode.SCREEN; O(pg).setValue(10); vida(pg, v[0], v[1]);
         // palabras con su tiempo (las de la voz si coinciden; si no, repartidas)
         var lineas = [], todas = [];
@@ -591,7 +591,7 @@ var COLLAGE = (function () {
         }
         // comilla gigante en lima que cae arriba a la izquierda
         var cm = texto("\u201C", "Impact", 640, LIME, ParagraphJustification.LEFT_JUSTIFY); cm.name = "comilla"; var rc = cm.sourceRectAtTime(0, false);
-        T(cm).property("ADBE Anchor Point").setValue([rc.left + rc.width / 2, rc.top + rc.height / 2]); cm.parent = nul; P(cm).setValue([200 - 540, y0 - 150 - 960]); R(cm).setValue(-8); vida(cm, t0 - 0.05, v[1]); caer(cm, t0 - 0.05);
+        T(cm).property("ADBE Anchor Point").setValue([rc.left + rc.width / 2, rc.top + rc.height / 2]); cm.parent = nul; P(cm).setValue([200 - 540, y0 - 150 - 960]); R(cm).setValue(-8); vida(cm, tE + 0.3, v[1]); caer(cm, tE + 0.3);
         // autor que se teclea al final, con una linea lima que se dibuja
         var tf = TW[TW.length - 1] + 0.2, au = texto(q.autor.replace(/^[\u2014\-\s]+/, "").toUpperCase(), "CourierNewPS-BoldMT", 40, "#FFFFFF", ParagraphJustification.LEFT_JUSTIFY); au.name = "cita autor";
         var ra = au.sourceRectAtTime(0, false); if (ra.width > 900) S(au).setValue([900 / ra.width * 100, 900 / ra.width * 100]);
@@ -698,13 +698,14 @@ var COLLAGE = (function () {
     // la firma del final: el narrador se autodestruye de una forma ligada a la historia (1.6 s antes del final)
     function autodestruir(L, tipo) {
         var t0 = DUR - 1.7, t1 = DUR - 0.25, op = O(L);
+        if (L.outPoint < DUR) L.outPoint = DUR;   // QA ep01: the head clip ended with the voice and the narrator vanished in 0.2 s; it holds (ping-pong) until the end
         for (var i = c.numLayers; i >= 1; i--) if (c.layer(i).name.indexOf("copia menta") === 0 && c.layer(i).outPoint > t0) c.layer(i).outPoint = t0;
         try {
             if (tipo === "static_dissolve" || tipo === "glitch_out") {
                 var td = fx(L, "ADBE Turbulent Displace"); td.property("Amount").setValueAtTime(t0, 0); td.property("Amount").setValueAtTime(t1, 260); td.property("Size").setValue(18);
                 td.property("Evolution").expression = "time*900;";
                 var nz = fx(L, "ADBE Noise"); nz.property(1).setValueAtTime(t0, 0); nz.property(1).setValueAtTime(t1, 100);
-                op.expression = "time<" + t0 + "?value: (posterizeTime(15), Math.max(0, 1-(time-" + t0 + ")/" + (t1 - t0) + ")*(random()>0.25?100:15));";
+                op.expression = "time<" + t0 + "?value: (posterizeTime(15), Math.max(0, 1-Math.max(0,time-" + (t0 + 0.5) + ")/" + (t1 - t0 - 0.5) + ")*(random()>0.25?100:40));";   // QA ep01: 0.5 s of glitching while still whole, then it breaks apart
             } else if (tipo === "melt") {
                 var sc = S(L), v = sc.value; sc.setValueAtTime(t0, v); sc.setValueAtTime(t1, [v[0] * 1.06, v[1] * 1.35]);
                 var tm = fx(L, "ADBE Turbulent Displace"); tm.property("Amount").setValueAtTime(t0, 0); tm.property("Amount").setValueAtTime(t1, 180); tm.property("Size").setValue(60);
@@ -745,8 +746,8 @@ var COLLAGE = (function () {
         sh.vertices = [[540, 960 - hh], [540 + hw, 960], [540, 960 + hh], [540 - hw, 960]]; sh.inTangents = [[-hw * K, 0], [0, -hh * K], [hw * K, 0], [0, hh * K]]; sh.outTangents = [[hw * K, 0], [0, hh * K], [-hw * K, 0], [0, -hh * K]]; sh.closed = true;
         mk.property("ADBE Mask Shape").setValue(sh); mk.inverted = true; mk.property("ADBE Mask Feather").setValue([380, 380]); O(vg).setValue(55);
         // PLAY + contador (Courier), arriba a la izquierda, dentro de la zona segura
-        var t1 = texto(tc, "CourierNewPS-BoldMT", 28, "#F7F8F4", ParagraphJustification.LEFT_JUSTIFY); t1.name = "VHS play"; P(t1).setValue([60, 118]);   // arriba de las etiquetas (decorativo) O(t1).expression = "posterizeTime(2); time%2<1.6?85:0;";
-        var t2 = texto("SP 0:00:00", "CourierNewPS-BoldMT", 26, "#F7F8F4", ParagraphJustification.LEFT_JUSTIFY); t2.name = "VHS contador"; P(t2).setValue([60, 150]); O(t2).setValue(80);
+        var t1 = texto(tc, "CourierNewPS-BoldMT", 32, "#F7F8F4", ParagraphJustification.LEFT_JUSTIFY); t1.name = "VHS play"; P(t1).setValue([60, 112]); O(t1).expression = "posterizeTime(2); time%2<1.6?85:0;";   // arriba de las etiquetas (decorativo)
+        var t2 = texto("SP 0:00:00", "CourierNewPS-BoldMT", 32, "#F7F8F4", ParagraphJustification.LEFT_JUSTIFY); t2.name = "VHS contador"; P(t2).setValue([60, 152]); O(t2).setValue(80);
         t2.property("ADBE Text Properties").property("ADBE Text Document").expression = "var s=Math.floor(time); 'SP 0:'+('0'+Math.floor(s/60)).slice(-2)+':'+('0'+(s%60)).slice(-2);";
         var e1 = fx(t1, "ADBE Glo2"); try { e1.property(3).setValue(0.4); } catch (e) {}
     }
