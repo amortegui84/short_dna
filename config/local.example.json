@@ -57,6 +57,16 @@
     "figma": {
       "type": "http",
       "url": "https://mcp.figma.com/mcp"
+    },
+    "postwire": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "postwire-mcp@0.4.0"
+      ],
+      "env_keys": [
+        "POSTWIRE_API_KEY"
+      ]
     }
   },
   "_mcp_readme": "MCP servers the app gives Claude (strict: only these). Set claude_todos_los_conectores true (or tick it in the app) to also load every connector of the Claude account (Krea, Flora...): heavier context, higher cost per message.",

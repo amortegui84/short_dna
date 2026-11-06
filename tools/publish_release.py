@@ -1,6 +1,6 @@
 """Upload publish copies of episodes to a GitHub release so posting services (Zapier) can fetch them by a direct URL.
 Creates the public repo <your GitHub user>/<repo> and the release 'tapes' if missing; re-uploading a file replaces it.
-Uses the GitHub login git already has (git credential fill); the token is never printed. See docs/PUBLISHING.md (A4).
+Uses the GitHub login git already has (git credential fill); the token is never printed. See docs/PUBLISHING.md (A5).
 Usage: python tools/publish_release.py [--repo cult_pixel_media] <file.mp4> [<file.mp4> ...]"""
 import json, subprocess, sys, urllib.error, urllib.request
 from pathlib import Path

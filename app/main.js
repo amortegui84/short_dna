@@ -125,10 +125,21 @@ ipcMain.handle("readFile", (e, p) => { try { return fs.readFileSync(p, "utf8"); 
 
 // ---------- Claude
 const AUTO = new Set(["Read", "Glob", "Grep", "WebSearch", "WebFetch", "TodoWrite", "Skill", "ToolSearch"]);
+// values of the named keys from the .env, handed only to the MCP server that asks for them (config mcp.<name>.env_keys)
+function envValues(names) {
+  const out = {};
+  try {
+    for (const l of fs.readFileSync(CFG.env_file, "utf8").split(/\r?\n/)) {
+      const m = l.match(/^([A-Z0-9_]+)=(.*)$/); if (m && names.includes(m[1]) && m[2].trim()) out[m[1]] = m[2].trim();
+    }
+  } catch (e) {}
+  return out;
+}
 function mcpServers() {
   const out = {};
   for (const [k, v] of Object.entries(CFG.mcp || {}))
-    out[k] = v.type === "http" ? { type: "http", url: v.url } : { type: "stdio", command: v.command, args: (v.args || []).map((a) => a.replace("{motion_dna}", CFG.motion_dna)) };
+    out[k] = v.type === "http" ? { type: "http", url: v.url } : { type: "stdio", command: v.command, args: (v.args || []).map((a) => a.replace("{motion_dna}", CFG.motion_dna)),
+      ...(v.env_keys ? { env: { ...process.env, ...envValues(v.env_keys) } } : {}) };
   return out;
 }
 const APP_CONTEXT = `You are running inside the shorts-factory desktop app (repo: ${REPO}). Follow .claude/skills/shorts-factory/SKILL.md

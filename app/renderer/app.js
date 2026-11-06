@@ -276,7 +276,13 @@ V.publish = async () => {
         "Claude checks which channel and account it sees and saves them in brand.json → publicar."],
       link("Zapier", "https://zapier.com/"), link("Claude connectors", "https://claude.ai/settings/connectors"),
       h("button", { class: "ghost", onclick: () => askClaude(PROMPTS.publishSetup({ brand: BRAND, dir: BDIR() })) }, "Connect with Claude")),
-    step(!!pub.release_repo, "4 · Download links for the videos", pub.release_repo && "GitHub release " + pub.release_repo,
+    step(!!pub.tiktok, "4 · TikTok through PostWire", pub.tiktok,
+      ["Create the brand's TikTok in the TikTok app, then sign up at postwire.io (free: 10 posts a month, 2 networks per post).",
+        "PostWire → Accounts → connect TikTok, logging in with the BRAND's TikTok.",
+        "PostWire → API & MCP → copy the key. Put it in your .env as POSTWIRE_API_KEY= (never in a chat or the repo).",
+        "Restart the app: its Claude gets the postwire server from config/local.json → mcp. Claude checks the handle and saves it in brand.json → publicar.tiktok."],
+      link("PostWire dashboard", "https://postwire.io/dashboard.html")),
+    step(!!pub.release_repo, "5 · Download links for the videos", pub.release_repo && "GitHub release " + pub.release_repo,
       ["Zapier needs a direct link to each video. tools/publish_release.py uploads the publish copies to a public GitHub release using your git login.",
         "Run it yourself the first time (it reads your git credential and creates a public repo): python tools/publish_release.py --repo <brand>_media <files>"]),
   ];
@@ -289,16 +295,17 @@ V.publish = async () => {
         : p.final ? h("button", { class: "ghost", onclick: async () => { document.querySelector('[data-side="log"]').click(); await window.api.run("publicar", [p.dir], p.slug); show("publish"); } }, "Make publish copy") : "—"),
       h("td", {}, y ? h("span", {}, link(y.privacy === "public" ? "Public" : "Private", y.url), y.ai_label ? " · AI label" : "") : "—"),
       h("td", {}, i ? link("Reel", i.url) : "—"),
+      h("td", {}, p.publicado?.tiktok ? (p.publicado.tiktok.url ? link(p.publicado.tiktok.privacy === "public" ? "Public" : "Private", p.publicado.tiktok.url) : (p.publicado.tiktok.privacy === "public" ? "Public" : "Private (only you)")) : "—"),
       h("td", {}, p.final ? h("button", { class: "ghost", onclick: () => askClaude(PROMPTS.publish({ brand: BRAND, slug: p.slug, dir: p.dir, done: !!(y && i) })) },
         y && i ? "Republish / update" : "Publish with Claude") : ""));
   };
   return [h("h1", {}, "Publish"),
-    h("p", { class: "lead" }, "YouTube Shorts and Instagram Reels through Zapier. Set up the four links once per brand; then every finished episode goes private to YouTube, you review it, and it goes public on both. Nothing reaches Instagram without your “publish”."),
+    h("p", { class: "lead" }, "YouTube Shorts and Instagram Reels through Zapier, TikTok through PostWire. Set up the five links once per brand; then every finished episode goes out private (YouTube, TikTok), you review it, and it goes public everywhere. Nothing goes public without your “publish”."),
     h("div", { class: "row" }, h("button", { class: "ghost", onclick: () => window.api.open(guide) }, "Full guide (docs/PUBLISHING.md)"),
       b.dir ? h("button", { class: "ghost", onclick: () => window.api.open(b.dir + "/posts.md") }, "Posts and copy (posts.md)") : ""),
     h("h2", {}, "Once per brand"), h("div", { class: "steps" }, setup),
     h("h2", {}, "Episodes"),
-    ps.length ? h("table", {}, h("tr", {}, ...["Episode", "Final cut", "Publish copy", "YouTube", "Instagram", ""].map((x) => h("th", {}, x))), ps.map(row))
+    ps.length ? h("table", {}, h("tr", {}, ...["Episode", "Final cut", "Publish copy", "YouTube", "Instagram", "TikTok", ""].map((x) => h("th", {}, x))), ps.map(row))
       : h("p", { class: "lead" }, "No episodes yet."),
     h("h2", {}, "Every episode, in order"),
     h("ol", { class: "lead" }, [
@@ -307,6 +314,7 @@ V.publish = async () => {
       "Claude writes the title, caption, hashtags and tags (posts.md), uploads to YouTube as PRIVATE and sets the AI label.",
       "You review it in YouTube Studio (with the brand channel selected) → Content → Shorts.",
       "On your OK: YouTube goes public and the Reel is created, processed (~4 min) and published on Instagram.",
+      "TikTok through PostWire: private (only you) to check it, then public with TikTok's AI label. Each post counts against PostWire's 10 a month.",
       "The links are saved in the episode's publicado.json and show up here."].map((x) => h("li", {}, x)))];
 };
 

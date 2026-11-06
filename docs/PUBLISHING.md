@@ -1,4 +1,13 @@
-# Publishing: from a finished cut to YouTube Shorts and Instagram Reels
+# Publishing: from a finished cut to YouTube Shorts, Instagram Reels and TikTok
+
+| Network | Route | Why this route |
+|---|---|---|
+| YouTube Shorts | Zapier MCP (YouTube actions + YouTube API requests) | free plan; private upload, then the AI label and public |
+| Instagram Reels | Zapier MCP (Instagram for Business + Graph API requests) | free plan; Zapier's own Publish Video times out, the Graph API route does not |
+| TikTok | PostWire MCP (`postwire-mcp`) | Zapier has no TikTok action; PostWire is an audited TikTok app, so it can post publicly, privately or as a draft, with TikTok's AI label |
+
+PostWire can also post to YouTube, Instagram, Facebook, LinkedIn, X, Bluesky and Mastodon. On its free plan (10 posts a
+month, 2 networks per post) it is kept for TikTok. Zapier covers YouTube and Instagram.
 
 The app's **Publish** view follows this guide. Part A is done once per brand (accounts and links). Part B is done for every
 episode. It was first run on 2026-11-06 for Cult Pixel Tapes 01–03; the links and copy are in
@@ -54,7 +63,29 @@ networks costs about 10 tasks (upload, AI label, make public, Instagram create/c
    - Instagram: the "Instagram Account to Use" list of Publish Video must show the brand's account. Write its id in
      `brand.json` → `publicar.instagram_id`.
 
-### A4. A place the videos can be downloaded from
+### A4. TikTok through PostWire
+1. The person creates the brand's TikTok account in the TikTok app and signs up at postwire.io with Google or email.
+   The free plan covers 10 posts a month, 1 brand and 2 networks per post.
+2. In PostWire → **Accounts**, connect TikTok. TikTok's own sign-in screen opens; the person logs in with the
+   **brand's** TikTok and allows it.
+3. In PostWire → **API & MCP**, copy the API key (`pw_live_...`). Treat it like a password: don't paste it in chats or
+   commit it. If it leaks, create a new key there and revoke the old one.
+4. Put it in the `.env` named by `config/local.json` → `env_file`, as `POSTWIRE_API_KEY=...` (template:
+   `config/.env.example`). The app's Claude gets the `postwire` server from `config/local.json` → `mcp`, and the app
+   passes it only the keys listed in its `env_keys`:
+   ```json
+   "postwire": { "command": "npx", "args": ["-y", "postwire-mcp@0.4.0"], "env_keys": ["POSTWIRE_API_KEY"] }
+   ```
+   For Claude Code outside the app, register it for your user (the key stays in `~/.claude.json`, never in the repo):
+   ```
+   claude mcp add --scope user postwire -e POSTWIRE_API_KEY=<key> -- npx -y postwire-mcp@0.4.0
+   ```
+   The version is pinned on purpose. 0.4.0 was read before use: a thin bridge to `https://postwire.io/api/mcp` that runs
+   no commands and reads no files. Read a new version before raising the pin.
+5. Check it: `GET https://postwire.io/api/me` (header `Authorization: Bearer <key>`), or the MCP tool `my_account`, must
+   list the TikTok handle under `connections`. Write it in `brand.json` → `publicar.tiktok`.
+
+### A5. A place the videos can be downloaded from
 Zapier works in the cloud, so it needs a **direct download link** to each video, not a file on this PC.
 - **Default: a GitHub release.** `tools/publish_release.py` creates a public repo `<your GitHub user>/<brand>_media` and a
   release `tapes`, uploads the files, and prints one direct link per file. It uses the GitHub login git already has
@@ -99,8 +130,24 @@ Zapier works in the cloud, so it needs a **direct download link** to each video,
    3. `POST https://graph.facebook.com/v21.0/<instagram_id>/media_publish?creation_id=<container id>` for each one, in
       episode order. The last one published shows first on the grid.
    4. Read the permalinks: `GET https://graph.facebook.com/v21.0/?ids=<media ids>&fields=permalink`.
-9. **Record it.** Write `publicado.json` in the project folder (`{"youtube": {"id", "url", "privacy"}, "instagram":
-   {"id", "url"}, "video_url", "date"}`). The Publish view and the Projects gallery read it.
+9. **TikTok.** Through PostWire (`post_to_social`, or `POST https://postwire.io/api/post`):
+   ```json
+   {"platforms": ["tiktok"], "text": "<caption>", "video_url": "<release link>",
+    "options": {"tiktok": {"privacy_level": "SELF_ONLY", "ai_generated": true, "upload_method": "max"}},
+    "idempotency_key": "<brand>-<slug>-tiktok"}
+   ```
+   - `SELF_ONLY` (only you) is the review step; `PUBLIC_TO_EVERYONE` once approved. `as_draft: true` sends it to the
+     TikTok inbox instead, so the person can add a trending sound and post it from the app.
+   - `ai_generated: true` adds TikTok's AI label.
+   - The `idempotency_key` keeps a retry from posting twice.
+   - Check it with `get_post_status` (`platform`, `id`). `publish_complete` with no public id means it is private, as
+     intended.
+   - TikTok captions are shorter than YouTube's: the hook in one line, the comment question, the AI line, and 8–10
+     hashtags.
+   - A private TikTok can't be made public through the API: post it again with `PUBLIC_TO_EVERYONE` and a new
+     idempotency key, then delete the private one in the app. Each try counts as a post on the free plan.
+10. **Record it.** Write `publicado.json` in the project folder (`{"youtube": {"id", "url", "privacy"}, "instagram":
+   {"id", "url"}, "tiktok": {"id", "privacy"}, "video_url", "date"}`). The Publish view and the Projects gallery read it.
 
 ## What can go wrong
 | Symptom | Cause | Fix |
@@ -111,4 +158,7 @@ Zapier works in the cloud, so it needs a **direct download link** to each video,
 | `Video is still processing` from Publish Video | Meta's processing takes longer than Zapier waits | Use the three-step Graph API route (B8) |
 | Upload fails with an HTML or virus-scan error | The link is a Drive page, not the file | Use the GitHub release, or a direct-download link |
 | Claude can't run `publish_release.py` | The permission system blocks reading a git credential and creating a public repo | The person runs it in their terminal, or approves it when the app asks |
+| PostWire answers `no_api_key` | `POSTWIRE_API_KEY` is missing from the `.env` (or the user MCP config) | Add it (A4) and restart the app |
+| TikTok post `publish_complete` but no link | It went out as `SELF_ONLY`: only the account sees it | Expected for the test. For the real post, send it again as `PUBLIC_TO_EVERYONE` |
+| PostWire refuses a post with a monthly limit error | Free plan: 10 posts a month | Wait for the reset (1st of the month) or upgrade |
 | Zapier stops working mid-month | The ~100 free tasks are used up | Wait for the reset or upgrade; each episode costs ~10 tasks |
