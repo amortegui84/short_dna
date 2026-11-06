@@ -13,7 +13,7 @@ var COLLAGE = (function () {
     var ROOT = "", G = "";   // carpeta del kit (library/kit/), la pone build() desde los datos
     var W = 1080, H = 1920, FPS = 30, DUR = 10;
     var INK = "#191D1D", PAPEL = "#F7F8F4", TEAL = "#6FAFA8", MINT = "#3ECCB0", MAG = "#E6128F", LIME = "#C1F157", OCRE = "#B8945A", SLATE = "#9FB5AE";
-    var cache = {}, fold, c, D, MC, MG, nLupa = 0, nObra = 0;
+    var cache = {}, fold, c, D, MC, MG, nLupa = 0, nObra = 0, FONDOS = ["#2E6F66", "#7A2550", "#3D5A3A"];
     function rgb(h) { h = h.replace("#", ""); return [parseInt(h.substr(0, 2), 16) / 255, parseInt(h.substr(2, 2), 16) / 255, parseInt(h.substr(4, 2), 16) / 255]; }
     function imp(p, recta) {
         if (cache[p] !== undefined) return cache[p];
@@ -411,7 +411,7 @@ var COLLAGE = (function () {
     // fondo de la cabeza: la obra a sangre en duotono (identidad de collage) y la palabra clave gigante que se desliza detras
     function fondoCabeza(s, q) {
         var v = viva(s), img = (q.obras.length ? q.obras[0].img : D.obrasArtista[0]), oi = imp(img, false);
-        var bg = c.layers.addSolid(rgb(["#2E6F66", "#7A2550", "#3D5A3A"][s % 3]), "color fondo", W, H, 1, DUR); tab(bg, 540, 960, s, 1); vida(bg, v[0], q.corte ? q.corte + 0.02 : v[1]);   // v10: el fondo se corta con la presentadora (con +0.4 tapaba la obra ~5 cuadros: verde vacio)
+        var bg = c.layers.addSolid(rgb(FONDOS[s % FONDOS.length]), "color fondo", W, H, 1, DUR); tab(bg, 540, 960, s, 1); vida(bg, v[0], q.corte ? q.corte + 0.02 : v[1]);   // v10: el fondo se corta con la presentadora (con +0.4 tapaba la obra ~5 cuadros: verde vacio)
         // v8: sin la obra en duotono detras: las obras no se intervienen
         var pal = [], pt = [];
         var fc = q.corte || v[1];   // las palabras gigantes solo mientras esta la cabeza; cada una con su propio tiempo
@@ -603,6 +603,9 @@ var COLLAGE = (function () {
     // ---------- armado
     function build(datos) {
         D = datos; D.medidas = []; D.insertos = []; D.tarjetas = []; DUR = D.total; ROOT = G = D.kit;
+        var tk = (D.estilo && D.estilo.tokens) || {};   // los colores del estilo de la marca (library/styles o brands/<marca>/styles)
+        INK = tk.tinta || INK; PAPEL = tk.papel || PAPEL; MAG = tk.rojo || tk.magenta || MAG; LIME = tk.mascara || tk.lima || LIME; TEAL = tk.estatica || tk.teal || TEAL; MINT = tk.fosforo || tk.menta || MINT;
+        if (tk.fondos_presentadora) FONDOS = tk.fondos_presentadora;
         for (var i = app.project.numItems; i >= 1; i--) { var it0 = app.project.item(i); if ((it0 instanceof CompItem && it0.name.indexOf(D.comp) === 0) || (it0 instanceof FolderItem && it0.name === D.comp + " media") || (it0 instanceof FootageItem && it0.file && it0.file.fsName.indexOf(D.comp) >= 0 && it0.file.fsName.indexOf("_mdna_sound") >= 0)) it0.remove(); }   // el wav de sonido importado queda bloqueado en Windows si no se quita
         fold = app.project.items.addFolder(D.comp + " media"); cache = {};
         c = app.project.items.addComp(D.comp, W, H, 1, DUR, FPS); c.motionBlur = true; c.shutterAngle = 90;   // v10c: menos estela en el deslizamiento
@@ -657,8 +660,20 @@ var COLLAGE = (function () {
         var ga = c.layers.addSolid([0, 0, 0], "glitch", W, H, 1, DUR); ga.adjustmentLayer = true; var dm = fx(ga, "ADBE Displacement Map"); dm.property(1).setValue(mgl.index); dm.property(2).setValue(1); dm.property(4).setValue(1); dm.property(5).setValue(0);
         var gl = []; for (i = 1; i < S0.length; i++) gl.push("(time>" + (S0[i].ini - 0.14).toFixed(3) + "&&time<" + (S0[i].ini - 0.03).toFixed(3) + ")");
         dm.property(3).expression = "0;";   // v8: sin glitch en los saltos (transiciones suaves)
+        if (D.estilo && D.estilo.glitch) {   // estilo con glitches (cult_pixel_vhs): desplazamiento + destello de estatica en cada cambio y corte
+            var tg = []; for (i = 1; i < S0.length; i++) tg.push(S0[i].ini); for (i = 0; i < S0.length; i++) if (S0[i].corte) tg.push(S0[i].corte + 0.12);
+            for (i = 0; i < D.insertos.length; i++) { tg.push(D.insertos[i][1] + 0.12); tg.push(D.insertos[i][2] + 0.1); }
+            dm.property(3).expression = "var T=[" + tg.map(function (x) { return x.toFixed(3); }).join(",") + "]; var g=0; for (var i=0;i<T.length;i++) if (time>T[i]-0.18 && time<T[i]+0.06) g=1; posterizeTime(15); g? 60+random(120):0;";
+            var est = D.estatica ? imp(D.estatica, false) : null;
+            for (i = 0; i < tg.length; i++) {
+                var sl = est ? c.layers.add(est) : c.layers.addSolid([0.6, 0.6, 0.6], "estatica", W, H, 1, DUR); sl.name = "estatica cambio";
+                if (est) { S(sl).setValue([W / est.width * 100 * 1.05, H / est.height * 100 * 1.05]); P(sl).setValue([W / 2, H / 2]); } else fx(sl, "ADBE Noise").property(1).setValue(100);
+                sl.blendingMode = BlendingMode.SCREEN; O(sl).expression = "posterizeTime(12); 35+random(50);"; vida(sl, tg[i] - 0.12, tg[i] + 0.02);
+            }
+        }
         for (i = 0; i < cabs.length; i++) cabs[i].moveToBeginning();
         for (i = 0; i < D.tarjetas.length; i++) D.tarjetas[i].moveToBeginning();   // v10b: tarjetas de detalle sobre la presentadora
+        if (D.autodestruccion && cabs.length) autodestruir(cabs[cabs.length - 1], D.autodestruccion);
         // barrido magenta a la entrada de la ficha
         var sw = shp("barrido magenta"), g = grp(sw, "m"); linea(g, [[-700, -1100], [320, -1100], [90, 1100], [-930, 1100]], true); fill(g, MAG);
         P(sw).setValueAtTime(D.barrido - 0.25, [W + 1100, H / 2]); P(sw).setValueAtTime(D.barrido + 0.2, [-1100, H / 2]); vida(sw, D.barrido - 0.25, D.barrido + 0.25);
@@ -669,8 +684,38 @@ var COLLAGE = (function () {
         var tp = c.layers.add(imp("imagenes/texturas/Paper002_2k.jpg", false)); S(tp).setValue([H * 1.05 / tp.source.height * 100, H * 1.05 / tp.source.height * 100]); P(tp).setValue([W / 2, H / 2]); mult(tp, 8);
         var gn = c.layers.addSolid([0, 0, 0], "grano", W, H, 1, DUR); gn.adjustmentLayer = true; fx(gn, "ADBE Noise").property(1).setValue(6);
         for (i = 0; i < D.voces.length; i++) { var V = c.layers.add(imp(D.voces[i].wav, false)); V.name = D.voces[i].id + " voz"; V.startTime = D.voces[i].start; }
-        if (D.musica) { var mu = c.layers.add(imp(D.musica, false)); mu.name = "Musica"; mu.outPoint = DUR; var nv = D.musica.indexOf("elegida") >= 0 ? 0 : -13.2, al = mu.property("Audio").property("Audio Levels"); al.setValueAtTime(0, [nv, nv]); al.setValueAtTime(Math.max(0, DUR - 1.8), [nv, nv]); al.setValueAtTime(DUR, [-48, -48]);   // v10c: musica propia ya normalizada; se apaga al final }
+        if (D.musica) { var mu = c.layers.add(imp(D.musica, false)); mu.name = "Musica"; mu.outPoint = DUR; var nv = D.musica.indexOf("elegida") >= 0 ? 0 : -13.2, al = mu.property("Audio").property("Audio Levels"); al.setValueAtTime(0, [nv, nv]); al.setValueAtTime(Math.max(0, DUR - 1.8), [nv, nv]); al.setValueAtTime(DUR, [-48, -48]); }   // v10c: musica propia ya normalizada; se apaga al final
         return "ok " + c.numLayers + " capas\n" + D.medidas.join("\n");
+    }
+    // la firma del final: el narrador se autodestruye de una forma ligada a la historia (1.6 s antes del final)
+    function autodestruir(L, tipo) {
+        var t0 = DUR - 1.7, t1 = DUR - 0.25, op = O(L);
+        for (var i = c.numLayers; i >= 1; i--) if (c.layer(i).name.indexOf("copia menta") === 0 && c.layer(i).outPoint > t0) c.layer(i).outPoint = t0;
+        try {
+            if (tipo === "static_dissolve" || tipo === "glitch_out") {
+                var td = fx(L, "ADBE Turbulent Displace"); td.property("Amount").setValueAtTime(t0, 0); td.property("Amount").setValueAtTime(t1, 260); td.property("Size").setValue(18);
+                td.property("Evolution").expression = "time*900;";
+                var nz = fx(L, "ADBE Noise"); nz.property(1).setValueAtTime(t0, 0); nz.property(1).setValueAtTime(t1, 100);
+                op.expression = "time<" + t0 + "?value: (posterizeTime(15), Math.max(0, 1-(time-" + t0 + ")/" + (t1 - t0) + ")*(random()>0.25?100:15));";
+            } else if (tipo === "melt") {
+                var sc = S(L), v = sc.value; sc.setValueAtTime(t0, v); sc.setValueAtTime(t1, [v[0] * 1.06, v[1] * 1.35]);
+                var tm = fx(L, "ADBE Turbulent Displace"); tm.property("Amount").setValueAtTime(t0, 0); tm.property("Amount").setValueAtTime(t1, 180); tm.property("Size").setValue(60);
+                op.setValueAtTime(t1 - 0.4, op.value); op.setValueAtTime(t1, 0);
+            } else if (tipo === "burn") {
+                var bf = fx(L, "CC Burn Film"); bf.property("Evolution").setValueAtTime(t0, 0); bf.property("Evolution").setValueAtTime(t1, 110);
+            } else if (tipo === "sparks") {
+                var pw = fx(L, "CC Particle World"); pw.property("Birth Rate").setValueAtTime(t0, 0); pw.property("Birth Rate").setValueAtTime(t0 + 0.2, 8); pw.property("Birth Rate").setValueAtTime(t1, 0);
+                op.expression = "time<" + t0 + "?value: (posterizeTime(20), Math.max(0, 1-(time-" + t0 + ")/" + (t1 - t0) + ")*(random()>0.4?100:0));";
+            } else if (tipo === "smoke") {
+                var fb = fx(L, "ADBE Fast Box Blur"); fb.property(1).setValueAtTime(t0, 0); fb.property(1).setValueAtTime(t1, 40);
+                var ts = fx(L, "ADBE Turbulent Displace"); ts.property("Amount").setValueAtTime(t0, 0); ts.property("Amount").setValueAtTime(t1, 140); ts.property("Size").setValue(120);
+                op.setValueAtTime(t0, op.value); op.setValueAtTime(t1, 0);
+            }
+        } catch (e) { op.setValueAtTime(t0, op.value); op.setValueAtTime(t1, 0); }   // efecto no disponible: al menos se apaga
+        if (D.estatica && (tipo === "static_dissolve" || tipo === "glitch_out")) {
+            var st = c.layers.add(imp(D.estatica, false)); st.name = "estatica final"; S(st).setValue([W / st.source.width * 105, H / st.source.height * 105]); P(st).setValue([W / 2, H / 2]);
+            st.blendingMode = BlendingMode.SCREEN; O(st).setValueAtTime(t0 + 0.4, 0); O(st).setValueAtTime(t1, 85); O(st).setValueAtTime(DUR, 100); vida(st, t0 + 0.4, DUR);
+        }
     }
     function subtitulos() {
         var L = D.subs, Y = D.yBarra;

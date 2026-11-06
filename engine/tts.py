@@ -6,13 +6,14 @@ import base64, json, sys, urllib.request
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
-from comun import clave_eleven, parecido, proyecto, texto_oido  # noqa: E402
+from comun import clave_eleven, parecido, personaje, proyecto, texto_oido  # noqa: E402
 
 carpeta = Path(sys.argv[1])
 pj = proyecto(carpeta)
 vo = carpeta / "vo"
 vo.mkdir(exist_ok=True)
 H = {"xi-api-key": clave_eleven(), "Content-Type": "application/json"}
+VOZ = personaje(pj).get("voz", {}) if pj.get("personaje") else {}
 for ln in pj["lineas"]:
     mp3 = vo / f"{ln['id']}.mp3"
     if mp3.exists():
@@ -33,5 +34,8 @@ for ln in pj["lineas"]:
             break
     mejor = max(tomas)[1]
     mejor.replace(mp3)
+    if VOZ.get("procesado") == "ultratumba":   # personaje "de ultratumba": tono mas bajo, cripta, eco (voz_ultratumba.py)
+        from voz_ultratumba import procesar
+        crudo = mp3.with_name(mp3.stem + "_crudo.mp3"); mp3.replace(crudo); procesar(crudo, mp3, VOZ.get("semitonos", 2.0))
     for _, t in tomas:
         t.unlink(missing_ok=True)

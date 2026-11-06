@@ -13,7 +13,7 @@ import numpy as np
 from PIL import Image
 
 sys.path.insert(0, str(Path(__file__).parent))
-from comun import CFG, KIT, MOTION_DNA  # noqa: E402
+from comun import CFG, KIT, MOTION_DNA, buscar, marca_dir  # noqa: E402
 
 carpeta = Path(sys.argv[1]).resolve()
 HERE = Path(__file__).parent
@@ -397,12 +397,16 @@ for i, s in enumerate(subs):
     s["fin"] = round(min(nxt, s["words"][-1]["e"] + 0.5, total), 3)
 
 marcos = {m: abertura(Path(G) / "alfa3" / f"{m}.png") for m in MARCOS}
-RETRATO = (carpeta / "retrato_recorte.png").as_posix()   # el retrato del artista recortado (etapa "retrato")
+RETRATO = (carpeta / "retrato_recorte.png").as_posix()
+ESTILO = json.loads(buscar("styles", pj.get("estilo", "collage_v10c"), pj.get("marca")).read_text(encoding="utf-8"))   # colores, glitch, sonidos
+_est = marca_dir(pj.get("marca")) / "kit" / "fondo_estatica.png"
+ESTATICA = _est.as_posix() if _est.exists() else ""   # el retrato del artista recortado (etapa "retrato")
 OBRAS_ARTISTA = [(carpeta / "obras" / f).as_posix() for f in sorted(os.listdir(carpeta / "obras")) if f.endswith(".jpg") and not f.startswith("00_")
                  and aspecto(carpeta / "obras" / f) >= 0.8]   # sin obras muy altas: dentro de la silueta suben hasta la cara
 DATA = {"retrato": RETRATO, "obrasArtista": OBRAS_ARTISTA, "piezasRelleno": piezas(ENJAMBRE, 18) + piezas(CORRIENTE, 8), "comp": COMP, "total": total, "secciones": secciones, "subs": subs, "yBarra": Y_BARRA, "marcos": marcos, "numero": f"{pj['numero']:02d}",
         "artista": pj["artista"], "fechas": pj["fechas"], "lema": pj["lema"], "barrido": fz0, "musica": MUSICA,
-        "voces": [{"id": s["id"], "wav": Path(s["wav"]).as_posix(), "start": s["start"]} for s in segs], "desaturar": 0, "kit": KIT}
+        "voces": [{"id": s["id"], "wav": Path(s["wav"]).as_posix(), "start": s["start"]} for s in segs], "desaturar": 0, "kit": KIT,
+        "estilo": ESTILO, "estatica": ESTATICA, "autodestruccion": (pj.get("autodestruccion") or {}).get("tipo")}
 (carpeta / "datos_ae.json").write_text(json.dumps(DATA, indent=1), encoding="utf-8")
 print(COMP, "|", len(secciones), "secciones |", len(subs), "subtitulos | total", total)
 print("subtitulos:", " / ".join(" ".join(w["w"] for w in s["words"]) for s in subs))
@@ -471,6 +475,12 @@ for i, sec in enumerate(secciones):
     if sec["tipo"] == "ficha":
         cues.append({"t": round(sec["ini"] + 0.65, 3), "sfx": "shimmer", "gain": -8, "why": "la silueta se llena"})
 cues.append({"t": 0.38, "sfx": "hit", "gain": -5, "why": "gancho"})
+if DATA.get("autodestruccion"):   # la firma del final
+    cues.append({"t": round(total - 1.7, 3), "sfx": "glitch", "gain": -4, "why": "autodestruccion"})
+    cues.append({"t": round(total - 1.2, 3), "sfx": "sub", "gain": -6, "why": "autodestruccion"})
+SON = ESTILO.get("sonidos", {})   # el estilo puede cambiar cada sonido (p. ej. whoosh -> glitch en un canal de terror)
+for c_ in cues:
+    c_["sfx"] = SON.get(c_["sfx"], c_["sfx"])
 cues.sort(key=lambda c: c["t"])
 print(str(M.t_add_sound(cues=cues, comp=COMP, auto=False))[:160])
 print(M.t_check_layout(comps=[COMP]))
