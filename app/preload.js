@@ -4,6 +4,7 @@ contextBridge.exposeInMainWorld("api", {
   library: (b) => ipcRenderer.invoke("library", b),
   projects: (b) => ipcRenderer.invoke("projects", b),
   folders: (b) => ipcRenderer.invoke("folders", b),
+  assetsOf: (b) => ipcRenderer.invoke("assetsOf", b),
   brands: () => ipcRenderer.invoke("brands"),
   saveBrand: (b) => ipcRenderer.invoke("saveBrand", b),
   run: (script, args, tag) => ipcRenderer.invoke("run", { script, args, tag }),

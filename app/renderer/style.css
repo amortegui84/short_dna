@@ -58,3 +58,37 @@ video { max-height: 520px; border-radius: 8px; }
 .step ol li { margin: 3px 0; }
 td .sub { color: var(--mute); font-size: 12px; }
 a { color: var(--teal); }
+/* nav connections: names, not only dots */
+#conn-mini { display: block; padding: 6px 4px; font-size: 11px; color: var(--mute); max-height: 46vh; overflow: auto; }
+#conn-mini .ttl { font-weight: 600; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 4px; cursor: pointer; }
+#conn-mini .c { display: flex; align-items: center; gap: 6px; padding: 1px 0; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#conn-mini .c.ok { color: var(--ink); }
+#conn-mini .dot { width: 8px; height: 8px; flex: none; }
+/* start: how a video gets made */
+.flow { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; }
+.flow .step p { font-size: 12px; color: var(--mute); margin: 6px 0 0; }
+.flow .step.link { cursor: pointer; } .flow .step.link:hover { border-color: var(--teal); }
+/* library: clickable items and a detail panel with examples */
+.items { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px; }
+.items .item { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; cursor: pointer; }
+.items .item:hover { border-color: var(--teal); } .items .item .sub { color: var(--mute); font-size: 12px; margin-top: 3px; }
+.detail { margin-top: 22px; border-top: 1px solid var(--line); padding-top: 6px; }
+.detail .sub { color: var(--mute); font-size: 12px; } .detail img.sheet { max-width: 100%; border-radius: 8px; margin: 6px 0; cursor: zoom-in; }
+/* in-app player */
+dialog.player { background: #0d1010; color: var(--ink); border: 1px solid var(--line); border-radius: 12px; padding: 12px; width: min(560px, 92vw); }
+dialog.player::backdrop { background: rgba(0,0,0,.7); }
+dialog.player .head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+dialog.player video { width: 100%; max-height: 72vh; background: #000; border-radius: 8px; display: block; }
+dialog.player .sub { color: var(--mute); font-size: 12px; margin: 6px 0 0; }
+/* assets: groups of tiles (images, videos, audio) */
+details.agroup { margin: 8px 0; } details.agroup > summary { cursor: pointer; color: var(--mute); font-size: 13px; padding: 4px 0; }
+details.agroup > summary a { margin-left: 10px; font-size: 12px; }
+details.agroup.ep { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 6px 12px; }
+details.agroup.ep > summary { color: var(--ink); font-size: 14px; }
+.assets { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; margin: 6px 0 10px; }
+.asset { background: #0d1010; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; }
+.asset:hover { border-color: var(--teal); }
+.asset img, .asset video { width: 100%; aspect-ratio: 1; object-fit: contain; background: repeating-conic-gradient(#1a1f1f 0 25%, #141818 0 50%) 0 0 / 16px 16px; cursor: zoom-in; display: block; }
+.asset.audio { grid-column: span 2; } .asset audio { width: 100%; margin: 8px 0 0; }
+.asset .nm { font-size: 11px; color: var(--mute); padding: 4px 6px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.asset .acts { display: flex; gap: 4px; padding: 4px 6px 6px; } .asset .acts button { font-size: 11px; padding: 2px 6px; }

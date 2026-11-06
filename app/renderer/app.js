@@ -61,7 +61,13 @@ async function runFactory(slug, extra = []) {
 }
 
 // ---------- connections
-function paintMini() { $("#conn-mini").replaceChildren(...STATUS.map((s) => h("span", { class: "dot " + (s.ok === null ? "unk" : s.ok ? "ok" : "bad"), title: s.name + ": " + s.detail }))); }
+// the nav's connection list: every service by name with its state; the full table (with what to do) is on Start
+function paintMini() {
+  const st = (s) => (s.ok === null ? "unk" : s.ok ? "ok" : "bad");
+  const on = STATUS.filter((s) => s.ok).length;
+  $("#conn-mini").replaceChildren(h("div", { class: "ttl", title: "Open Start to see the details", onclick: () => show("home") }, `Connections ${on}/${STATUS.length}`),
+    ...STATUS.map((s) => h("div", { class: "c " + st(s), title: s.detail, onclick: () => show("home") }, h("span", { class: "dot " + st(s) }), s.name.replace(/ \(.*\)$/, ""))));
+}
 async function refreshStatus() { STATUS = await window.api.status(); paintMini(); return STATUS; }
 
 // ---------- views
@@ -77,6 +83,13 @@ V.home = async () => {
       h("div", { class: "card", onclick: go("character") }, h("div", { class: "k" }, "Character"), h("p", {}, "Pick one, describe a new one, or let Claude propose one for your idea.")),
       h("div", { class: "card", onclick: go("assets") }, h("div", { class: "k" }, "Assets"), h("p", {}, "Images, props and backgrounds with local models or paid APIs (cost first).")),
       h("div", { class: "card", onclick: go("platforms") }, h("div", { class: "k" }, "Platforms"), h("p", {}, "Strategy, hooks and a series plan for TikTok, Reels, Shorts and more."))),
+    h("h2", {}, "How a new video gets made"),
+    h("div", { class: "flow" }, [
+      ["1 · New Short", "You give the topic, platforms, character, style and length. The app creates the project folder (factory.py new).", "short"],
+      ["2 · Claude: research + script", "In the side panel Claude researches with sources, picks the hooks and writes proyecto.json, then STOPS for your OK.", null],
+      ["3 · Projects → Run next", "factory.py run generates it stage by stage (voice, clips, matte, music, After Effects, render, QC). Paid steps show their cost first.", "projects"],
+      ["4 · Review", "Watch it in Projects. A fix (one clip, a line) re-runs only the stages after it.", "projects"],
+      ["5 · Publish", "YouTube and TikTok private first, then public; Instagram on your OK.", "publish"]].map(([t, d, v]) => h("div", { class: "step" + (v ? " link" : ""), onclick: v ? go(v) : null }, h("b", {}, t), h("p", {}, d)))),
     h("h2", {}, "Connections"),
     h("table", { class: "status" }, st.map((s) => h("tr", {}, h("td", {}, h("span", { class: "dot " + (s.ok === null ? "unk" : s.ok ? "ok" : "bad") })), h("td", {}, s.name), h("td", {}, s.detail)))),
     h("div", { class: "row" }, h("button", { class: "ghost", onclick: () => show("home") }, "Refresh"), h("button", { class: "ghost", onclick: () => askClaude("Check the connections: call ae_status (Motion DNA), blender_status (Motion DNA Blender) and tell me which MCP servers and claude.ai connectors (Figma, Krea, Flora) are available in this session.") }, "Ask Claude to test MCP"))];
@@ -184,12 +197,48 @@ V.character = async () => {
     h("div", { class: "row" }, h("button", { class: "mag", onclick: () => askClaude(PROMPTS.characterPropose({ idea: idea.value, platforms: [] }), true) }, "Propose 3 characters"))];
 };
 
+// a big view of one image
+function viewer(p) {
+  const close = () => { d.close(); d.remove(); };
+  const d = h("dialog", { class: "player" }, h("div", { class: "head" }, h("b", {}, p.split(/[\\/]/).pop()), h("button", { class: "ghost", onclick: close }, "Close")),
+    h("img", { src: fileUrl(p), style: "width:100%;max-height:74vh;object-fit:contain;background:#000;border-radius:8px" }),
+    h("div", { class: "row" }, h("button", { class: "ghost", onclick: () => window.api.open(p) }, "Open"), h("button", { class: "ghost", onclick: () => window.api.open(p.replace(/[\\/][^\\/]*$/, "")) }, "Folder")));
+  d.addEventListener("cancel", close); document.body.append(d); d.showModal();
+}
+
 V.assets = async () => {
   const st = { provider: "comfy_klein", size: "768x1344", cutout: false, n: 1 }; const prompt = h("textarea", { rows: 3, placeholder: "an antique brass magnifying glass on paper, studio light, isolated" });
   const name = h("input", { placeholder: "lupa_laton" }); const refs = []; const out = h("div", { class: "looks" });
-  const f = await window.api.folders();
+  const A = await window.api.assetsOf(BRAND);
   const viaMcp = (p) => p === "krea" || p === "flora";
-  return [h("h1", {}, "Assets"), h("p", { class: "lead" }, "Props, backgrounds, stickers, textures. Local models cost nothing; paid APIs show the estimate first. Krea and Flora run through Claude's MCP connectors."),
+  const addRef = (p) => { refs.push(p); out.append(h("div", { class: "look" }, h("img", { src: fileUrl(p) }), h("span", {}, "reference"))); prompt.scrollIntoView({ behavior: "smooth" }); };
+  // one tile per file: images open big, videos play in the player, audio plays inline; each can feed the generator or Claude
+  const tile = (f, all) => {
+    const media = f.kind === "image" ? h("img", { src: fileUrl(f.path), loading: "lazy", onclick: () => viewer(f.path) })
+      : f.kind === "video" ? h("video", { src: fileUrl(f.path) + "#t=1", preload: "metadata", muted: "", onmouseenter: (e) => { e.target.muted = true; e.target.play(); }, onmouseleave: (e) => e.target.pause(),
+        onclick: () => { const vs = all.filter((x) => x.kind === "video"); player(vs.map((x) => ({ video: x.path, label: x.name })), vs.indexOf(f), "Assets"); } })
+      : h("audio", { src: fileUrl(f.path), controls: "", preload: "none" });
+    return h("div", { class: "asset " + f.kind }, media, h("div", { class: "nm", title: f.path }, f.name),
+      h("div", { class: "acts" }, f.kind === "image" ? h("button", { class: "ghost", title: "Use it as a reference in the generator above", onclick: () => addRef(f.path) }, "Ref") : "",
+        f.kind !== "audio" ? h("button", { class: "ghost", title: "Ask Claude for variations or a matching set", onclick: () => askClaude(PROMPTS.assetLike({ brand: BRAND, file: f.path, dir: BDIR() + "/kit" })) }, "More like this") : ""));
+  };
+  const block = (g) => h("details", { class: "agroup", open: "" }, h("summary", {}, `${g.group}  ·  ${g.files.length}`, h("a", { href: "#", onclick: (e) => { e.preventDefault(); window.api.open(g.dir); } }, "folder")),
+    h("div", { class: "assets" }, g.files.map((f) => tile(f, g.files))));
+  const nFiles = (gs) => gs.reduce((n, g) => n + g.files.length, 0);
+  return [h("h1", {}, "Assets"), h("p", { class: "lead" }, "Everything this brand's videos are built from: the brand kit (props, backgrounds, loops, effects), music and voice, and each episode's artworks, reconstructions, start frames and sound. Click to see or play it; ask Claude for more or for what is missing."),
+    h("div", { class: "row" },
+      h("button", { onclick: () => askClaude(PROMPTS.assetSuggest({ brand: BRAND, dir: BDIR() })) }, "Suggest what is missing"),
+      h("button", { class: "ghost", onclick: () => window.api.open(A.dir + "/kit") }, "Open kit folder")),
+    (() => { const ask = h("input", { placeholder: "Ask Claude for assets: e.g. 5 old evidence photos, a burnt paper texture, a VHS tracking loop" });
+      return h("div", { class: "row" }, ask, h("button", { class: "ghost", onclick: () => { if (ask.value.trim()) askClaude(PROMPTS.assetRequest({ brand: BRAND, dir: BDIR() + "/kit", what: ask.value.trim() })); } }, "Ask")); })(),
+    h("h2", {}, `Brand kit and library  ·  ${nFiles(A.groups)} files`),
+    A.groups.length ? A.groups.map(block) : h("p", { class: "lead" }, "No assets yet for this brand: generate some below or ask Claude to suggest a kit."),
+    h("h2", {}, "By episode"),
+    A.episodes.length ? A.episodes.map((ep) => h("details", { class: "agroup ep" }, h("summary", {}, h("b", {}, ep.slug), `  ${ep.tema || ""}  ·  ${nFiles(ep.groups)} files`),
+      ep.creditos ? h("p", { class: "sub" }, `Sources and licences: ${ep.creditos.fuente || ""} — ${ep.creditos.licencia || ""} (obras/CREDITOS.json)`) : "",
+      ep.groups.map(block),
+      h("div", { class: "row" }, h("button", { class: "ghost", onclick: () => askClaude(PROMPTS.assetEpisode({ brand: BRAND, slug: ep.slug, dir: ep.dir })) }, "Ask Claude for assets for this episode")))) : h("p", { class: "lead" }, "No episodes yet."),
+    h("h2", {}, "Generate an asset"), h("p", { class: "lead" }, "Props, backgrounds, stickers, textures. Local models cost nothing; paid APIs show the estimate first. Krea and Flora run through Claude's MCP connectors. “Ref” on any tile above adds it as a reference."),
     h("div", { class: "grid2" }, h("div", {}, h("label", {}, "Prompt"), prompt, h("label", {}, "File name"), name,
       h("div", { class: "row" }, h("button", { class: "ghost", onclick: async () => { const p = await window.api.pickFile([{ name: "Image", extensions: ["png", "jpg", "jpeg", "webp"] }]); if (p) { refs.push(p); out.append(h("div", { class: "look" }, h("img", { src: fileUrl(p) }), h("span", {}, "reference"))); } } }, "Add reference image"))),
       h("div", {}, h("label", {}, "Provider"), sel([["qwen_layered", "Qwen-Image-Layered · local, alpha"], ["comfy_klein", "Flux Klein · local"], ["zimage", "Z-Image · local"], ["qwen_style", "Qwen style transfer · local (ref 1 = photo, ref 2 = style)"], ["nano_banana", "Nano Banana · paid"], ["generic_http", "Generic API · paid"], ["krea", "Krea · MCP, paid"], ["flora", "Flora · MCP, paid"]], st.provider, (v) => st.provider = v),
@@ -207,8 +256,7 @@ V.assets = async () => {
         const r = await window.api.run("assets", ["--provider", st.provider, "--prompt", prompt.value, "--out", `${dest}/${name.value}_${i + 1}.png`, "--size", st.size, "--seed", String(7 + i), ...(refs.length ? ["--refs", ...refs] : []), ...(st.cutout ? ["--cutout"] : [])], "asset");
         const p = r.out.trim().split("\n").pop(); if (!r.code) out.append(h("div", { class: "look" }, h("img", { src: fileUrl(p) }), h("span", {}, p.split(/[\\/]/).pop())));
       }
-    } }, "Generate")), out,
-    h("h2", {}, "Asset folders"), h("div", { class: "cards" }, f.assets.map((a) => h("div", { class: "card", onclick: () => window.api.open(a.dir) }, h("h3", {}, a.slug), h("p", {}, a.files.length + " files"))))];
+    } }, "Generate")), out];
 };
 
 V.platforms = async () => {
@@ -229,21 +277,23 @@ V.projects = async () => {
   const names = ["research", "script", "design", "obras", "retrato", "look", "inicios", "voz", "clips", "sts", "montaje", "mates", "musica", "ae", "render", "qc", "collect"];
   const url = (p) => "file:///" + encodeURI(p.split("\\").join("/"));
   const day = (ms) => new Date(ms).toLocaleDateString(undefined, { day: "numeric", month: "short" });
+  const vids = ps.filter((x) => x.video);
+  const play = (p) => player(vids.map((x) => ({ video: x.video, label: `${x.slug} — ${x.tema || ""}` })), vids.indexOf(p), "Projects");
   const card = (p) => {
     const n = names.filter((x) => p.done.includes(x)).length;
     const thumb = p.video
-      ? h("video", { src: url(p.video) + "#t=3", preload: "metadata", playsinline: "", onmouseenter: (e) => { e.target.muted = true; e.target.play(); }, onmouseleave: (e) => e.target.pause(), onclick: () => window.api.open(p.video) })
+      ? h("video", { src: url(p.video) + "#t=3", preload: "metadata", playsinline: "", onmouseenter: (e) => { e.target.muted = true; e.target.play(); }, onmouseleave: (e) => e.target.pause(), onclick: () => play(p) })
       : h("div", { class: "empty" }, "No video yet");
     return h("div", { class: "vid" }, thumb,
       h("div", { class: "meta" }, h("b", {}, p.slug), h("span", { class: "tag" + (p.final ? " on" : "") }, p.video ? (p.final ? "Final" : "Draft") : `${n}/${names.length} stages`)),
       h("p", {}, p.tema || ""),
       h("p", { class: "sub" }, [p.estilo, p.video ? `${p.mb} MB` : "", day(p.when)].filter(Boolean).join(" · ")),
       h("details", {}, h("summary", {}, `Stages ${n}/${names.length}`), h("div", { class: "chips" }, names.map((x) => h("span", { class: p.done.includes(x) ? "on" : "" }, x)))),
-      h("div", { class: "row" }, p.video ? h("button", { onclick: () => window.api.open(p.video) }, "Play") : h("button", { onclick: () => runFactory(p.slug) }, "Run next"),
+      h("div", { class: "row" }, p.video ? h("button", { onclick: () => play(p) }, "▶ Play") : h("button", { onclick: () => runFactory(p.slug) }, "Run next"),
         h("button", { class: "ghost", onclick: () => window.api.open(p.dir) }, "Folder"),
         h("button", { class: "ghost", onclick: () => askClaude(PROMPTS.run({ slug: p.slug })) }, "With Claude")));
   };
-  return [h("h1", {}, "Projects"), h("p", { class: "lead" }, "Every video of this brand, newest first. Hover to preview, click to play the finished cut; each one is a folder in work_dir with everything that made it."),
+  return [h("h1", {}, "Projects"), h("p", { class: "lead" }, "Every video of this brand, newest first. Hover to preview, click to play it here (play/pause, speed, next); each one is a folder in work_dir with everything that made it."),
     ps.length ? h("div", { class: "gallery" }, ps.map(card)) : h("p", { class: "lead" }, "No projects yet: start with Topic → Short.")];
 };
 
@@ -318,16 +368,61 @@ V.publish = async () => {
       "The links are saved in the episode's publicado.json and show up here."].map((x) => h("li", {}, x)))];
 };
 
-V.library = async () => [h("h1", {}, "Library"), h("p", { class: "lead" }, "What the system knows: styles, techniques and templates (library/), model notes (docs/models/), every lesson (docs/LEARNINGS.md)."),
-  h("h2", {}, "Styles"), h("table", {}, LIB.styles.map((s) => h("tr", {}, h("td", {}, h("b", {}, s.nombre)), h("td", {}, h("div", {}, Object.values(s.tokens || {}).filter((v) => typeof v === "string").map((c) => h("span", { class: "sw", style: "background:" + c }))), (s.reglas || []).slice(0, 4).join(" · "))))),
-  h("h2", {}, "Techniques"), h("table", {}, LIB.techniques.map((t) => h("tr", {}, h("td", {}, h("b", {}, t.nombre)), h("td", {}, t.uso), h("td", {}, t.como)))),
-  h("h2", {}, "Templates"), h("table", {}, LIB.templates.map((t) => h("tr", {}, h("td", {}, h("b", {}, t.nombre)), h("td", {}, (t.estructura || []).map((s) => s.seccion).join(" → ")))))];
+// ---------- in-app player: play/pause, scrub, volume, speed; a list of clips to step through
+function player(items, start = 0, title = "") {
+  let i = start;
+  const vid = h("video", { controls: "", autoplay: "", playsinline: "" });
+  const cap = h("p", { class: "sub" });
+  const speed = sel([["0.5", "0.5×"], ["1", "1×"], ["1.5", "1.5×"], ["2", "2×"]], "1", (v) => vid.playbackRate = +v);
+  const load = () => { const it = items[i]; vid.src = fileUrl(it.video); vid.playbackRate = +speed.value; cap.textContent = `${it.label}${items.length > 1 ? `  ·  ${i + 1}/${items.length}` : ""}`; };
+  const close = () => { vid.pause(); d.close(); d.remove(); };
+  const d = h("dialog", { class: "player" }, h("div", { class: "head" }, h("b", {}, title), h("button", { class: "ghost", onclick: close }, "Close")), vid, cap,
+    h("div", { class: "row" },
+      items.length > 1 ? h("button", { class: "ghost", onclick: () => { i = (i - 1 + items.length) % items.length; load(); } }, "◀ Previous") : "",
+      h("button", { onclick: () => (vid.paused ? vid.play() : vid.pause()) }, "Play / Pause"),
+      items.length > 1 ? h("button", { class: "ghost", onclick: () => { i = (i + 1) % items.length; load(); } }, "Next ▶") : "",
+      h("label", { class: "small" }, "Speed ", speed),
+      h("button", { class: "ghost", onclick: () => window.api.open(items[i].video) }, "Open in system player")));
+  d.addEventListener("cancel", close);
+  d.addEventListener("keydown", (e) => { if (e.key === " " && e.target === d) { e.preventDefault(); vid.paused ? vid.play() : vid.pause(); } });
+  document.body.append(d); d.showModal(); load();
+}
+
+// ---------- library: every item opens with what it is and a playable example (finished videos that used it)
+V.library = async () => {
+  const ex = LIB.examples || [];
+  const clip = (e) => ({ video: e.video, label: `${e.brand} / ${e.slug} — ${e.tema || ""}` });
+  const detail = h("div", { class: "detail" }, h("p", { class: "lead" }, "Click a style, template or technique to see what it is and play an example."));
+  const show1 = (title, body, clips, sheets = []) => {
+    detail.replaceChildren(h("h2", {}, title), ...body,
+      clips.length ? h("div", { class: "gallery" }, clips.map((c, k) => h("div", { class: "vid" },
+        h("video", { src: fileUrl(c.video) + "#t=3", preload: "metadata", muted: "", onmouseenter: (e) => { e.target.muted = true; e.target.play(); }, onmouseleave: (e) => e.target.pause(), onclick: () => player(clips, k, title) }),
+        h("p", { class: "sub" }, c.label), h("div", { class: "row" }, h("button", { onclick: () => player(clips, k, title) }, "▶ Play")))))
+        : sheets.length ? h("div", {}, h("p", { class: "sub" }, "No video yet; contact sheets of earlier examples:"), sheets.map((f) => h("img", { class: "sheet", src: fileUrl(f), onclick: () => window.api.open(f) })))
+        : h("p", { class: "sub" }, "No finished video uses it yet. Make one from New Short and it shows up here."));
+    detail.scrollIntoView({ behavior: "smooth" });
+  };
+  const item = (name, sub, onclick) => h("div", { class: "item", onclick }, h("b", {}, name), h("div", { class: "sub" }, sub));
+  const swatches = (s) => h("div", {}, Object.values(s.tokens || {}).filter((v) => typeof v === "string" && v.startsWith("#")).map((c) => h("span", { class: "sw", style: "background:" + c })));
+  return [h("h1", {}, "Library"), h("p", { class: "lead" }, "What the system knows: styles, templates and techniques (library/ and this brand's own folders). Each one plays the finished videos that used it."),
+    h("h2", {}, "Styles"), h("div", { class: "items" }, LIB.styles.map((s) => {
+      const clips = ex.filter((e) => e.estilo === s.slug).map(clip);
+      return item(s.nombre || s.slug, `${clips.length} video${clips.length === 1 ? "" : "s"}`, () => show1(s.nombre || s.slug, [swatches(s), h("p", {}, s.descripcion || ""), h("ul", {}, (s.reglas || []).slice(0, 8).map((r) => h("li", {}, r)))], clips, s.hojas || []));
+    })),
+    h("h2", {}, "Templates"), h("div", { class: "items" }, LIB.templates.map((t) => {
+      const clips = ex.filter((e) => e.plantilla === t.slug).map(clip);
+      return item(t.nombre || t.slug, `${clips.length} video${clips.length === 1 ? "" : "s"}`, () => show1(t.nombre || t.slug, [h("p", {}, (t.estructura || []).map((x) => x.seccion).join(" → "))], clips));
+    })),
+    h("h2", {}, "Techniques"), h("div", { class: "items" }, LIB.techniques.map((t) => item(t.nombre, t.uso || "", () => show1(t.nombre, [h("p", {}, h("b", {}, "Use: "), t.uso || ""), h("p", {}, h("b", {}, "How: "), t.como || ""), h("p", { class: "sub" }, "Code: " + (t.donde || ""))],
+      ex.filter((e) => (t.estilos || []).includes(e.estilo)).map(clip))))),
+    detail];
+};
 
 async function show(v) {
   document.querySelectorAll("#nav button[data-view]").forEach((b) => b.classList.toggle("on", b.dataset.view === v));
   LIB = await window.api.library(BRAND);
   $("#view").replaceChildren(h("p", { class: "lead" }, "…"));
-  $("#view").replaceChildren(...(await V[v]()));
+  $("#view").replaceChildren(...(await V[v]()).flat(Infinity).filter((x) => x !== "" && x != null));
 }
 document.querySelectorAll("#nav button[data-view]").forEach((b) => b.onclick = () => show(b.dataset.view));
 // ---------- brand selector: every view works inside the chosen brand (brands/<brand>/...)

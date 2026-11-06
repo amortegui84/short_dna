@@ -56,7 +56,7 @@ ipcMain.handle("status", async () => {
     { id: "klein", name: "ComfyUI Klein", ok: await ping(CFG.comfy_klein.url + "/system_stats"), detail: CFG.comfy_klein.url },
     { id: "qwen", name: "QwenStudio", ok: CFG.qwen ? await ping(CFG.qwen.url) : false, detail: CFG.qwen ? CFG.qwen.url : "not configured" },
   ];
-  for (const [id, name] of [["ELEVENLABS_API_KEY", "ElevenLabs"], ["GEMINI_API_KEY", "Nano Banana (Gemini)"], ["SEEDANCE_API_KEY", "Seedance"], ["SUNO_API_KEY", "Suno"], ["ASSETS_API_KEY", "Generic asset API"]])
+  for (const [id, name] of [["ELEVENLABS_API_KEY", "ElevenLabs"], ["GEMINI_API_KEY", "Nano Banana (Gemini)"], ["SEEDANCE_API_KEY", "Seedance"], ["SUNO_API_KEY", "Suno"], ["ASSETS_API_KEY", "Generic asset API"], ["POSTWIRE_API_KEY", "PostWire (TikTok)"]])
     s.push({ id, name, ok: !!k[id], detail: k[id] ? "key present" : "no key in " + CFG.env_file });
   return s;
 });
@@ -76,7 +76,20 @@ ipcMain.handle("library", (e, brand) => {
   const templates = both("templates").map(([b, t]) => readJSON(path.join(b, t, "template.json"))).filter(Boolean);
   const pdir = path.join(L, "platforms");
   const platforms = fs.existsSync(pdir) ? fs.readdirSync(pdir).filter((f) => f.endsWith(".json")).map((f) => readJSON(path.join(pdir, f))) : [];
-  return { chars, styles, templates, platforms, hooks: readJSON(path.join(L, "hooks.json"), []), techniques: readJSON(path.join(L, "techniques/techniques.json"), []) };
+  // finished videos of every brand, so the library can play an example of each style and template
+  const examples = [];
+  for (const b of listDirs(BRANDS)) {
+    const W = path.join(BRANDS, b, "proyectos");
+    for (const d of listDirs(W)) {
+      const pj = readJSON(path.join(W, d, "proyecto.json"), null); if (!pj) continue;
+      const base = pj.slug || d;
+      const video = [`${base}_AE.mp4`, `${base}.mp4`].map((f) => path.join(W, d, f)).find((f) => fs.existsSync(f));
+      if (video) examples.push({ brand: b, slug: d, tema: pj.tema || pj.artista, estilo: pj.estilo, plantilla: pj.plantilla, video });
+    }
+  }
+  // a style may also point to older example folders with a contact sheet (no video)
+  for (const s of styles) s.hojas = (s.ejemplos || []).map((e) => path.join(REPO, e, "contact_sheet.jpg")).filter((f) => fs.existsSync(f));
+  return { chars, styles, templates, platforms, examples, hooks: readJSON(path.join(L, "hooks.json"), []), techniques: readJSON(path.join(L, "techniques/techniques.json"), []) };
 });
 
 ipcMain.handle("projects", (e, brand) => {
@@ -105,6 +118,37 @@ ipcMain.handle("folders", (e, brand) => {
     out[k] = listDirs(p).map((d) => ({ slug: d, dir: path.join(p, d), files: fs.readdirSync(path.join(p, d)) }));
   }
   return out;
+});
+
+// every asset of a brand (kit, assets, references, music) and of each episode (artworks and reconstructions, start frames,
+// the self-destruct, music takes, sound), grouped by folder; folders starting with "_" (layers, discarded) are skipped
+const MEDIA = { image: /\.(png|jpe?g|webp|gif)$/i, video: /\.(mp4|mov|webm)$/i, audio: /\.(wav|mp3|m4a|ogg)$/i };
+const kindOf = (f) => Object.keys(MEDIA).find((k) => MEDIA[k].test(f));
+function mediaGroups(dir, label, depth = 2) {
+  const out = [];
+  const walk = (d, name, lvl) => {
+    if (!fs.existsSync(d)) return;
+    const ents = fs.readdirSync(d, { withFileTypes: true });
+    const files = ents.filter((e) => e.isFile() && kindOf(e.name)).map((e) => ({ path: path.join(d, e.name), name: e.name, kind: kindOf(e.name) }));
+    if (files.length) out.push({ group: name, dir: d, files });
+    if (lvl < depth) for (const e of ents) if (e.isDirectory() && !e.name.startsWith("_")) walk(path.join(d, e.name), name + " / " + e.name, lvl + 1);
+  };
+  walk(dir, label, 1);
+  return out;
+}
+ipcMain.handle("assetsOf", (e, brand) => {
+  const B = path.join(BRANDS, brand || "_general");
+  const groups = [...mediaGroups(path.join(B, "kit"), "Kit"), ...mediaGroups(path.join(B, "assets"), "Assets"),
+    ...mediaGroups(path.join(B, "references"), "References", 1), ...mediaGroups(path.join(B, "music"), "Music and voice", 2)];
+  const W = path.join(B, "proyectos");
+  const episodes = listDirs(W).filter((d) => fs.existsSync(path.join(W, d, "proyecto.json"))).map((d) => {
+    const P = path.join(W, d), pj = readJSON(path.join(P, "proyecto.json"), {});
+    return { slug: d, tema: pj.tema || pj.artista, dir: P, creditos: readJSON(path.join(P, "obras", "CREDITOS.json"), null),
+      groups: [...mediaGroups(path.join(P, "obras"), "Artworks and reconstructions", 1), ...mediaGroups(path.join(P, "inicios"), "Start frames", 1),
+        ...mediaGroups(path.join(P, "final"), "Self-destruct ending", 1), ...mediaGroups(path.join(P, "musica"), "Music takes", 1),
+        ...mediaGroups(path.join(P, "ae", "sound"), "Sound design", 1)] };
+  });
+  return { dir: B, groups, episodes };
 });
 
 // python: factory.py or engine/<script>.py, output streamed to the log
