@@ -14,6 +14,7 @@ const REPO = path.resolve(__dirname, "..");
 const cfgFile = fs.existsSync(path.join(REPO, "config/local.json")) ? "config/local.json" : "config/local.example.json";
 const CFG = JSON.parse(fs.readFileSync(path.join(REPO, cfgFile), "utf8"));
 const PY = CFG.python_tools || "python";
+const BRANDS = CFG.brands_dir || path.join(REPO, "brands");
 let win, session = null, abort = null;
 const pending = new Map();   // permission requests waiting for the user
 
@@ -60,23 +61,26 @@ ipcMain.handle("status", async () => {
   return s;
 });
 
-ipcMain.handle("library", () => {
-  const L = path.join(REPO, "library");
-  const chars = listDirs(path.join(L, "characters")).map((c) => {
-    const j = readJSON(path.join(L, "characters", c, "character.json"), {});
-    const d = path.join(L, "characters", c);
-    return { slug: c, nombre: j.nombre, descripcion: j.descripcion, maestro: path.join(d, j.maestro || ""),
+ipcMain.handle("library", (e, brand) => {
+  const L = path.join(REPO, "library"), B = brand ? path.join(BRANDS, brand) : null;
+  const both = (sub) => [...(B ? listDirs(path.join(B, sub)).map((n) => [path.join(B, sub), n, true]) : []), ...listDirs(path.join(L, sub)).map((n) => [path.join(L, sub), n, false])];
+  const jsonFiles = (sub) => [...(B && fs.existsSync(path.join(B, sub)) ? fs.readdirSync(path.join(B, sub)).filter((f) => f.endsWith(".json")).map((f) => path.join(B, sub, f)) : []),
+    ...fs.readdirSync(path.join(L, sub)).filter((f) => f.endsWith(".json")).map((f) => path.join(L, sub, f))];
+  const chars = both("characters").filter(([b, c]) => fs.existsSync(path.join(b, c, "character.json"))).map(([b, c, own]) => {
+    const j = readJSON(path.join(b, c, "character.json"), {});
+    const d = path.join(b, c);
+    return { slug: c, own, nombre: j.nombre, descripcion: j.descripcion, maestro: path.join(d, j.maestro || ""),
       looks: Object.entries(j.looks || {}).map(([k, v]) => ({ key: k, imagen: path.join(d, v.imagen), ropa: v.ropa })) };
   });
-  const styles = fs.readdirSync(path.join(L, "styles")).filter((f) => f.endsWith(".json")).map((f) => readJSON(path.join(L, "styles", f)));
-  const templates = listDirs(path.join(L, "templates")).map((t) => readJSON(path.join(L, "templates", t, "template.json")));
+  const styles = jsonFiles("styles").map((f) => readJSON(f)).filter(Boolean);
+  const templates = both("templates").map(([b, t]) => readJSON(path.join(b, t, "template.json"))).filter(Boolean);
   const pdir = path.join(L, "platforms");
   const platforms = fs.existsSync(pdir) ? fs.readdirSync(pdir).filter((f) => f.endsWith(".json")).map((f) => readJSON(path.join(pdir, f))) : [];
   return { chars, styles, templates, platforms, hooks: readJSON(path.join(L, "hooks.json"), []), techniques: readJSON(path.join(L, "techniques/techniques.json"), []) };
 });
 
-ipcMain.handle("projects", () => {
-  const W = CFG.work_dir;
+ipcMain.handle("projects", (e, brand) => {
+  const W = path.join(BRANDS, brand || "_general", "proyectos");
   return listDirs(W).filter((d) => fs.existsSync(path.join(W, d, "proyecto.json"))).map((d) => {
     const pj = readJSON(path.join(W, d, "proyecto.json"), {});
     const done = fs.readdirSync(path.join(W, d)).filter((f) => f.startsWith(".done_")).map((f) => f.slice(6));
@@ -85,10 +89,12 @@ ipcMain.handle("projects", () => {
   });
 });
 
-ipcMain.handle("folders", () => {
+ipcMain.handle("brands", () => listDirs(BRANDS).filter((b) => fs.existsSync(path.join(BRANDS, b, "brand.json"))).map((b) => ({ ...readJSON(path.join(BRANDS, b, "brand.json"), {}), dir: path.join(BRANDS, b) })));
+ipcMain.handle("saveBrand", (e, b) => { fs.writeFileSync(path.join(BRANDS, b.slug, "brand.json"), JSON.stringify(b, null, 1)); return true; });
+ipcMain.handle("folders", (e, brand) => {
   const out = {};
-  for (const k of ["referencias", "marcas", "assets"]) {
-    const p = path.join(CFG.work_dir, k);
+  for (const k of ["references", "assets", "kit", "music", "research"]) {
+    const p = path.join(BRANDS, brand || "_general", k);
     out[k] = listDirs(p).map((d) => ({ slug: d, dir: path.join(p, d), files: fs.readdirSync(path.join(p, d)) }));
   }
   return out;
@@ -104,7 +110,7 @@ ipcMain.handle("run", (e, { script, args, tag }) => new Promise((resolve) => {
   p.on("close", (code) => { send("log", { tag, text: `\n[${tag}] exit ${code}\n` }); resolve({ code, out }); });
 }));
 
-ipcMain.handle("workdir", () => CFG.work_dir.split("\\").join("/"));
+ipcMain.handle("workdir", () => BRANDS.split("\\").join("/"));
 ipcMain.handle("open", (e, p) => shell.openPath(p));
 ipcMain.handle("pickFile", async (e, filters) => (await dialog.showOpenDialog(win, { properties: ["openFile"], filters })).filePaths[0] || null);
 ipcMain.handle("readFile", (e, p) => { try { return fs.readFileSync(p, "utf8"); } catch (x) { return null; } });
@@ -118,7 +124,7 @@ function mcpServers() {
   return out;
 }
 const APP_CONTEXT = `You are running inside the shorts-factory desktop app (repo: ${REPO}). Follow .claude/skills/shorts-factory/SKILL.md
-and CLAUDE.md. Projects live in ${CFG.work_dir}. The user sees your text in a chat panel and approves tool calls in the app.
+and CLAUDE.md. Brands live in ${BRANDS}/<brand>/ (brand.json, characters, styles, kit, music, references, research, proyectos, collects); a project is ${BRANDS}/<brand>/proyectos/<slug>. Work inside the brand the user picked. The user sees your text in a chat panel and approves tool calls in the app.
 Speak the user's language in chat; write repo files in English. Quote USD before any paid generation.`;
 
 ipcMain.handle("claude:send", async (e, { prompt, fresh, all }) => {

@@ -11,11 +11,11 @@ import collections, json, re, sys, urllib.parse, urllib.request
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
-from comun import CFG  # noqa: E402
+from comun import CFG, marca_dir  # noqa: E402
 
 UA = {"User-Agent": "Mozilla/5.0 (shorts-factory brand reader)"}
 url, slug = sys.argv[1], sys.argv[2]
-d = Path(CFG["work_dir"]) / "marcas" / slug; d.mkdir(parents=True, exist_ok=True)
+d = marca_dir(slug, True) / "references" / "web"; d.mkdir(parents=True, exist_ok=True)   # the brand folder itself (brands/<slug>)
 
 
 def get(u, binary=False):

@@ -1,13 +1,14 @@
 """shorts-factory: one command from a brief to a finished, collected Short.
 
   python factory.py stages                                   list the stages
-  python factory.py new <slug> --topic "Odilon Redon" [--template artist_short] [--character green_hair_presenter]
+  python factory.py brand-new <brand> --name "Cult Pixel" --handle cult_pixel [--platforms tiktok,instagram_reels]
+  python factory.py new <slug> --brand <brand> --topic "Odilon Redon" [--template artist_short] [--character green_hair_presenter]
                         [--style collage_v10c] [--look 05_corse_camisa]
   python factory.py run <slug|folder> [--from STAGE] [--to STAGE] [--only STAGE] [--force]
   python factory.py status <slug|folder>
   python factory.py estimate <slug|folder>                  estimated USD of the remaining stages
 
-A project is a folder under config work_dir with proyecto.json (docs/PROJECT_SCHEMA.md). Every stage leaves a mark
+A project is a folder brands/<brand>/proyectos/<slug> with proyecto.json (docs/PROJECT_SCHEMA.md). Every stage leaves a mark
 .done_<stage>; run resumes where it stopped. The "creative" stages (research, script, design) are done by Claude with the
 skill (.claude/skills/shorts-factory/SKILL.md) and the user; the factory checks their output and stops until it exists.
 GPU stages run one at a time; if config "comfy_switch" is set, the factory switches ComfyUI (Klein for images, H3 for video
@@ -17,7 +18,7 @@ from pathlib import Path
 
 REPO = Path(__file__).parent
 sys.path.insert(0, str(REPO / "engine"))
-from comun import CFG, LIB  # noqa: E402
+from comun import BRANDS, CFG, LIB, buscar, marca_dir  # noqa: E402
 
 E = REPO / "engine"
 # (name, kind, what it needs / does, command or check)
@@ -44,8 +45,16 @@ NAMES = [s[0] for s in STAGES]
 
 
 def carpeta_de(x):
+    """A folder, "<brand>/<slug>", or a slug searched in every brand."""
     p = Path(x)
-    return p.resolve() if p.exists() else Path(CFG["work_dir"]) / x
+    if p.exists():
+        return p.resolve()
+    if "/" in x:
+        b, sl = x.split("/", 1); return marca_dir(b) / "proyectos" / sl
+    hits = list(BRANDS.glob(f"*/proyectos/{x}"))
+    if not hits:
+        sys.exit(f"no project {x} in {BRANDS}")
+    return hits[0]
 
 
 def gpu(kind, log):
@@ -68,7 +77,7 @@ def check(name, carpeta, pj):
     if name == "script":
         return bool(pj.get("lineas")) and all(l.get("texto") for l in pj["lineas"])
     if name == "look":
-        c = json.loads((LIB / "characters" / pj["personaje"] / "character.json").read_text(encoding="utf-8"))
+        c = json.loads((buscar("characters", pj["personaje"], pj.get("marca")) / "character.json").read_text(encoding="utf-8"))
         return not pj.get("look") or pj["look"] in c["looks"]
     return False
 
@@ -108,12 +117,12 @@ def run(args):
 
 
 def new(args):
-    carpeta = Path(CFG["work_dir"]) / args.slug
+    carpeta = marca_dir(args.brand, True) / "proyectos" / args.slug
     if (carpeta / "proyecto.json").exists():
         sys.exit(f"{carpeta} already exists")
     carpeta.mkdir(parents=True)
-    tpl = json.loads((LIB / "templates" / args.template / "template.json").read_text(encoding="utf-8"))
-    pj = dict(tpl["proyecto_base"], slug=args.slug, plantilla=args.template, estilo=args.style, personaje=args.character, tema=args.topic)
+    tpl = json.loads((buscar("templates", args.template, args.brand) / "template.json").read_text(encoding="utf-8"))
+    pj = dict(tpl["proyecto_base"], slug=args.slug, marca=args.brand, plantilla=args.template, estilo=args.style, personaje=args.character, tema=args.topic)
     if args.look:
         pj["look"] = args.look
     if tpl.get("campo_tema"):
@@ -122,6 +131,18 @@ def new(args):
     (carpeta / "brief.md").write_text(f"# Brief: {args.topic}\n\n- template: {args.template}\n- character: {args.character}\n- style: {args.style}\n"
                                       f"- look: {args.look or '(choose one)'}\n\nNext: research (docs/templates/research.md), then script.\n", encoding="utf-8")
     print("new project:", carpeta)
+
+
+def brand_new(args):
+    d = marca_dir(args.slug, True)
+    f = d / "brand.json"
+    if f.exists():
+        sys.exit(f"{f} already exists")
+    b = {"slug": args.slug, "nombre": args.name, "handle": args.handle, "plataformas": args.platforms.split(","), "idioma": args.lang,
+         "audiencia": "", "tono": "", "mensaje": "", "colores": {}, "fuentes": {}, "personaje": "", "estilo": "", "plantilla": "", "voz": {},
+         "musica": None, "reglas": [], "figma": {"file_key": "", "url": ""}, "notas": []}
+    f.write_text(json.dumps(b, indent=1, ensure_ascii=False), encoding="utf-8")
+    print("new brand:", d)
 
 
 def status(args):
@@ -133,18 +154,22 @@ def status(args):
 ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
 sub = ap.add_subparsers(dest="cmd", required=True)
 sub.add_parser("stages")
-n = sub.add_parser("new"); n.add_argument("slug"); n.add_argument("--topic", required=True); n.add_argument("--template", default="artist_short")
+n = sub.add_parser("new"); n.add_argument("slug"); n.add_argument("--brand", default="_general"); n.add_argument("--topic", required=True); n.add_argument("--template", default="artist_short")
 n.add_argument("--character", default="green_hair_presenter"); n.add_argument("--style", default="collage_v10c"); n.add_argument("--look")
 r = sub.add_parser("run"); r.add_argument("proyecto"); r.add_argument("--from", dest="desde", choices=NAMES); r.add_argument("--to", dest="hasta", choices=NAMES)
 r.add_argument("--only", choices=NAMES); r.add_argument("--force", action="store_true"); r.add_argument("--yes", action="store_true", help="accept the estimated cost of paid stages")
 es = sub.add_parser("estimate"); es.add_argument("proyecto")
 s = sub.add_parser("status"); s.add_argument("proyecto")
+bn = sub.add_parser("brand-new"); bn.add_argument("slug"); bn.add_argument("--name", required=True); bn.add_argument("--handle", default="")
+bn.add_argument("--platforms", default="youtube_shorts,tiktok,instagram_reels"); bn.add_argument("--lang", default="English")
 a = ap.parse_args()
 if a.cmd == "stages":
     for name, kind, what, _ in STAGES:
         print(f"{name:9s} {kind:10s} {what}")
 elif a.cmd == "new":
     new(a)
+elif a.cmd == "brand-new":
+    brand_new(a)
 elif a.cmd == "estimate":
     print(subprocess.run([sys.executable, str(E / "costo.py"), "proyecto", str(carpeta_de(a.proyecto))], capture_output=True, text=True).stdout)
 elif a.cmd == "run":

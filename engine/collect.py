@@ -8,12 +8,12 @@ import json, shutil, subprocess, sys, zipfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
-from comun import CFG, MOTION_DNA, REPO, proyecto  # noqa: E402
+from comun import CFG, MOTION_DNA, REPO, marca_dir, proyecto  # noqa: E402
 
 carpeta = Path(sys.argv[1]).resolve(); pj = proyecto(carpeta)
 datos = json.loads((carpeta / "datos_ae.json").read_text(encoding="utf-8"))
 aep = (carpeta / "ae" / f"{pj['slug']}.aep").as_posix()
-dest = Path(CFG["work_dir"]) / "collects" / pj["slug"]
+dest = marca_dir(pj.get("marca"), True) / "collects" / pj["slug"]
 if dest.exists():
     shutil.rmtree(dest)
 # light mattes at the path the collect expects: collect.jsx does not copy what already exists and relinks to it

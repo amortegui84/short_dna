@@ -1,6 +1,8 @@
 // What the app asks Claude for each path. Claude follows the repo's skill (.claude/skills/shorts-factory/SKILL.md) and docs.
 const PROMPTS = {
-  short: (o) => `Use the shorts-factory skill. Project "${o.slug}" was just created in ${o.dir}.
+  brandBuild: (o) => `Build the brand "${o.brand}" (folder ${o.dir}, profile brand.json) with the shorts-factory skill, path "Brand → Kit" + "Character" + style (docs/NEW_STYLE.md, docs/NEW_CHARACTER.md, CLAUDE.md).
+Fill what is missing in brand.json with me (audience, tone, message, colours, fonts, platforms); then propose, in this order and stopping for my yes after each: 1) the brand's style file in ${o.dir}/styles/ (reuse the animation techniques in library/techniques; new colours, textures, type, sound and music), 2) its character in ${o.dir}/characters/ (sheet first: master, base scene, looks; voice), 3) its template in ${o.dir}/templates/ if the content needs a new structure, 4) the kit of icons, backgrounds and elements in ${o.dir}/kit/ (local generation first: Qwen-Image-Layered for alpha, Z-Image, Klein; cost first for anything paid) and in Figma if brand.json has a Figma file.`,
+  short: (o) => `Use the shorts-factory skill. Brand "${o.brand}" (read its brand.json first: tone, audience, message, platforms). Project "${o.slug}" was just created in ${o.dir}.
 Topic: "${o.topic}". Platforms: ${o.platforms.join(", ") || "youtube_shorts"}. Template: ${o.template}. Character: ${o.character}, look ${o.look || "(propose one)"}. Style: ${o.style}. Target length: ${o.length} s. Language of the video: ${o.lang}.
 ${o.notes ? "Notes from the user: " + o.notes + "\n" : ""}1) Research the topic with web search into research.md (docs/templates/research.md): facts with sources, public-domain artworks or visuals, a real quote.
 2) Pick the hook pattern(s) from library/hooks.json and apply the platform rules in library/platforms/<platform>.json (length, safe area, CTA, AI disclosure).

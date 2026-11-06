@@ -16,3 +16,5 @@ work/
 *.log
 node_modules/
 app/node_modules/
+# brand folders (profiles, characters, kits, projects) live outside git
+brands/

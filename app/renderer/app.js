@@ -4,7 +4,8 @@
 const $ = (s, el = document) => el.querySelector(s);
 const h = (t, a = {}, ...kids) => { const e = document.createElement(t); for (const [k, v] of Object.entries(a)) k.startsWith("on") ? e.addEventListener(k.slice(2), v) : k === "html" ? (e.innerHTML = v) : e.setAttribute(k, v); for (const c of kids.flat()) e.append(c instanceof Node ? c : document.createTextNode(c ?? "")); return e; };
 const fileUrl = (p) => "file:///" + p.replace(/\\/g, "/");
-let LIB = null, STATUS = [], CFGDIR = "";
+let LIB = null, STATUS = [], CFGDIR = "", BRAND = "_general";
+const BDIR = () => CFGDIR + "/" + BRAND;
 const PAID_MCP = /krea|flora|generate_(image|video|audio|3d)|create_generations|run_canvas|upscale/i;
 
 // ---------- side panel: Claude + log
@@ -53,10 +54,10 @@ function confirmCost(est, title) {
 }
 async function estimate(args) { const r = await window.api.run("costo", args, "cost"); try { return JSON.parse(r.out.trim().split("\n").pop()); } catch (e) { return { total_usd: 0, filas: [] }; } }
 async function runFactory(slug, extra = []) {
-  const est = await estimate(["proyecto", CFGDIR + "/" + slug]);
+  const est = await estimate(["proyecto", BDIR() + "/proyectos/" + slug]);
   if (!(await confirmCost(est, slug))) return;
   document.querySelector('[data-side="log"]').click();
-  await window.api.run("factory", ["run", slug, ...extra, "--yes"], slug);
+  await window.api.run("factory", ["run", BRAND + "/" + slug, ...extra, "--yes"], slug);
 }
 
 // ---------- connections
@@ -112,10 +113,10 @@ V.short = async () => {
         h("label", {}, "Look"), lp.box)),
     h("div", { class: "row" }, h("button", { onclick: async () => {
       if (!st.topic || !slug.value) return alert("Topic and project id");
-      const args = ["new", slug.value, "--topic", st.topic, "--template", st.template, "--character", st.character, "--style", st.style]; if (st.look) args.push("--look", st.look);
+      const args = ["new", slug.value, "--brand", BRAND, "--topic", st.topic, "--template", st.template, "--character", st.character, "--style", st.style]; if (st.look) args.push("--look", st.look);
       const r = await window.api.run("factory", args, "new");
       if (r.code) return alert(r.out);
-      askClaude(PROMPTS.short({ ...st, slug: slug.value, dir: CFGDIR + "/" + slug.value }), true);
+      askClaude(PROMPTS.short({ ...st, brand: BRAND, slug: slug.value, dir: BDIR() + "/proyectos/" + slug.value }), true);
     } }, "Create project and ask Claude for research + script"))];
 };
 
@@ -129,33 +130,36 @@ V.reference = async () => {
     h("div", { class: "row" }, h("button", { onclick: async () => {
       if (!src || !slug.value) return alert("Link or file, and a name");
       document.querySelector('[data-side="log"]').click();
-      const r = await window.api.run("referencia", [src, slug.value], "reference");
+      const r = await window.api.run("referencia", [src, slug.value, BRAND], "reference");
       if (r.code) return;
-      const dir = CFGDIR + "/referencias/" + slug.value;
+      const dir = BDIR() + "/references/" + slug.value;
       out.replaceChildren(h("img", { class: "sheet", src: fileUrl(dir + "/hoja.jpg") }), h("pre", {}, r.out.trim().split("\n").pop()));
       askClaude(PROMPTS.reference({ src, dir, slug: slug.value, motion_dna: "the Motion DNA repo" }), true);
     } }, "Analyse and ask Claude")), out,
-    h("h2", {}, "Analysed references"), h("div", { class: "cards" }, f.referencias.map((r) => h("div", { class: "card", onclick: () => window.api.open(r.dir) }, h("h3", {}, r.slug), r.files.includes("hoja.jpg") ? h("img", { class: "sheet", src: fileUrl(r.dir + "/hoja.jpg") }) : "")))];
+    h("h2", {}, "Analysed references"), h("div", { class: "cards" }, f.references.map((r) => h("div", { class: "card", onclick: () => window.api.open(r.dir) }, h("h3", {}, r.slug), r.files.includes("hoja.jpg") ? h("img", { class: "sheet", src: fileUrl(r.dir + "/hoja.jpg") }) : "")))];
 };
 
 V.brand = async () => {
-  const url = h("input", { placeholder: "https://brand.com" }); const slug = h("input", { placeholder: "brand-slug" }); const out = h("div", {});
-  const f = await window.api.folders();
+  const bs = await window.api.brands(); const b = bs.find((x) => x.slug === BRAND);
+  if (!b) return [h("h1", {}, "Brand"), h("p", { class: "lead" }, "Pick a brand in the selector or create one (+ New brand). Every brand has its own folder: profile, characters, styles, kit, music, references, research, projects and collects.")];
+  const url = h("input", { placeholder: "https://brand.com (optional: read logo, colours and fonts from the site)" }); const out = h("div", {});
+  const field = (k, label, rows) => { const el = rows ? h("textarea", { rows }) : h("input", {}); el.value = typeof b[k] === "string" ? b[k] : JSON.stringify(b[k] || ""); el.oninput = () => { try { b[k] = typeof b[k] === "string" || rows ? el.value : JSON.parse(el.value); } catch (x) { b[k] = el.value; } }; return [h("label", {}, label), el]; };
   const showKit = async (dir) => {
     const k = JSON.parse(await window.api.readFile(dir + "/marca.json") || "{}");
-    out.replaceChildren(h("h2", {}, k.nombre || ""), h("div", {}, [...Object.values(k.colores_var || {}), ...(k.colores || [])].slice(0, 12).map((c) => h("span", { class: "sw", title: c, style: "background:" + c }))),
-      h("p", { class: "lead" }, "Fonts: " + (k.fuentes || []).join(", ") + (k.google_fonts?.length ? " · Google: " + k.google_fonts.join(", ") : "")),
-      h("div", { class: "looks" }, (k.logos || []).map((l) => h("div", { class: "look" }, h("img", { src: fileUrl(dir + "/" + l), style: "object-fit:contain;background:#fff" }), h("span", {}, l)))));
+    out.replaceChildren(h("div", {}, [...Object.values(k.colores_var || {}), ...(k.colores || [])].slice(0, 12).map((c) => h("span", { class: "sw", title: c, style: "background:" + c }))),
+      h("p", { class: "lead" }, "Fonts: " + (k.fuentes || []).join(", ")), h("div", { class: "looks" }, (k.logos || []).map((l) => h("div", { class: "look" }, h("img", { src: fileUrl(dir + "/" + l), style: "object-fit:contain;background:#fff" }), h("span", {}, l)))));
   };
-  return [h("h1", {}, "Brand → Kit"), h("p", { class: "lead" }, "The app reads the brand's public page (logo candidates, colours, fonts, tagline) and drafts a Motion DNA brand. Claude checks it with you, then builds the components in After Effects and, if you want, frames in Figma."),
-    h("div", { class: "grid2" }, h("div", {}, h("label", {}, "Website"), url), h("div", {}, h("label", {}, "Brand id"), slug)),
-    h("div", { class: "row" }, h("button", { onclick: async () => {
-      if (!url.value || !slug.value) return alert("URL and id");
-      const r = await window.api.run("marca", [url.value, slug.value], "brand"); if (r.code) return;
-      const dir = CFGDIR + "/marcas/" + slug.value; await showKit(dir);
-      askClaude(PROMPTS.brand({ url: url.value, dir }), true);
-    } }, "Read the brand and ask Claude")), out,
-    h("h2", {}, "Brands read"), h("div", { class: "cards" }, f.marcas.map((m) => h("div", { class: "card", onclick: () => showKit(m.dir) }, h("h3", {}, m.slug), h("p", {}, m.files.length + " files"))))];
+  return [h("h1", {}, b.nombre), h("p", { class: "lead" }, b.dir),
+    h("div", { class: "grid2" }, h("div", {}, ...field("handle", "Handle"), ...field("audiencia", "Audience", 2), ...field("tono", "Tone of voice", 2), ...field("mensaje", "Underlying message", 2),
+      ...field("plataformas", "Platforms (JSON list)")),
+      h("div", {}, ...field("colores", "Colours (JSON)"), ...field("fuentes", "Fonts (JSON)"), ...field("personaje", "Character"), ...field("estilo", "Style"), ...field("plantilla", "Template"), ...field("figma", "Figma (JSON: url, file_key)"))),
+    h("div", { class: "row" }, h("button", { onclick: async () => { await window.api.saveBrand(b); alert("Saved"); } }, "Save profile"), h("button", { class: "ghost", onclick: () => window.api.open(b.dir) }, "Open folder"),
+      h("button", { class: "mag", onclick: () => askClaude(PROMPTS.brandBuild({ brand: b.slug, dir: b.dir }), true) }, "Build the brand with Claude")),
+    h("h2", {}, "Read a website (optional)"), url,
+    h("div", { class: "row" }, h("button", { class: "ghost", onclick: async () => {
+      if (!url.value) return; const r = await window.api.run("marca", [url.value, BRAND], "brand"); if (r.code) return;
+      const dir = BDIR() + "/references/web"; await showKit(dir); askClaude(PROMPTS.brand({ url: url.value, dir }), true);
+    } }, "Read it and ask Claude")), out];
 };
 
 V.character = async () => {
@@ -183,13 +187,13 @@ V.assets = async () => {
   return [h("h1", {}, "Assets"), h("p", { class: "lead" }, "Props, backgrounds, stickers, textures. Local models cost nothing; paid APIs show the estimate first. Krea and Flora run through Claude's MCP connectors."),
     h("div", { class: "grid2" }, h("div", {}, h("label", {}, "Prompt"), prompt, h("label", {}, "File name"), name,
       h("div", { class: "row" }, h("button", { class: "ghost", onclick: async () => { const p = await window.api.pickFile([{ name: "Image", extensions: ["png", "jpg", "jpeg", "webp"] }]); if (p) { refs.push(p); out.append(h("div", { class: "look" }, h("img", { src: fileUrl(p) }), h("span", {}, "reference"))); } } }, "Add reference image"))),
-      h("div", {}, h("label", {}, "Provider"), sel([["comfy_klein", "Flux Klein · local"], ["zimage", "Z-Image · local"], ["qwen_style", "Qwen style transfer · local (ref 1 = photo, ref 2 = style)"], ["nano_banana", "Nano Banana · paid"], ["generic_http", "Generic API · paid"], ["krea", "Krea · MCP, paid"], ["flora", "Flora · MCP, paid"]], st.provider, (v) => st.provider = v),
+      h("div", {}, h("label", {}, "Provider"), sel([["qwen_layered", "Qwen-Image-Layered · local, alpha"], ["comfy_klein", "Flux Klein · local"], ["zimage", "Z-Image · local"], ["qwen_style", "Qwen style transfer · local (ref 1 = photo, ref 2 = style)"], ["nano_banana", "Nano Banana · paid"], ["generic_http", "Generic API · paid"], ["krea", "Krea · MCP, paid"], ["flora", "Flora · MCP, paid"]], st.provider, (v) => st.provider = v),
         h("label", {}, "Size"), sel([["768x1344", "9:16"], ["1344x768", "16:9"], ["1024x1024", "1:1"], ["1080x1350", "4:5"]], st.size, (v) => st.size = v),
         h("label", {}, "How many"), h("input", { type: "number", value: 1, min: 1, max: 8, oninput: (e) => st.n = +e.target.value }),
         h("label", { class: "small" }, h("input", { type: "checkbox", onchange: (e) => st.cutout = e.target.checked }), "cut out the background"))),
     h("div", { class: "row" }, h("button", { onclick: async () => {
       if (!prompt.value || !name.value) return alert("Prompt and file name");
-      const dest = CFGDIR + "/assets/" + name.value;
+      const dest = BDIR() + "/assets/" + name.value;
       const est = await estimate(["asset", st.provider, "--n", String(st.n)]);
       if (!(await confirmCost({ ...est, filas: [{ ...est, etapa: "asset", usd: est.total_usd }] }, name.value))) return;
       if (viaMcp(st.provider)) return askClaude(PROMPTS.assetClaude({ prompt: prompt.value, size: st.size, cutout: st.cutout, provider: st.provider, out: dest, target: "the asset library" }));
@@ -212,11 +216,11 @@ V.platforms = async () => {
     h("h2", {}, "Hooks"), h("div", { class: "chips" }, (LIB.hooks.hooks || LIB.hooks || []).map?.((k) => h("span", { title: k.definicion }, k.nombre || k.id)) || ""),
     h("h2", {}, "Plan a series"), h("label", {}, "Channel topic"), topic,
     h("div", { class: "chips" }, P.map((p) => { const c = h("span", {}, p.nombre || p.slug); c.onclick = () => { st.platforms = st.platforms.includes(p.slug) ? st.platforms.filter((x) => x !== p.slug) : [...st.platforms, p.slug]; c.classList.toggle("on"); }; return c; })),
-    h("div", { class: "row" }, h("button", { onclick: () => askClaude(PROMPTS.platformPlan({ platforms: st.platforms.length ? st.platforms : ["youtube_shorts", "tiktok", "instagram_reels"], topic: topic.value, character: LIB.chars[0]?.slug, style: LIB.styles[0]?.slug, out: CFGDIR + "/planes/" + (topic.value || "plan").replace(/\W+/g, "_") + ".md" }), true) }, "Plan with Claude"))];
+    h("div", { class: "row" }, h("button", { onclick: () => askClaude(PROMPTS.platformPlan({ platforms: st.platforms.length ? st.platforms : ["youtube_shorts", "tiktok", "instagram_reels"], topic: topic.value, character: LIB.chars[0]?.slug, style: LIB.styles[0]?.slug, out: BDIR() + "/research/plan_" + (topic.value || "plan").replace(/\W+/g, "_") + ".md" }), true) }, "Plan with Claude"))];
 };
 
 V.projects = async () => {
-  const ps = await window.api.projects();
+  const ps = await window.api.projects(BRAND);
   const names = ["research", "script", "design", "obras", "retrato", "look", "inicios", "voz", "clips", "sts", "montaje", "mates", "musica", "ae", "render", "qc", "collect"];
   return [h("h1", {}, "Projects"), h("p", { class: "lead" }, "Every video is a folder in work_dir. Run the next stages (cost estimate first), ask Claude, open the folder or play the render."),
     ps.length ? h("table", {}, h("tr", {}, ...["Project", "Character / look / style", "Stages", ""].map((x) => h("th", {}, x))), ps.map((p) => h("tr", {},
@@ -233,9 +237,28 @@ V.library = async () => [h("h1", {}, "Library"), h("p", { class: "lead" }, "What
 
 async function show(v) {
   document.querySelectorAll("#nav button[data-view]").forEach((b) => b.classList.toggle("on", b.dataset.view === v));
-  LIB = await window.api.library();
+  LIB = await window.api.library(BRAND);
   $("#view").replaceChildren(h("p", { class: "lead" }, "…"));
   $("#view").replaceChildren(...(await V[v]()));
 }
 document.querySelectorAll("#nav button[data-view]").forEach((b) => b.onclick = () => show(b.dataset.view));
-(async () => { CFGDIR = await window.api.workdir(); show("home"); })();
+// ---------- brand selector: every view works inside the chosen brand (brands/<brand>/...)
+async function paintBrands() {
+  const bs = await window.api.brands();
+  const s = h("select", { id: "brand-sel", onchange: (e) => { if (e.target.value === "+") return newBrand(); BRAND = e.target.value; try { localStorage.setItem("brand", BRAND); } catch (x) {} show(document.querySelector("#nav button.on")?.dataset.view || "home"); } },
+    [["_general", "General"], ...bs.map((b) => [b.slug, b.nombre || b.slug]), ["+", "+ New brand"]].map(([v, t]) => { const o = h("option", { value: v }, t); if (v === BRAND) o.selected = true; return o; }));
+  $("#brand-box").replaceChildren(h("label", {}, "Brand"), s);
+}
+function newBrand() {
+  const name = h("input", { placeholder: "Cult Pixel" }), slug = h("input", { placeholder: "cult_pixel" }), handle = h("input", { placeholder: "@cult_pixel" });
+  const plats = h("input", { value: "instagram_reels,tiktok,youtube_shorts" }), lang = h("input", { value: "English" });
+  const d = h("dialog", {}, h("h2", {}, "New brand"), h("label", {}, "Name"), name, h("label", {}, "Id (folder)"), slug, h("label", {}, "Handle"), handle,
+    h("label", {}, "Platforms"), plats, h("label", {}, "Language"), lang,
+    h("div", { class: "row" }, h("button", { onclick: async () => {
+      if (!slug.value || !name.value) return;
+      const r = await window.api.run("factory", ["brand-new", slug.value, "--name", name.value, "--handle", handle.value, "--platforms", plats.value, "--lang", lang.value], "brand");
+      d.close(); d.remove(); if (!r.code) { BRAND = slug.value; await paintBrands(); show("brand"); }
+    } }, "Create"), h("button", { class: "ghost", onclick: () => { d.close(); d.remove(); paintBrands(); } }, "Cancel")));
+  d.style.cssText = "background:#191d1d;color:#f7f8f4;border:1px solid #c1f157;border-radius:10px;width:420px"; document.body.append(d); d.showModal();
+}
+(async () => { CFGDIR = await window.api.workdir(); try { BRAND = localStorage.getItem("brand") || "_general"; } catch (x) {} await paintBrands(); show("home"); })();

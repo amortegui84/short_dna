@@ -4,7 +4,7 @@ paleta.json, analisis.json {duration, fps, size, shots, cuts_per_min, avg_shot_s
 Next (Claude, with the skill): read hoja.jpg + analisis.json, write a Motion DNA reference profile
 (<motion_dna>/library/references/<slug>.json, schema in its _schema.md), run match_reference, then create the missing moves
 and a style file in library/styles/. Only analyse videos the user gives you; keep them out of git.
-Usage: python referencia.py <url|file> <slug>"""
+Usage: python referencia.py <url|file> <slug> [brand]"""
 import json, re, subprocess, sys
 from pathlib import Path
 
@@ -12,10 +12,11 @@ import numpy as np
 from PIL import Image
 
 sys.path.insert(0, str(Path(__file__).parent))
-from comun import CFG, duracion  # noqa: E402
+from comun import CFG, duracion, marca_dir  # noqa: E402
 
 src, slug = sys.argv[1], sys.argv[2]
-d = Path(CFG["work_dir"]) / "referencias" / slug; d.mkdir(parents=True, exist_ok=True)
+marca = sys.argv[3] if len(sys.argv) > 3 else None   # brand folder (brands/<marca>/references/<slug>)
+d = marca_dir(marca, True) / "references" / slug; d.mkdir(parents=True, exist_ok=True)
 v = d / "video.mp4"
 if not v.exists():
     if re.match(r"https?://", src):

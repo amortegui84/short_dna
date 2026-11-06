@@ -1,5 +1,5 @@
 """Path "assets": one command to make an image asset with any provider (local or paid), for a project or for the library.
-  python assets.py --provider comfy_klein|nano_banana|zimage|qwen_style|generic_http --prompt "..." [--refs a.png b.png]
+  python assets.py --provider comfy_klein|qwen_layered|zimage|qwen_style|nano_banana|generic_http --prompt "..." [--refs a.png b.png]
                    --out <file.png> [--size 768x1344] [--seed 7] [--cutout]
 --cutout removes the background afterwards (Motion DNA video_matte.py) for props and stickers.
 Paid providers: the app shows the estimated cost and asks before running (house rule: quote USD first).
@@ -16,7 +16,7 @@ ap.add_argument("--out", required=True); ap.add_argument("--size", default="768x
 ap.add_argument("--cutout", action="store_true")
 a = ap.parse_args()
 out = Path(a.out); out.parent.mkdir(parents=True, exist_ok=True)
-if a.provider in ("zimage", "qwen_style"):
+if a.provider in ("zimage", "qwen_style", "qwen_layered"):
     from factory.providers import local_tools as P
     res = P.image(a.prompt, a.refs, out, a.size, a.seed, tool=a.provider)
 else:

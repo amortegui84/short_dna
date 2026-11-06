@@ -36,3 +36,4 @@ table { border-collapse: collapse; width: 100%; } td, th { border-bottom: 1px so
 #log { margin: 0; padding: 12px; overflow: auto; font: 12px/1.4 Consolas, monospace; color: #cfd8d4; white-space: pre-wrap; }
 .status td:first-child { width: 22px; } img.sheet { max-width: 100%; border-radius: 8px; border: 1px solid var(--line); }
 video { max-height: 520px; border-radius: 8px; }
+#brand-box { margin: 0 6px 14px; } #brand-box label { margin-top: 0; } #brand-box select { background: #222828; border-color: #c1f157; }

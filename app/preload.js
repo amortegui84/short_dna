@@ -1,9 +1,11 @@
 const { contextBridge, ipcRenderer } = require("electron");
 contextBridge.exposeInMainWorld("api", {
   status: () => ipcRenderer.invoke("status"),
-  library: () => ipcRenderer.invoke("library"),
-  projects: () => ipcRenderer.invoke("projects"),
-  folders: () => ipcRenderer.invoke("folders"),
+  library: (b) => ipcRenderer.invoke("library", b),
+  projects: (b) => ipcRenderer.invoke("projects", b),
+  folders: (b) => ipcRenderer.invoke("folders", b),
+  brands: () => ipcRenderer.invoke("brands"),
+  saveBrand: (b) => ipcRenderer.invoke("saveBrand", b),
   run: (script, args, tag) => ipcRenderer.invoke("run", { script, args, tag }),
   workdir: () => ipcRenderer.invoke("workdir"),
   open: (p) => ipcRenderer.invoke("open", p),

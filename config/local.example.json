@@ -1,6 +1,6 @@
 {
   "_readme": "Copy to config/local.json (git-ignored) and point every path at this machine. Keys never go here: they live in the .env file named by env_file.",
-  "work_dir": "D:/shorts_work",
+  "work_dir": "D:/short_dna/brands",
   "env_file": "D:/secrets/shorts_factory.env",
   "python_tools": "C:/Python314/python.exe",
   "motion_dna": "D:/motion category ai library",
@@ -29,7 +29,7 @@
     "research": "claude"
   },
   "zimage": {
-    "script": "D:/minimax/scripts/zimage_gen.py"
+    "script": "engine/zimage_gen.py"
   },
   "qwen": {
     "url": "http://127.0.0.1:7860"
@@ -60,5 +60,9 @@
     }
   },
   "_mcp_readme": "MCP servers the app gives Claude (strict: only these). Set claude_todos_los_conectores true (or tick it in the app) to also load every connector of the Claude account (Krea, Flora...): heavier context, higher cost per message.",
-  "claude_todos_los_conectores": false
+  "claude_todos_los_conectores": false,
+  "brands_dir": "D:/short_dna/brands",
+  "qwen_layered": {
+    "script": "engine/qwen_layered.py"
+  }
 }
