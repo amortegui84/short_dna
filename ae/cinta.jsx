@@ -172,12 +172,13 @@ var CINTA = (function () {
         var ws = sec.cita.join(" ").replace(/[“”"]/g, "").split(/\s+/), pw = sec.palabras || [], TW = [];
         for (var i = 0; i < ws.length; i++) TW.push(pw.length === ws.length ? pw[i][1] : t0 + 0.2 + i * 0.3);
         var lin = partir(ws.join(" ").toUpperCase(), 11), x = 130, lh = 112, y0 = 960 - lin.length * lh / 2, n = 0, clave = limpia(sec.clave || "");
-        var bar = caja("quote bar", 82, 960, 12, lin.length * lh + 40, RED, 100); S(bar).setValueAtTime(t0, [100, 0]); S(bar).setValueAtTime(t0 + 0.35, [100, 100]); vida(bar, t0, t1);
+        var bar = caja("quote bar", 82, 960, 12, lin.length * lh + 40, RED, 100); S(bar).setValueAtTime(t0, [100, 40]); S(bar).setValueAtTime(t0 + 0.3, [100, 100]); vida(bar, t0, t1);
         for (i = 0; i < lin.length; i++) {
             var L = texto(lin[i], F_TIT, 92, PH); anclar(L, false); ajustar(L, 860); P(L).setValue([x, y0 + i * lh + lh / 2]); vida(L, t0, t1);
             var lw = lin[i].split(" "), St = [], K = [];
             for (var j = 0; j < lw.length; j++) { St.push(TW[n + j].toFixed(3)); if (clave && limpia(lw[j]) === clave) K.push(j); }
-            var an = L.property("ADBE Text Properties").property("ADBE Text Animators").addProperty("ADBE Text Animator"); an.property("ADBE Text Animator Properties").addProperty("ADBE Text Opacity").setValue(0);
+            // teletext: every word is there dimmed from the cut (no near-black frame) and lights up when it is said
+            var an = L.property("ADBE Text Properties").property("ADBE Text Animators").addProperty("ADBE Text Animator"); an.property("ADBE Text Animator Properties").addProperty("ADBE Text Opacity").setValue(16);
             var sl = an.property("ADBE Text Selectors").addProperty("ADBE Text Expressible Selector"); sl.property("ADBE Text Range Type2").setValue(3);
             sl.property("ADBE Text Expressible Amount").expression = "var S=[" + St.join(",") + "]; time<S[textIndex-1]?100:0;";
             rojas(L, K);
