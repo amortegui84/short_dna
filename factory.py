@@ -27,6 +27,7 @@ STAGES = [
     ("script", "claude", "proyecto.json lineas + momentos_a + obras_b + titulos + cita (docs/templates/script.md)", "lineas"),
     ("design", "claude", "optional: storyboard frames in Figma with the style tokens (docs/FIGMA.md); mark it done to skip", None),
     ("obras", "cpu", "download the public-domain artworks (obras_descarga)", ["obras.py"]),
+    ("visuales", "gpu:h3", "document pages (public-domain PDFs) + generated reconstructions (Z-Image) into obras/", ["visuales.py"]),
     ("retrato", "gpu:h3", "cut out the artist portrait for the artist card", ["retrato.py"]),
     ("look", "check", "the character look exists (else: engine/looks.py with the user)", None),
     ("inicios", "gpu:klein", "a different start frame per talking line", ["inicios.py"]),
