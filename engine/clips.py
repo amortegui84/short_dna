@@ -6,7 +6,7 @@ import difflib, json, os, re, subprocess, sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
-from comun import H3, PY_PORTABLE, escena_de, palabras, personaje, proyecto, run  # noqa: E402
+from comun import H3, PY_PORTABLE, duracion, escena_de, palabras, personaje, proyecto, run  # noqa: E402
 
 carpeta = Path(sys.argv[1])
 pj = proyecto(carpeta)
@@ -40,6 +40,9 @@ for ln in [l for l in pj["lineas"] if l["id"] in ids]:
     # sin puntos suspensivos (H3 inventa palabras en la pausa) y sin frases fuera de <d> (H3 las dice en voz alta)
     dialogo = ln["texto"].replace("...", ",").replace(",,", ",")
     seg = next(s for s in REJILLA if s >= len(dialogo.split()) / 2.7 + 0.8)
+    if PJE.get("sin_boca") and (carpeta / "vo" / f"{lid}.mp3").exists():   # sin boca: el clip dura lo que la voz dramatica (pausas incluidas)
+        vd = duracion(carpeta / "vo" / f"{lid}.mp3") + 0.3
+        seg = next((s for s in REJILLA if s >= vd), REJILLA[-1])
     prompt = PJE["prompt_clip"].format(artista=pj.get("artista", pj.get("tema", "")), accion=ln["accion"], dialogo=dialogo)
     pf = carpeta / "prompts" / f"{lid}.txt"
     pf.write_text(prompt, encoding="utf-8")

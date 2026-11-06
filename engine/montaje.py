@@ -10,11 +10,13 @@ from pathlib import Path
 import numpy as np
 
 sys.path.insert(0, str(Path(__file__).parent))
-from comun import duracion, palabras, proyecto, run  # noqa: E402
+from comun import duracion, palabras, personaje, proyecto, run  # noqa: E402
 
 GAP = 0.12
 NIVELES = [1.0, 1.32, 1.12, 1.45]   # encuadres del avatar en cada salto de zoom
 SIL = "silenceremove=start_periods=1:start_threshold=-45dB:stop_periods=-1:stop_duration=0.3:stop_threshold=-45dB"
+# conservar_pausas (narradores dramaticos): solo se recortan el silencio del principio y del final; las pausas y silencios quedan
+SIL_BORDES = "silenceremove=start_periods=1:start_threshold=-45dB,areverse,silenceremove=start_periods=1:start_threshold=-45dB,areverse"
 
 
 def tiempos_guion(texto, oidas, ini, fin, sustituir):
@@ -33,11 +35,21 @@ def main(carpeta):
     aud = carpeta / "audio"
     aud.mkdir(exist_ok=True)
     segs = []
+    sin_boca = bool(pj.get("personaje") and personaje(pj).get("sin_boca"))
+    filtro = SIL_BORDES if pj.get("conservar_pausas") else SIL
     for ln in pj["lineas"]:
         lid, vo = ln["id"], carpeta / "vo" / f"{ln['id']}.mp3"
         limpia = aud / f"{lid}_limpia.wav"
-        run(["ffmpeg", "-y", "-v", "error", "-i", str(vo), "-af", SIL, "-ac", "2", "-ar", "48000", str(limpia)])
+        run(["ffmpeg", "-y", "-v", "error", "-i", str(vo), "-af", filtro, "-ac", "2", "-ar", "48000", str(limpia)])
         wav = aud / f"{lid}.wav"
+        if ln["tipo"] == "A" and sin_boca:
+            # personaje sin boca: no hay labios que cuadrar; la linea dura lo que dura la voz (con sus pausas) y el clip arranca con ella
+            clip = carpeta / "clips" / f"{lid}.mp4"
+            run(["ffmpeg", "-y", "-v", "error", "-i", str(limpia), "-af", "apad=pad_dur=0.2,loudnorm=I=-20:TP=-2:LRA=9", "-ar", "48000", str(wav)])
+            ws = palabras(wav)
+            pal = tiempos_guion(ln["texto"], ws, ws[0][1], ws[-1][2], sus)
+            segs.append({"id": lid, "tipo": "A", "clip": str(clip), "t0": 0.0, "dur": duracion(wav), "pal": pal, "wav": str(wav), "atempo": "voz"})
+            continue
         if ln["tipo"] == "A":
             clip = carpeta / "clips" / f"{lid}.mp4"
             ws = palabras(clip)

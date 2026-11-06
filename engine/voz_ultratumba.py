@@ -19,15 +19,24 @@ def cadena(semitonos=2.0):
             "acompressor=threshold=-18dB:ratio=3:attack=10:release=200,loudnorm=I=-20:TP=-2:LRA=7")
 
 
-def procesar(src, dst, semitonos=2.0):
-    subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", str(src), "-af", cadena(semitonos), "-ar", "44100", str(dst)], check=True)
+def cadena_clara():
+    """Mas entendible (revision 2026-11-05: "un poco inaudible por el efecto"): sin bajar el tono ni cortar agudos; cuerpo en 120 Hz,
+    presencia en 3 kHz para las consonantes, un toque de sala corto (no el eco de cripta) y compresion pareja."""
+    return ("highpass=f=60,equalizer=f=120:t=q:w=1:g=2,equalizer=f=3000:t=q:w=1.2:g=4,equalizer=f=6500:t=q:w=1:g=1.5,"
+            "aecho=0.85:0.25:35|70:0.12|0.06,"
+            "acompressor=threshold=-28dB:ratio=3.5:attack=5:release=120:makeup=2,loudnorm=I=-20:TP=-2:LRA=8")   # susurros arriba, picos contenidos
+
+
+def procesar(src, dst, semitonos=2.0, modo="ultratumba"):
+    af = cadena_clara() if modo == "claro" else cadena(semitonos)
+    subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", str(src), "-af", af, "-ar", "44100", str(dst)], check=True)
     return dst
 
 
 if __name__ == "__main__":
     if sys.argv[1] == "procesar":
         st = float(sys.argv[sys.argv.index("--semitonos") + 1]) if "--semitonos" in sys.argv else 2.0
-        procesar(sys.argv[2], sys.argv[3], st); print(sys.argv[3])
+        procesar(sys.argv[2], sys.argv[3], st, "claro" if "--claro" in sys.argv else "ultratumba"); print(sys.argv[3])
     else:
         marca, linea = sys.argv[2], sys.argv[3]
         d = marca_dir(marca, True) / "music" / "voz_pruebas"; d.mkdir(parents=True, exist_ok=True)

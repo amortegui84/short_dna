@@ -34,8 +34,8 @@ for ln in pj["lineas"]:
             break
     mejor = max(tomas)[1]
     mejor.replace(mp3)
-    if VOZ.get("procesado") == "ultratumba":   # personaje "de ultratumba": tono mas bajo, cripta, eco (voz_ultratumba.py)
+    if VOZ.get("procesado") in ("ultratumba", "claro"):   # voz procesada en local (voz_ultratumba.py): "claro" = entendible, "ultratumba" = cripta
         from voz_ultratumba import procesar
-        crudo = mp3.with_name(mp3.stem + "_crudo.mp3"); mp3.replace(crudo); procesar(crudo, mp3, VOZ.get("semitonos", 2.0))
+        crudo = mp3.with_name(mp3.stem + "_crudo.mp3"); mp3.replace(crudo); procesar(crudo, mp3, VOZ.get("semitonos", 2.0), VOZ["procesado"])
     for _, t in tomas:
         t.unlink(missing_ok=True)
