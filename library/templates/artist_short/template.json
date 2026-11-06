@@ -1,0 +1,100 @@
+{
+ "slug": "artist_short",
+ "nombre": "Artist file: art history Short with a presenter",
+ "duracion_s": [
+  55,
+  70
+ ],
+ "campo_tema": "artista",
+ "estructura": [
+  {
+   "seccion": "gancho",
+   "linea": "L01",
+   "tipo": "A",
+   "regla": "a surprising fact in one sentence; the named artwork enters as an insert"
+  },
+  {
+   "seccion": "ficha",
+   "linea": "L02",
+   "tipo": "B",
+   "regla": "name, country, year; the artist card covers the start, then the first artwork"
+  },
+  {
+   "seccion": "cabeza",
+   "linea": "L03",
+   "tipo": "A",
+   "regla": "zoom into one artwork or detail; cut to it under stripes when she names it"
+  },
+  {
+   "seccion": "obra",
+   "linea": "L04",
+   "tipo": "B",
+   "regla": "the story around that artwork"
+  },
+  {
+   "seccion": "cabeza",
+   "linea": "L05",
+   "tipo": "A",
+   "regla": "the turn (what we do not know, what changed)"
+  },
+  {
+   "seccion": "cita",
+   "linea": "L06",
+   "tipo": "B",
+   "regla": "a real quote with its source (obras: [\"__cita__\"])"
+  },
+  {
+   "seccion": "obra",
+   "linea": "L07",
+   "tipo": "B",
+   "regla": "a second story, patron or legacy"
+  },
+  {
+   "seccion": "cabeza",
+   "linea": "L08",
+   "tipo": "A",
+   "regla": "the open debate"
+  },
+  {
+   "seccion": "obra",
+   "linea": "L09",
+   "tipo": "B",
+   "regla": "a short line that lets the artwork breathe"
+  },
+  {
+   "seccion": "cierre",
+   "linea": "L10",
+   "tipo": "A",
+   "regla": "a two-option question to comment (detail cards by gesture) + call to action"
+  }
+ ],
+ "proyecto_base": {
+  "slug": "",
+  "plantilla": "artist_short",
+  "estilo": "collage_v10c",
+  "personaje": "",
+  "look": "",
+  "numero": 1,
+  "artista": "",
+  "fechas": "",
+  "lema": "",
+  "gancho": "",
+  "retrato": "00_retrato",
+  "ritmo_b": 1.0,
+  "pausa_b": 1.2,
+  "cita": {
+   "lineas": [],
+   "autor": "",
+   "clave": ""
+  },
+  "palabras_clave": [],
+  "obras_descarga": {},
+  "titulos": {},
+  "momentos_a": {},
+  "obras_b": {},
+  "juntas": [],
+  "musica": null,
+  "lineas": [],
+  "fuentes": []
+ }
+}

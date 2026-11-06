@@ -1,0 +1,84 @@
+{
+ "slug": "green_hair_presenter",
+ "nombre": "Art presenter (green hair)",
+ "descripcion": "A generated, fictional 30-year-old art YouTuber: long solid emerald-green hair, left side buzzed, ear gauges, silver hoop, black choker, small triangle tattoo; cosy bedroom streaming room with a black podcast microphone on a boom arm and blurred LED lights. Not a real person.",
+ "maestro": "master.jpg",
+ "escena_base": "escena_base.jpg",
+ "voz": {
+  "proveedor": "elevenlabs",
+  "voice_id": "6u6JbqKdaQy89ENzLSju",
+  "modelo": "eleven_v3",
+  "stability": 0.5,
+  "nota": "Library voice used as provisional; a designed voice can replace it (put its id here)."
+ },
+ "identidad_fija": "Keep everything from the first reference image exactly the same: her cosy bedroom streaming room (seen from a slightly different camera angle when described), the black podcast microphone on its boom arm in front of her just below her chin, the purple, pink and teal LED lights and neon moon softly blurred behind her, the same room and camera direction. Only her pose, the camera angle, the LED colour and the small shelf details change as described. Her face is identical to the second reference image: same eyes, eyebrows, nose, lips, jaw and skin, with her long solid emerald-green hair, the buzzed left side, ear gauges, silver hoop, black choker and the small triangle tattoo. Her face is brightly and evenly lit by a soft frontal key light. Realistic vertical 9:16 smartphone video frame.",
+ "mirada": "Whatever the head angle, her eyes look straight into the camera lens, making direct eye contact with the viewer.",
+ "identidad_cabeza": "Keep everything else from the first reference image exactly the same: her outfit, what her hands are doing, the room, the black podcast microphone on its boom arm just below her chin, the LED lights and neon moon, the camera framing. Her face is identical to the second reference image: same eyes, eyebrows, nose, lips, jaw and skin, long solid emerald-green hair, buzzed side, ear gauges, silver hoop, black choker. Her eyes look straight into the camera lens. No crossed hands, no mesh or see-through clothing. Realistic vertical 9:16 smartphone video frame.",
+ "nunca": [
+  "mesh or see-through clothing",
+  "crossed or interlaced hands (they deform fingers)",
+  "anything over the face",
+  "looking away from the lens",
+  "the same head tilt in every look (the channel grid shows the pattern)"
+ ],
+ "looks": {
+  "01_cuero_puas": {
+   "imagen": "looks/01_cuero_puas.jpg",
+   "ropa": "She now wears a cropped black leather biker jacket covered in silver cone studs and spikes on the shoulders and lapels, open over a black strapless bandeau top, a chunky silver chain necklace.",
+   "pose": "Her head and shoulders face the camera squarely and straight on, perfectly frontal and symmetrical, chin level with a confident look; her hands rest out of frame. The camera is a little closer than usual, a tight medium close-up. The camera is slightly higher, looking down a touch; the LEDs glow deep red and orange and a small resin skull sits on the shelf.",
+   "cabeza": "Change only her head angle: her head is perfectly upright and level, not tilted at all, facing the camera straight on, both eyes at the same height."
+  },
+  "02_terciopelo_broches": {
+   "imagen": "looks/02_terciopelo_broches.jpg",
+   "ropa": "She now wears a deep burgundy velvet blazer pinned with antique occult brooches (a crescent moon, an eye, a snake) over a black lace-trimmed camisole with a modest neckline.",
+   "pose": "Her head tilts softly to one side with a curious look, and she rests her chin on the back of her left hand, elbow on the desk. The camera is shifted a little to the left, so the neon moon sits near the edge of the frame; the LEDs glow warm magenta and a small vintage tarot print hangs on the wall.",
+   "cabeza": "Change only her head angle: she still rests her chin on her hand, but her head now tilts toward the RIGHT side of the image (the viewer's right), the opposite way from the first reference."
+  },
+  "04_denim_pintado": {
+   "imagen": "looks/04_denim_pintado.jpg",
+   "ropa": "She now wears an oversized vintage denim jacket hand-painted with tarot symbols and stars in gold and white, open over a black ribbed tank top, several rings on her fingers.",
+   "pose": "Her head tilts toward the left side of the image with eyebrows raised and a playful look; she holds a small open art book low in one hand near the edge of the frame, fingers relaxed, the other hand out of frame. The camera is shifted a little to the right, showing more of the bookshelf with a small plant and two lit candles; the LEDs glow blue-violet.",
+   "cabeza": "Change only her head angle: she still holds the open book, but her head now tilts clearly toward the RIGHT side of the image (the viewer's right), the opposite way from the first reference, with a playful look."
+  },
+  "05_corse_camisa": {
+   "imagen": "looks/05_corse_camisa.jpg",
+   "ropa": "She now wears a white oversized poet shirt with ruffled cuffs under a black structured corset vest, and a vintage bolo tie with a green stone.",
+   "pose": "Her head is clearly turned toward the right side of the image (the viewer's right) in a three-quarter view, and she touches the green bolo-tie stone with the fingertips of one hand. The camera is slightly lower and a bit to the left, looking up at her gently, with a warm orange accent light on her cheek from the desk lamp. The LEDs glow soft pink and lilac and a vase of dried flowers sits on the shelf behind her.",
+   "cabeza": "Change only her head angle: she still touches the bolo-tie stone, but her head is now turned and slightly tilted toward the RIGHT side of the image (the viewer's right) in a three-quarter view."
+  },
+  "06_leopardo": {
+   "imagen": "looks/06_leopardo.jpg",
+   "ropa": "She now wears a faux-fur leopard-print coat slipping off one shoulder over a black strapless top, with oversized vintage tortoiseshell sunglasses pushed up into her hair.",
+   "pose": "She leans back a little with her head clearly turned and tilted toward the right side of the image (the viewer's right) and a teasing half smile, pushing the sunglasses up into her hair with one hand. The buzzed side of her head is on the right side of the image exactly as in the second reference image, and her long green hair falls on the left side of the image. The framing is a little wider, showing more of the room and her shoulders, with a cool teal accent light on her hair. The LEDs glow teal and emerald and a small framed black-and-white engraving hangs on the wall.",
+   "cabeza": "kept from v5 (tilts to the viewer's left)"
+  }
+ },
+ "inicios_variantes": [
+  "Tight frontal close-up: head and shoulders square to the camera, chin level, the camera a little closer than in the first reference.",
+  "Her head and shoulders are clearly turned toward the left side of the image (the viewer's left) in a strong three-quarter view, the camera shifted a little to the right so more of the bookshelf shows; hands out of frame.",
+  "Her head is clearly turned toward the right side of the image (the viewer's right) in a three-quarter view, eyebrows raised high in surprise, the camera shifted a little to the left with the neon moon near the edge of the frame; hands out of frame.",
+  "The camera is a little farther back, a medium shot showing more of her torso and the desk; only her right hand is raised in a relaxed open-palm gesture near her shoulder, fingers natural and apart; her other hand is out of frame.",
+  "Her head is tilted strongly to one side, about twenty degrees, with a knowing half smile; the camera is lower and closer, looking up at her, with a warm orange accent light from the desk lamp on one cheek."
+ ],
+ "inicios_fijo": "Keep everything from the first reference image the same: her exact outfit, her cosy bedroom streaming room, the black podcast microphone on its boom arm just below her chin, the LED lights and neon moon softly blurred behind her. Her face is identical to the second reference image: same eyes, eyebrows, nose, lips, jaw and skin, with her long solid emerald-green hair, the buzzed side, ear gauges, silver hoop, black choker and the small triangle tattoo. Her face is brightly and evenly lit by a soft frontal key light. Her mouth is relaxed and slightly open as if about to speak. No crossed hands, no mesh or see-through clothing. Realistic vertical 9:16 smartphone video frame.",
+ "inicios_mirada": "Whatever the head angle, her eyes look straight into the camera lens, making direct eye contact with the viewer.",
+ "prompt_clip": "subject_definitions:\n<Subject 1> is the woman from <Picture 1>, a 30-year-old art YouTuber with long solid emerald-green hair, the left side of her head buzzed, ear gauges and a silver hoop; her face matches <Picture 2> exactly. <Audio 1> is her voice.\n\nsummary:\n[reference-to-video generation + audio generation]\nA vertical YouTube Shorts clip: she talks straight to the camera about the artist {artista}.\n\nretention_analysis:\n<Subject 1>: fully_preserved (face, hair, tattoos, outfit, body proportions)\n\ndetailed_description:\nA realistic vertical 9:16 smartphone video, static camera at eye level, close medium shot from the chest up. <Subject 1> sits in her cosy bedroom streaming setup exactly as in <Picture 1>, with the same black podcast microphone on its boom arm in front of her, and the colourful streamer LED lights behind her stay softly blurred in bokeh. Her face is brightly and evenly lit by a large soft key light from the front, well exposed and natural. She wears the same outfit as in <Picture 1>. Her face stays clearly visible and identical to <Picture 2> for the whole clip, with big expressive lip movement synced to her words and lively animated eyebrows. While speaking {accion}.\n<Subject 1> (S1) says in a warm, natural, conversational American voice, expressive and confident: <d>[English] {dialogo}</d>\n\noverall_soundscape:\nQuiet room tone. Only her voice, clear and close to the microphone.\n\nnon_diegetic_music:\nN/A\n",
+ "h3": {
+  "turbo": "pika_h3_flex_ref2va_v1_bf16.safetensors",
+  "steps": 6,
+  "size": "768x1344",
+  "lora": "minidv_lora_h3_v1.safetensors:0.9",
+  "seeds": [
+   23,
+   24,
+   25
+  ],
+  "qc_min": 0.85
+ },
+ "encuadre_ae": {
+  "x": 540,
+  "y": 1100,
+  "s": 100,
+  "nota": "bust cut-out with the boom mic fills the frame; the face sits around y 700-1200"
+ }
+}

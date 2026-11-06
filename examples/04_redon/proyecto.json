@@ -1,0 +1,352 @@
+{
+ "slug": "04_redon",
+ "plantilla": "artist_short",
+ "estilo": "collage_v10c",
+ "personaje": "green_hair_presenter",
+ "look": "05_corse_camisa",
+ "numero": 4,
+ "artista": "Odilon Redon",
+ "fechas": "1840 - 1916",
+ "lema": "the dreamer who painted in black, then in color",
+ "gancho": "Twenty years in black",
+ "retrato": "00_mon_portrait",
+ "voz": "6u6JbqKdaQy89ENzLSju",
+ "ritmo_b": 1.0,
+ "pausa_b": 1.2,
+ "cita": {
+  "lineas": [
+   "“My drawings",
+   "inspire, and are",
+   "not to be defined.”"
+  ],
+  "autor": "— Odilon Redon",
+  "clave": "defined"
+ },
+ "palabras_clave": [
+  [
+   "L03",
+   "eye",
+   "a floating eye"
+  ],
+  [
+   "L05",
+   "pastels",
+   "color"
+  ],
+  [
+   "L07",
+   "cyclops",
+   "a shy cyclops"
+  ],
+  [
+   "L10",
+   "black",
+   "black or color"
+  ]
+ ],
+ "obras_descarga": {
+  "00_mon_portrait": "https://upload.wikimedia.org/wikipedia/commons/c/c6/095_Odilon_Redon_Mon_portrait.jpg",
+  "01_eye_balloon_poe": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/91/Redon_-_The_Eye%2C_Like_a_Strange_Balloon_Moves_Towards_Infinity%2C_plate_one_from_To_Edgar_Poe%2C_1920.1570.jpg/1920px-Redon_-_The_Eye%2C_Like_a_Strange_Balloon_Moves_Towards_Infinity%2C_plate_one_from_To_Edgar_Poe%2C_1920.1570.jpg",
+  "02_eye_balloon_1878": "https://upload.wikimedia.org/wikipedia/commons/5/55/Redon_-_Eye-Balloon_%28%C5%92il-ballon%29_1878.jpg",
+  "03_smiling_spider": "https://upload.wikimedia.org/wikipedia/commons/d/d2/Redon_smiling-spider.jpg",
+  "04_cyclops": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/be/Odilon_Redon_-_The_Cyclops%2C_c._1914.jpg/1920px-Odilon_Redon_-_The_Cyclops%2C_c._1914.jpg",
+  "05_ophelia": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/68/Odilon_Redon%2C_Ophelia_among_the_Flowers%2C_The_National_Gallery%2C_London.jpg/1920px-Odilon_Redon%2C_Ophelia_among_the_Flowers%2C_The_National_Gallery%2C_London.jpg",
+  "06_buddha": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/72/De_Boeddha_-_Odilon_Redon_%28Van_Gogh_Museum%29.jpg/1920px-De_Boeddha_-_Odilon_Redon_%28Van_Gogh_Museum%29.jpg",
+  "07_conque_marine": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/84/Bemberg_Fondation_Toulouse_-_Conque_marine_-_Odilon_Redon.jpg/1920px-Bemberg_Fondation_Toulouse_-_Conque_marine_-_Odilon_Redon.jpg"
+ },
+ "titulos": {
+  "00_mon_portrait": [
+   "Self-portrait",
+   "1867"
+  ],
+  "01_eye_balloon_poe": [
+   "The Eye, like a strange balloon",
+   "1882"
+  ],
+  "02_eye_balloon_1878": [
+   "Eye-Balloon",
+   "1878"
+  ],
+  "03_smiling_spider": [
+   "The Smiling Spider",
+   "1881"
+  ],
+  "04_cyclops": [
+   "The Cyclops",
+   "c. 1914"
+  ],
+  "05_ophelia": [
+   "Ophelia",
+   "c. 1900-1905"
+  ],
+  "06_buddha": [
+   "The Buddha",
+   "c. 1905"
+  ],
+  "07_conque_marine": [
+   "Sea Shell",
+   "1912"
+  ]
+ },
+ "momentos_a": {
+  "L01": [
+   [
+    "obra",
+    "01_eye_balloon_poe",
+    "painter"
+   ],
+   [
+    "obra",
+    "05_ophelia",
+    "exploded"
+   ],
+   [
+    "etq",
+    "Color",
+    "color"
+   ]
+  ],
+  "L03": [
+   [
+    "obra",
+    "02_eye_balloon_1878",
+    "eye"
+   ],
+   [
+    "etq",
+    "Noirs",
+    "noirs"
+   ],
+   [
+    "obra",
+    "03_smiling_spider",
+    "spider"
+   ],
+   [
+    "flecha",
+    "spider"
+   ],
+   [
+    "lapiz",
+    "smiles"
+   ]
+  ],
+  "L05": [
+   [
+    "obra",
+    "07_conque_marine",
+    "changed"
+   ],
+   [
+    "flecha",
+    "changed"
+   ],
+   [
+    "etq",
+    "Pastels",
+    "pastels"
+   ]
+  ],
+  "L08": [
+   [
+    "obra",
+    "04_cyclops",
+    "monsters"
+   ],
+   [
+    "obra",
+    "06_buddha",
+    "glow"
+   ],
+   [
+    "etq",
+    "Now they glow",
+    "glow"
+   ]
+  ],
+  "L10": [
+   [
+    "obra",
+    "01_eye_balloon_poe",
+    "black"
+   ],
+   [
+    "etq",
+    "The black",
+    "black"
+   ],
+   [
+    "obra",
+    "05_ophelia",
+    "color"
+   ],
+   [
+    "etq",
+    "The color",
+    "color"
+   ],
+   [
+    "cta",
+    "Drop your answer",
+    "comments"
+   ]
+  ]
+ },
+ "obras_b": {
+  "L02": [
+   [
+    "02_eye_balloon_1878",
+    "charcoal"
+   ]
+  ],
+  "L04": [
+   [
+    "01_eye_balloon_poe",
+    "series"
+   ]
+  ],
+  "L07": [
+   [
+    "05_ophelia",
+    "flowers"
+   ],
+   [
+    "04_cyclops",
+    "cyclops"
+   ]
+  ],
+  "L09": [
+   [
+    "07_conque_marine",
+    "darkest"
+   ]
+  ]
+ },
+ "juntas": [
+  [
+   "allan",
+   "poe"
+  ],
+  [
+   "butt",
+   "song"
+  ],
+  [
+   "charcoal",
+   "drawings"
+  ],
+  [
+   "do",
+   "you"
+  ],
+  [
+   "edgar",
+   "allan"
+  ],
+  [
+   "giant",
+   "instruments"
+  ],
+  [
+   "odilon",
+   "redon"
+  ],
+  [
+   "the",
+   "second"
+  ],
+  [
+   "which",
+   "redon"
+  ]
+ ],
+ "musica": null,
+ "lineas": [
+  {
+   "id": "L01",
+   "tipo": "A",
+   "texto": "For twenty years, this painter worked almost only in black... and then everything exploded into color.",
+   "tts": "For twenty years, this painter worked almost only in black... [excited] and then everything exploded into color.",
+   "accion": "she speaks in a low, mysterious voice with her hands close together, then throws both hands open like fireworks on 'exploded into color' with a big smile"
+  },
+  {
+   "id": "L02",
+   "tipo": "B",
+   "texto": "Odilon Redon. France, 1840. He called his charcoal drawings his noirs.",
+   "tts": "Odilon Redon. France, 1840. He called his charcoal drawings... his noirs.",
+   "obras": [
+    "01_eye_balloon_poe",
+    "02_eye_balloon_1878"
+   ]
+  },
+  {
+   "id": "L03",
+   "tipo": "A",
+   "texto": "And his noirs are weird. A giant eye floating like a balloon. A spider that smiles at you.",
+   "tts": "And his noirs are weird. A giant eye, floating like a balloon. A spider... that smiles at you.",
+   "accion": "she makes a circle with her fingers around one eye like a lens, lifts it upward like a floating balloon, then wiggles her fingers like spider legs and grins creepily"
+  },
+  {
+   "id": "L04",
+   "tipo": "B",
+   "texto": "He even made a whole series for Edgar Allan Poe. Nightmares, drawn in charcoal.",
+   "tts": "He even made a whole series for Edgar Allan Poe. Nightmares, drawn in charcoal.",
+   "obras": [
+    "03_smiling_spider",
+    "01_eye_balloon_poe"
+   ]
+  },
+  {
+   "id": "L05",
+   "tipo": "A",
+   "texto": "Then, in his fifties, something changed. He picked up pastels, and he never looked back.",
+   "tts": "Then, in his fifties, something changed. He picked up pastels, and he never looked back.",
+   "accion": "she pauses with a surprised look, mimes picking up a pastel and drawing a colourful stroke in the air, then flicks her hand backward on 'never looked back'"
+  },
+  {
+   "id": "L06",
+   "tipo": "B",
+   "texto": "My drawings inspire, and are not to be defined.",
+   "tts": "[softly] My drawings inspire... and are not to be defined.",
+   "obras": [
+    "__cita__"
+   ]
+  },
+  {
+   "id": "L07",
+   "tipo": "B",
+   "texto": "Flowers, butterflies, a Buddha, and a shy cyclops falling in love.",
+   "tts": "Flowers, butterflies, a Buddha... and a shy cyclops, falling in love.",
+   "obras": [
+    "05_ophelia",
+    "06_buddha",
+    "04_cyclops"
+   ]
+  },
+  {
+   "id": "L08",
+   "tipo": "A",
+   "texto": "Same dreams, same monsters. But now they glow.",
+   "tts": "Same dreams, same monsters. [warmly] But now they glow.",
+   "accion": "she nods slowly with a knowing look, then opens her fingers beside her face as if light is radiating from it, smiling softly"
+  },
+  {
+   "id": "L09",
+   "tipo": "B",
+   "texto": "From the darkest black to the brightest color.",
+   "tts": "From the darkest black... to the brightest color.",
+   "obras": [
+    "07_conque_marine",
+    "05_ophelia"
+   ]
+  },
+  {
+   "id": "L10",
+   "tipo": "A",
+   "texto": "So, which Redon do you prefer? The black, or the color? Tell me in the comments.",
+   "tts": "So, which Redon do you prefer? The black... or the color? Tell me in the comments.",
+   "accion": "she holds out her left hand for 'the black' and her right hand for 'the color', looks back and forth between them, then points at the viewer on 'tell me' and winks"
+  }
+ ],
+ "fuentes": []
+}

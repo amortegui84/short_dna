@@ -1,0 +1,87 @@
+{
+ "slug": "collage_v10c",
+ "nombre": "Art collage (paper, tape, giant words)",
+ "formato": {
+  "w": 1080,
+  "h": 1920,
+  "fps": 30,
+  "seguro": [
+   40,
+   150,
+   950,
+   1330
+  ],
+  "y_subtitulos": 1400
+ },
+ "tokens": {
+  "tinta": "#191D1D",
+  "papel": "#F7F8F4",
+  "teal": "#6FAFA8",
+  "menta": "#3ECCB0",
+  "magenta": "#E6128F",
+  "lima": "#C1F157",
+  "ocre": "#B8945A",
+  "pizarra": "#9FB5AE",
+  "fondos_presentadora": [
+   "#2E6F66",
+   "#7A2550",
+   "#3D5A3A"
+  ]
+ },
+ "tipografia": {
+  "titulares": "Impact",
+  "serif": "InstrumentSerif-Italic",
+  "mono": "CourierNewPS-BoldMT",
+  "subtitulos": "Impact 74, white, current word in lime, ink bar with rough edges"
+ },
+ "kit": [
+  "alfa3/cinta",
+  "alfa3/mano_yeso",
+  "alfa3/marco_barroco|oval|simple",
+  "alfa3/tools (tubes, brushes, palette, charcoal...)",
+  "texturas3/craquelado",
+  "texturas3/lienzo",
+  "imagenes/texturas/Paper001|Paper002|concrete_*",
+  "componentes_ae/mates_png/semitono_parejo_4K_alfa"
+ ],
+ "reglas": [
+  "The presenter is big and centred when she talks (bust cut-out with the boom mic at x540 y1100 s100), on a colour with the key word giant behind her, sliding.",
+  "An artwork enters full-bleed on the word that names it, at least 1.8 s on screen, never altered (no filters, no pieces cut out of it, nothing drawn on it).",
+  "Presenter -> artwork (and back) is a hard cut covered by four diagonal stripes (0.8 s). Stripes only where the presenter enters or leaves.",
+  "A voice-over that continues with the artwork she just named does not cut: the same artwork stays. A different artwork comes in with a 0.9 s cross-dissolve.",
+  "Between non-presenter sections the camera slides 1.2 s between board spots; the incoming artwork is already in place; each artwork is clipped to its 1080x1920 frame.",
+  "Full-bleed artworks drift at most 70 px/s (x) and 50 px/s (y) and zoom 0.8 %/s; camera drift is capped at 5 s of travel; the camera path is linear (no spatial auto-bezier).",
+  "Voice-over at natural pace; the artwork holds 1.2 s after each voice-over line; every section lasts until the next one starts.",
+  "Detail cards in the closing line come out on the side the presenter's hand opens to, above her, never over the face, at least 1.5 s before the camera leaves.",
+  "Artist card: cut-out portrait filling with colour blocks and painter's tools; name, dates and motto fade in with the card (never an empty card first).",
+  "Quote: dark block, ragged magenta slab with halftone and paper inside, tape, paper hand, giant lime quote mark, Impact lines of <=12 letters revealed word by word on the voice, key word in lime circled by a pencil stroke, author typed with a lime underline.",
+  "Subtitles by clause, <=4 words or 24 letters per line, never ending on a weak word, never splitting a name pair (proyecto 'juntas').",
+  "Sound: whoosh on stripes and slides, tick on arrival, sub when an artwork fills the frame, riser into the hook's artwork, click on detail cards, typing on the card dates, chime on the quote, pop on labels."
+ ],
+ "tiempos": {
+  "franjas_s": 0.8,
+  "fundido_obras_s": 0.9,
+  "deslizamiento_s": 1.2,
+  "paso_tapado_s": 0.55,
+  "pausa_b_s": 1.2,
+  "ritmo_b": 1.0,
+  "obra_min_s": 1.8,
+  "tarjeta_min_s": 1.5
+ },
+ "audio": {
+  "voz_lufs": -20,
+  "musica_lufs": -27,
+  "master_lufs": -20,
+  "tp": -1.5
+ },
+ "musica": {
+  "tags": "dark cinematic documentary score, low cello drone, sparse felt piano, deep pulsing synth bass, subtle ticking percussion, mysterious, elegant, modern, serious, slow build, no vocals",
+  "bpm": 88,
+  "key": "D minor",
+  "evitar": "childish timbres: lute, recorder, celesta, glockenspiel, pizzicato"
+ },
+ "ejemplos": [
+  "examples/03_bosch",
+  "examples/04_redon"
+ ]
+}

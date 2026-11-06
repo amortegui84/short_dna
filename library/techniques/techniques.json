@@ -1,0 +1,86 @@
+[
+ {
+  "id": "stripe_cut",
+  "nombre": "Stripe-covered cut",
+  "donde": "ae/collage.jsx franjas()",
+  "uso": "presenter <-> artwork",
+  "como": "4 diagonal parallelograms (teal, magenta, grey, ink) sweep left to right in 0.8 s with ease 60; the cut happens under them (+0.02 s, never +0.4: that left 5 green frames)"
+ },
+ {
+  "id": "board_slide",
+  "nombre": "Board slide between artworks",
+  "donde": "build(): CAM null + tab()",
+  "uso": "artwork <-> artwork, card, quote",
+  "como": "every section sits on a board spot 1400x2200 apart; a CAM null moves 1.2 s on a linear path between spots; content lives from ini-1.25 to fin+0.1; artworks clipped by a frame-size alpha matte"
+ },
+ {
+  "id": "fold_voiceover",
+  "nombre": "Voice-over folded into the line",
+  "donde": "engine/build_collage.py (v10b block)",
+  "uso": "a voice-over line after a talking line with a cut",
+  "como": "the obra section joins the talking section: the same artwork continues (no transition); a different one cross-dissolves 0.9 s; its card appears after the dissolve"
+ },
+ {
+  "id": "slow_drift",
+  "nombre": "Slow artwork drift",
+  "donde": "obraSangre()",
+  "uso": "full-bleed artworks",
+  "como": "pan <= 35*dur px each way (70 px/s), y <= 25*dur, zoom 0.8 %/s; never the old 1100 px/s sweep"
+ },
+ {
+  "id": "giant_words",
+  "nombre": "Giant sliding words",
+  "donde": "fondoCabeza()",
+  "uso": "behind the presenter",
+  "como": "the key word in 4 rows of Impact 230 (white/lime, 55-100 % opacity), each row sliding its own way, each word for its own time"
+ },
+ {
+  "id": "detail_cards",
+  "nombre": "Detail cards by gesture",
+  "donde": "tarjetaDetalle() + cabeza() no-cut branch",
+  "uso": "closing question (the black or the colour)",
+  "como": "a crop of the artwork on a taped card, above the presenter, on the side her hand opens to; both stay; >= 1.5 s before the camera leaves"
+ },
+ {
+  "id": "artist_card",
+  "nombre": "Artist card",
+  "donde": "ficha() + siluetaArtista()",
+  "uso": "after the hook",
+  "como": "cut-out portrait as a silhouette filling with magenta/teal blocks, paper, halftone and 18 painter's tools stacking up; name card with fades"
+ },
+ {
+  "id": "kinetic_quote",
+  "nombre": "Kinetic quote",
+  "donde": "cita()",
+  "uso": "the artist's quote",
+  "como": "word-by-word reveal on the voice timestamps (scale 175 to 100, y+40, 0.22 s ease) on a ragged magenta slab with tape, halftone and a paper hand; key word lime with a pencil ellipse; author typed"
+ },
+ {
+  "id": "hook_insert",
+  "nombre": "Hook insert",
+  "donde": "cabeza() inserto",
+  "uso": "first line",
+  "como": "the named artwork full-bleed for ~2.4 s inside the hook, the presenter hidden with hold keys, stripes in and out, riser before"
+ },
+ {
+  "id": "labels",
+  "nombre": "Capsule labels",
+  "donde": "etiqueta()",
+  "uso": "key phrases over artworks",
+  "como": "Impact uppercase on an ink parallelogram inside a paper capsule with a thick ink stroke; scale pop 0-110-100 in 7 frames; placed away from the face boxes (cajas_cabeza.json)"
+ },
+ {
+  "id": "presenter_cutout",
+  "nombre": "Presenter cut-out",
+  "donde": "engine/mates.py",
+  "uso": "talking lines",
+  "como": "InSPyReNet matte (Motion DNA video_matte.py) to ProRes 4444; a mint copy offset (24,20) multiplied at 62 % behind; the last frame holds"
+ },
+ {
+  "id": "lipsync_voice",
+  "nombre": "Exact lipsync with one voice",
+  "donde": "engine/clips.py + sts.py + montaje.py",
+  "uso": "talking lines",
+  "como": "H3 generates speech and face together; ElevenLabs speech-to-speech changes the timbre keeping H3's timing (0 ms offset, corr 0.92-0.95)"
+ }
+]

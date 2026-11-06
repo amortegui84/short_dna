@@ -1,0 +1,31 @@
+{
+  "_readme": "Copy to config/local.json (git-ignored) and point every path at this machine. Keys never go here: they live in the .env file named by env_file.",
+  "work_dir": "D:/shorts_work",
+  "env_file": "D:/secrets/shorts_factory.env",
+  "python_tools": "C:/Python314/python.exe",
+  "motion_dna": "D:/motion category ai library",
+  "aerender": "C:/Program Files/Adobe/Adobe After Effects 2026/Support Files/aerender.exe",
+  "ae_render_template": "H.264 - Match Render Settings - 15 Mbps",
+  "comfy_h3": {
+    "url": "http://127.0.0.1:8188",
+    "python": "D:/ComfyUI_windows_portable_nvidia/ComfyUI_windows_portable/python_embeded/python.exe",
+    "h3_script": "D:/ComfyUI_windows_portable_nvidia/ComfyUI_windows_portable/h3/h3.py",
+    "comfy_dir": "D:/ComfyUI_windows_portable_nvidia/ComfyUI_windows_portable/ComfyUI"
+  },
+  "comfy_klein": {
+    "url": "http://127.0.0.1:8189",
+    "comfy_dir": "D:/ComfyUI_QI21/ComfyUI_windows_portable/ComfyUI"
+  },
+  "face_check": {
+    "python": "D:/ComfyUI_windows_portable_nvidia/ComfyUI_windows_portable/python_embeded/python.exe",
+    "faceid_dir": "D:/app_photobook/herramientas"
+  },
+  "providers": {
+    "image": "comfy_klein",
+    "video_talking": "comfy_h3",
+    "video_broll": "seedance",
+    "voice": "elevenlabs",
+    "music": "comfy_ace",
+    "research": "claude"
+  }
+}

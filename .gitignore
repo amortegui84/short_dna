@@ -1,0 +1,16 @@
+config/local.json
+*.env
+.env
+__pycache__/
+*.pyc
+# heavy media lives in work_dir, never in git
+*.mp4
+*.mov
+*.wav
+*.mp3
+*.aep
+*.aep.bak
+*.zip
+work/
+**/_candidatos/
+*.log

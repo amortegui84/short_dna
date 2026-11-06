@@ -1,0 +1,7 @@
+# engine (CPU python)
+numpy
+pillow
+scipy
+faster-whisper
+# face check (qa_cara.py) runs in the ComfyUI portable python: opencv-python, onnxruntime (+ faceid.py, see config face_check)
+# mattes (Motion DNA tools/video_matte.py) run in the ComfyUI portable python: torch, transparent-background

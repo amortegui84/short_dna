@@ -1,0 +1,12 @@
+{
+ "_readme": "Origin and licence of every asset in library/. Check before client or commercial work.",
+ "kit/alfa3/*": {"origen": "generated for this project (Flux Klein / Z-Image) and cut out locally", "licencia": "own work; the image model's licence applies (FLUX Kommunity is non-commercial)"},
+ "kit/texturas3/*": {"origen": "generated for this project", "licencia": "own work (same model note)"},
+ "kit/imagenes/texturas/Paper001_2k.jpg, Paper002_2k.jpg": {"origen": "ambientCG naming", "licencia": "CC0 (verify the source before redistribution)"},
+ "kit/imagenes/texturas/concrete_*_2k.jpg": {"origen": "Poly Haven naming", "licencia": "CC0 (verify the source before redistribution)"},
+ "kit/componentes_ae/mates_png/semitono_parejo_4K_alfa.png": {"origen": "made in code for this project", "licencia": "own work"},
+ "characters/green_hair_presenter/*": {"origen": "generated, fictional person (Flux Klein, H3 stills)", "licencia": "own work (model licence note); not a real person"},
+ "examples/*/obras (downloaded by the obras stage)": {"origen": "Wikimedia Commons", "licencia": "public domain per each file page; credits in obras/CREDITOS.json"},
+ "voice": {"origen": "ElevenLabs library voice 6u6JbqKdaQy89ENzLSju", "licencia": "ElevenLabs terms of the account's plan"},
+ "music": {"origen": "ACE-Step 1.5 locally (per project, not in git)", "licencia": "check the ACE-Step model licence for commercial use"}
+}
