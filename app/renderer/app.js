@@ -94,7 +94,12 @@ function lookPicker(state) {
 const sel = (opts, val, on) => { const s = h("select", { onchange: (e) => on(e.target.value) }, opts.map(([v, t]) => { const o = h("option", { value: v }, t); if (v === val) o.selected = true; return o; })); return s; };
 
 V.short = async () => {
-  const st = { topic: "", platforms: ["youtube_shorts"], template: LIB.templates[0]?.slug, character: LIB.chars[0]?.slug, look: "", style: LIB.styles[0]?.slug, length: 60, lang: "English", notes: "" };
+  // the brand's own defaults (brand.json: plantilla, personaje, estilo_por_defecto) win over the first item of each list
+  const B = (await window.api.brands()).find((x) => x.slug === BRAND) || {};
+  const has = (list, v) => v && list.some((x) => x.slug === v) ? v : null;
+  const st = { topic: "", platforms: B.plataformas?.length ? [...B.plataformas] : ["youtube_shorts"], template: has(LIB.templates, B.plantilla) || LIB.templates[0]?.slug,
+    character: has(LIB.chars, B.personaje) || LIB.chars[0]?.slug, look: "", style: has(LIB.styles, B.estilo_por_defecto) || has(LIB.styles, B.estilo) || LIB.styles[0]?.slug,
+    length: 60, lang: B.idioma || "English", notes: "" };
   const lp = lookPicker(st);
   const plats = h("div", { class: "chips" }, (LIB.platforms.length ? LIB.platforms : [{ slug: "youtube_shorts", nombre: "YouTube Shorts" }, { slug: "tiktok", nombre: "TikTok" }, { slug: "instagram_reels", nombre: "Instagram Reels" }])
     .map((p) => { const c = h("span", { class: st.platforms.includes(p.slug) ? "on" : "" }, p.nombre || p.slug); c.onclick = () => { st.platforms = st.platforms.includes(p.slug) ? st.platforms.filter((x) => x !== p.slug) : [...st.platforms, p.slug]; c.classList.toggle("on"); }; return c; }));
@@ -107,7 +112,7 @@ V.short = async () => {
         h("label", {}, "Template"), sel(LIB.templates.map((t) => [t.slug, t.nombre]), st.template, (v) => st.template = v),
         h("label", {}, "Style"), sel(LIB.styles.map((s) => [s.slug, s.nombre]), st.style, (v) => st.style = v),
         h("div", { class: "grid2" }, h("div", {}, h("label", {}, "Length (s)"), h("input", { type: "number", value: 60, oninput: (e) => st.length = +e.target.value })),
-          h("div", {}, h("label", {}, "Language"), h("input", { value: "English", oninput: (e) => st.lang = e.target.value }))),
+          h("div", {}, h("label", {}, "Language"), h("input", { value: st.lang, oninput: (e) => st.lang = e.target.value }))),
         h("label", {}, "Notes for Claude"), h("textarea", { rows: 3, oninput: (e) => st.notes = e.target.value })),
       h("div", {}, h("label", {}, "Character"), sel(LIB.chars.map((c) => [c.slug, c.nombre || c.slug]), st.character, (v) => { st.character = v; st.look = ""; lp.paint(); }),
         h("label", {}, "Look"), lp.box)),

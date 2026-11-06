@@ -7,6 +7,7 @@ Topic: "${o.topic}". Platforms: ${o.platforms.join(", ") || "youtube_shorts"}. T
 ${o.notes ? "Notes from the user: " + o.notes + "\n" : ""}1) Research the topic with web search into research.md (docs/templates/research.md): facts with sources, public-domain artworks or visuals, a real quote.
 2) Pick the hook pattern(s) from library/hooks.json and apply the platform rules in library/platforms/<platform>.json (length, safe area, CTA, AI disclosure).
 3) Write the script into proyecto.json (docs/templates/script.md, docs/PROJECT_SCHEMA.md).
+4) Follow every rule in brand.json "reglas". If the brand has a signature ending (a self-destruct), write proyecto.json "autodestruccion" {tipo, porque, prompt, sonido}: a new way, tied to this story, never one used by another episode of the brand (read their proyecto.json). Props and screens in clip prompts carry no real names, logos or faces (a blank tape, an unlabeled file).
 Then show me the hook, the script and the plan per platform, and STOP for my approval before any generation.`,
   run: (o) => `Run the factory for project "${o.slug}" (python factory.py run ${o.slug}). Follow the skill: show me the start frames, one talking clip and the music takes when they are ready; quote USD before any paid step; stop at checkpoints.`,
   reference: (o) => `I gave a reference video: ${o.src}. The measurements are in ${o.dir} (analisis.json, hoja.jpg with one frame per shot, cortes.json).
