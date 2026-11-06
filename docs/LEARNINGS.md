@@ -80,3 +80,9 @@ section the moment a review note arrives.
 ## App and Claude
 - **A one-word reply cost $0.70** → the Agent SDK loaded every connector of the account (~80 MCP servers) → strict MCP config with only
   Motion DNA, Blender and Figma: $0.08; the account's connectors only when the user ticks them.
+
+## Voice for narrators (Cult Pixel, 2026-11-05)
+- **"Inaudible because of the effect"** → crypt chain (pitch down, long echo, low-pass) hid the words → keep the voice clean (presence boost, firm compression); mood from the voice and the music.
+- **"Too slow for a 1-minute story"** → ElevenLabs v3 ignores `speed`, and designed voices speak ~95 wpm; tags like [slowly]/[long pause] slow it more → use `eleven_multilingual_v2` with `speed` 1.2 (~120 wpm, natural) + 1.1x, pauses capped at 0.4 s. v2 reads [tags] aloud: tts.py strips them for non-v3 models.
+- **Dramatic pauses were deleted** → montaje's silenceremove cut every silence > 0.3 s → `conservar_pausas` + `pausa_max` keep pauses up to N s.
+- A mouthless narrator needs no speech-to-speech: the line lasts as long as the voice, and the clip ping-pongs if the voice is longer.
