@@ -16,7 +16,8 @@ GAP = 0.12
 NIVELES = [1.0, 1.32, 1.12, 1.45]   # encuadres del avatar en cada salto de zoom
 SIL = "silenceremove=start_periods=1:start_threshold=-45dB:stop_periods=-1:stop_duration=0.3:stop_threshold=-45dB"
 # conservar_pausas (narradores dramaticos): solo se recortan el silencio del principio y del final; las pausas y silencios quedan
-SIL_BORDES = "silenceremove=start_periods=1:start_threshold=-45dB,areverse,silenceremove=start_periods=1:start_threshold=-45dB,areverse"
+SIL_BORDES = ("silenceremove=start_periods=1:start_threshold=-45dB:stop_periods=-1:stop_duration=0.9:stop_silence=0.9:stop_threshold=-45dB,"   # pausas de hasta 0.9 s
+              "areverse,silenceremove=start_periods=1:start_threshold=-45dB,areverse")
 
 
 def tiempos_guion(texto, oidas, ini, fin, sustituir):

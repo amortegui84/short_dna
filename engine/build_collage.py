@@ -20,6 +20,8 @@ HERE = Path(__file__).parent
 pj = json.loads((carpeta / "proyecto.json").read_text(encoding="utf-8"))
 tl = json.loads((carpeta / "timeline.json").read_text(encoding="utf-8"))
 CAJAS = json.loads((carpeta / "cajas_cabeza.json").read_text(encoding="utf-8"))
+from comun import personaje as _pers  # noqa: E402
+SIN_BOCA = bool(pj.get("personaje") and _pers(pj).get("sin_boca"))   # narrador sin boca: el clip va y vuelve en vez de congelarse
 (carpeta / "ae").mkdir(exist_ok=True)
 AEP = (carpeta / "ae" / f"{pj['slug']}.aep").as_posix()   # un proyecto de After por video
 G = KIT
@@ -115,7 +117,7 @@ for s in segs:
     fin = s["start"] + s["dur"] + tl["gap"]
     if s["tipo"] == "A":
         n = len(secciones)
-        sec = {"tipo": "cabeza", "id": s["id"], "ini": s["start"], "fin": fin, "mate": mate_de[s["id"]], "t0base": round(s["start"] - s["t0"], 3),
+        sec = {"tipo": "cabeza", "id": s["id"], "ini": s["start"], "fin": fin, "mate": mate_de[s["id"]], "t0base": round(s["start"] - s["t0"], 3), "sin_boca": SIN_BOCA,
                "head": dict(HEAD_A), "obras": [], "etqs": [], "lapiz": [], "flechas": [], "cta": None}
         libres = list(CAND_ETQ)
         if s is segs[0]:   # apertura: la cabeza grande y centrada es el eje; gancho arriba; una sola obra de avance

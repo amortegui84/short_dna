@@ -60,6 +60,8 @@ var COLLAGE = (function () {
     function nulo(n) { var L = c.layers.addNull(); L.name = n; T(L).property("ADBE Anchor Point").setValue([0, 0]); return L; }
     // vida de una seccion: medio segundo antes y despues; con los puntos a 1400 x 2200 px nada se ve desde otro punto
     var DERIVA = [[12, 9], [-12, 7], [10, -8], [-9, -9]];   // v8: la deriva cambia de direccion en cada seccion
+    // personaje sin boca: si la voz dura mas que el clip, el clip va y vuelve (ping-pong) en vez de congelarse
+    function vaiven(L) { L.timeRemapEnabled = true; L.property("ADBE Time Remapping").expression = "var d=source.duration-0.05, t=Math.max(0,time-thisLayer.startTime), n=Math.floor(t/d), r=t%d; (n%2)? d-r : r;"; return L; }
     function congelar(L) { L.timeRemapEnabled = true; L.property("ADBE Time Remapping").expression = "Math.min(time - thisLayer.startTime, source.duration - 0.05);"; return L; }
     // entrada suave de una obra: aparece y se asienta (sin el golpe de escala)
     function suave(L, t, d) { var o = O(L), v0 = o.numKeys ? 100 : o.value; o.setValueAtTime(t, 0); o.setValueAtTime(t + (d || 0.4), v0); if (L.inPoint < t) L.inPoint = t; return L; }
@@ -643,7 +645,7 @@ var COLLAGE = (function () {
             if (true) {
                 var fin = s.corte ? s.corte + 0.02 : v[1];   // llega al final de su linea; con corte, se corta bajo las franjas
                 var cs = c.layers.add(mt); cs.name = "copia menta " + s.id; S(cs).setValue([hd.s, hd.s]); tab(cs, hd.x + 24, hd.y + 20, i, 1.02); fx(cs, "ADBE Fill").property("Color").setValue(rgb(MINT)); mult(cs, 62); cs.startTime = s.t0base; vida(cs, v[0], fin);
-                var cb = c.layers.add(mt); cb.name = "CABEZA " + s.id; S(cb).setValue([hd.s, hd.s]); tab(cb, hd.x, hd.y, i, 1.05); cb.startTime = s.t0base; congelar(cb); congelar(cs); vida(cb, v[0], fin); vida(cs, v[0], fin); cabs.push(cb);
+                var cb = c.layers.add(mt); cb.name = "CABEZA " + s.id; S(cb).setValue([hd.s, hd.s]); tab(cb, hd.x, hd.y, i, 1.05); cb.startTime = s.t0base; if (s.sin_boca) { vaiven(cb); vaiven(cs); } else { congelar(cb); congelar(cs); } vida(cb, v[0], fin); vida(cs, v[0], fin); cabs.push(cb);
                 // v9: sin fundido (se veia raro): la cabeza se corta debajo de las franjas
                 if (s.inserto) { var qs = [cb, cs]; for (var z = 0; z < 2; z++) { var op = O(qs[z]), o0 = op.value; op.setValueAtTime(s.inserto.t0 + 0.12, o0); op.setValueAtTime(s.inserto.t0 + 0.13, 0); op.setValueAtTime(s.inserto.t1 + 0.1, 0); op.setValueAtTime(s.inserto.t1 + 0.11, o0);
                     for (var kk = 1; kk <= op.numKeys; kk++) op.setInterpolationTypeAtKey(kk, KeyframeInterpolationType.HOLD); } }
