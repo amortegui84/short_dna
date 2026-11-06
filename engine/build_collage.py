@@ -431,6 +431,31 @@ if (app.project.dirty && app.project.file) app.project.save();
 if (f.exists) app.open(f); else {{ app.newProject(); app.project.save(f); }}
 try {{ app.project.gpuAccelType = GpuAccelType.SOFTWARE; }} catch (e) {{}}
 return app.project.file.fsName;""", timeout=240))
+if ESTILO.get("builder") == "cinta":   # "Night Transmission" (ae/cinta.jsx): its own look, same timeline and data
+    _mk = marca_dir(pj.get("marca")) if pj.get("marca") else None
+    _fx = lambda n: ((_mk / "kit" / "fx" / f"{n}.mp4").as_posix() if _mk and (_mk / "kit" / "fx" / f"{n}.mp4").exists() else "")
+    _brand = json.loads((_mk / "brand.json").read_text(encoding="utf-8")) if _mk and (_mk / "brand.json").exists() else {}
+    DATA.update({"claves": [k[1] for k in pj.get("palabras_clave", []) if len(k) > 1], "titulos": pj.get("titulos", {}), "handle": _brand.get("handle", ""),
+                 "fx_humo": _fx("humo_volutas"), "fx_estatica": _fx("estatica_rafaga")})
+    for sec in DATA["secciones"]:
+        if sec.get("mate"):
+            sec["clip"] = str(sec["mate"]).replace("/mates/", "/clips/").rsplit(".", 1)[0] + ".mp4"
+    (carpeta / "datos_ae.json").write_text(json.dumps(DATA, indent=1), encoding="utf-8")
+    r = M.run_jsx((HERE.parent / "ae" / "cinta.jsx").read_text(encoding="utf-8") + chr(10) + f"var r = CINTA.build({json.dumps(DATA)}); app.project.save(); return r;", timeout=1800, includes=())
+    print(r.splitlines()[0])
+    SON = ESTILO.get("sonidos", {})
+    cues = []
+    for ln in r.splitlines()[1:]:
+        q = ln.split(";")
+        if len(q) == 5 and q[0] == "CUE":
+            cues.append({"t": float(q[1]), "sfx": SON.get(q[2], q[2]), "gain": float(q[3]), "why": q[4]})
+    cues.sort(key=lambda c: c["t"])
+    print(str(M.t_add_sound(cues=cues, comp=COMP, auto=False))[:160])
+    print(M.t_check_layout(comps=[COMP]))
+    print(M.run_jsx('app.project.save(); return "guardado";', includes=()))
+    if "--render" in sys.argv:
+        subprocess.run([sys.executable, str(HERE / "render_ae.py"), str(carpeta)], check=True)
+    sys.exit()
 base = (HERE.parent / "ae" / "collage.jsx").read_text(encoding="utf-8")
 r = M.run_jsx(base + f"\nvar r = COLLAGE.build({json.dumps(DATA)}); app.project.save(); return r;", timeout=1800, includes=())
 print(r.splitlines()[0])
