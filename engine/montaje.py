@@ -16,7 +16,7 @@ GAP = 0.12
 NIVELES = [1.0, 1.32, 1.12, 1.45]   # encuadres del avatar en cada salto de zoom
 SIL = "silenceremove=start_periods=1:start_threshold=-45dB:stop_periods=-1:stop_duration=0.3:stop_threshold=-45dB"
 # conservar_pausas (narradores dramaticos): solo se recortan el silencio del principio y del final; las pausas y silencios quedan
-SIL_BORDES = ("silenceremove=start_periods=1:start_threshold=-45dB:stop_periods=-1:stop_duration=0.9:stop_silence=0.9:stop_threshold=-45dB,"   # pausas de hasta 0.9 s
+SIL_BORDES_T = ("silenceremove=start_periods=1:start_threshold=-45dB:stop_periods=-1:stop_duration={pausa}:stop_silence={pausa}:stop_threshold=-45dB,"   # pausas de hasta 0.9 s
               "areverse,silenceremove=start_periods=1:start_threshold=-45dB,areverse")
 
 
@@ -37,7 +37,7 @@ def main(carpeta):
     aud.mkdir(exist_ok=True)
     segs = []
     sin_boca = bool(pj.get("personaje") and personaje(pj).get("sin_boca"))
-    filtro = SIL_BORDES if pj.get("conservar_pausas") else SIL
+    filtro = SIL_BORDES_T.format(pausa=pj.get("pausa_max", 0.45)) if pj.get("conservar_pausas") else SIL   # pausas dramaticas de hasta pausa_max s
     for ln in pj["lineas"]:
         lid, vo = ln["id"], carpeta / "vo" / f"{ln['id']}.mp3"
         limpia = aud / f"{lid}_limpia.wav"
@@ -46,7 +46,8 @@ def main(carpeta):
         if ln["tipo"] == "A" and sin_boca:
             # personaje sin boca: no hay labios que cuadrar; la linea dura lo que dura la voz (con sus pausas) y el clip arranca con ella
             clip = carpeta / "clips" / f"{lid}.mp4"
-            run(["ffmpeg", "-y", "-v", "error", "-i", str(limpia), "-af", "apad=pad_dur=0.2,loudnorm=I=-20:TP=-2:LRA=9", "-ar", "48000", str(wav)])
+            ritmo_a = pj.get("ritmo_a", 1.0)   # narrador sin boca: se puede acelerar sin romper labios (ep de ~1 min)
+            run(["ffmpeg", "-y", "-v", "error", "-i", str(limpia), "-af", f"atempo={ritmo_a},apad=pad_dur=0.2,loudnorm=I=-20:TP=-2:LRA=9", "-ar", "48000", str(wav)])
             ws = palabras(wav)
             pal = tiempos_guion(ln["texto"], ws, ws[0][1], ws[-1][2], sus)
             segs.append({"id": lid, "tipo": "A", "clip": str(clip), "t0": 0.0, "dur": duracion(wav), "pal": pal, "wav": str(wav), "atempo": "voz"})
