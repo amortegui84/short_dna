@@ -17,6 +17,7 @@ After Effects, Motion DNA Blender, Figma). Tick **all my connectors** in the cha
 | **Assets** | prompt, provider, size, refs, cut-out | `engine/assets.py` (Klein, Z-Image, Qwen style, Nano Banana, generic API) | Krea and Flora through MCP |
 | **Platforms** | a channel topic and platforms | — | a series plan: pillars, episodes with hooks, length and CTA per platform, repurposing |
 | **Projects** | — | `factory.py run` per project, with the cost estimate first | runs and reviews with the skill |
+| **Publish** | the brand's accounts, once (YouTube channel, Instagram Business, Zapier, GitHub release) | `engine/publicar.py` (publish copy); you run `tools/publish_release.py` | writes title, caption and hashtags, uploads to YouTube private with the AI label, and on your OK makes it public and posts the Instagram Reel ([PUBLISHING.md](PUBLISHING.md)) |
 
 ## Cost before anything paid
 Every paid action shows a table (stage, provider, quantity, USD, whether the price was verified) and waits for **Accept**:

@@ -9,6 +9,7 @@ contextBridge.exposeInMainWorld("api", {
   run: (script, args, tag) => ipcRenderer.invoke("run", { script, args, tag }),
   workdir: () => ipcRenderer.invoke("workdir"),
   open: (p) => ipcRenderer.invoke("open", p),
+  openUrl: (u) => ipcRenderer.invoke("openUrl", u),
   pickFile: (filters) => ipcRenderer.invoke("pickFile", filters),
   readFile: (p) => ipcRenderer.invoke("readFile", p),
   claude: (prompt, fresh, all) => ipcRenderer.invoke("claude:send", { prompt, fresh, all }),

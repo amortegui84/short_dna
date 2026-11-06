@@ -247,6 +247,69 @@ V.projects = async () => {
     ps.length ? h("div", { class: "gallery" }, ps.map(card)) : h("p", { class: "lead" }, "No projects yet: start with Topic → Short.")];
 };
 
+// ---------- publish: the one-time links per brand and the state of every episode (docs/PUBLISHING.md)
+V.publish = async () => {
+  const [ps, brands] = await Promise.all([window.api.projects(BRAND), window.api.brands()]);
+  const b = brands.find((x) => x.slug === BRAND || x.dir?.replace(/\\/g, "/").endsWith("/" + BRAND)) || {};
+  const pub = b.publicar || {};
+  const guide = CFGDIR.replace(/\/brands\/?$/, "") + "/docs/PUBLISHING.md";
+  const link = (label, url) => h("a", { href: "#", onclick: (e) => { e.preventDefault(); window.api.openUrl(url); } }, label);
+  const dot = (ok) => h("span", { class: "dot " + (ok ? "ok" : "bad") });
+  const step = (ok, title, done, how, ...links) => h("div", { class: "step" + (ok ? " ok" : "") },
+    h("div", { class: "head" }, dot(ok), h("b", {}, title), h("span", { class: "sub" }, ok ? done : "to do")),
+    h("ol", {}, how.map((x) => h("li", {}, x))), links.length ? h("div", { class: "row" }, ...links) : "");
+  const setup = [
+    step(!!pub.youtube_channel, "1 · YouTube channel for the brand", pub.youtube_channel,
+      ["Sign in to YouTube with the Google account that will own it (a Gmail only for the brand keeps it apart).",
+        "Profile → Settings → Add or manage your channels → Create a channel, with the brand's name (a brand channel: no personal name shown).",
+        "Customize channel: handle, avatar, banner, description. Verify with a phone to allow custom thumbnails."],
+      link("Create or switch channel", "https://www.youtube.com/channel_switcher"), link("Verify", "https://www.youtube.com/verify")),
+    step(!!pub.instagram_id, "2 · Instagram Business account", pub.instagram,
+      ["In the Instagram app: Settings → Account type and tools → Switch to professional → Business (Creator does not work with the API).",
+        "Link it to a Facebook Page you administer (Meta Business Suite → Settings → Instagram)."],
+      link("Meta Business Suite", "https://business.facebook.com/")),
+    step(!!(pub.youtube_channel && pub.instagram_id), "3 · Zapier: the bridge Claude posts through", "YouTube and Instagram connected",
+      ["Create a Zapier account (free plan: ~100 tasks a month; each episode on both networks costs ~10).",
+        "Add the Zapier connector to your Claude account and sign in.",
+        "Ask Claude: “enable Zapier for YouTube and Instagram for Business”. It gives you one sign-in link per app.",
+        "Open each link. In Google, choose the BRAND channel, not your personal one. In Facebook, allow the Page and the Instagram account.",
+        "Claude checks which channel and account it sees and saves them in brand.json → publicar."],
+      link("Zapier", "https://zapier.com/"), link("Claude connectors", "https://claude.ai/settings/connectors"),
+      h("button", { class: "ghost", onclick: () => askClaude(PROMPTS.publishSetup({ brand: BRAND, dir: BDIR() })) }, "Connect with Claude")),
+    step(!!pub.release_repo, "4 · Download links for the videos", pub.release_repo && "GitHub release " + pub.release_repo,
+      ["Zapier needs a direct link to each video. tools/publish_release.py uploads the publish copies to a public GitHub release using your git login.",
+        "Run it yourself the first time (it reads your git credential and creates a public repo): python tools/publish_release.py --repo <brand>_media <files>"]),
+  ];
+  const row = (p) => {
+    const y = p.publicado?.youtube, i = p.publicado?.instagram;
+    return h("tr", {},
+      h("td", {}, h("b", {}, p.slug), h("div", { class: "sub" }, p.tema || "")),
+      h("td", {}, p.final ? (p.qc?.ok ? "✓ QC ok" : "QC pending") : "no final cut"),
+      h("td", {}, p.pub ? h("a", { href: "#", onclick: (e) => { e.preventDefault(); window.api.open(p.pub); } }, "✓ _pub.mp4")
+        : p.final ? h("button", { class: "ghost", onclick: async () => { document.querySelector('[data-side="log"]').click(); await window.api.run("publicar", [p.dir], p.slug); show("publish"); } }, "Make publish copy") : "—"),
+      h("td", {}, y ? h("span", {}, link(y.privacy === "public" ? "Public" : "Private", y.url), y.ai_label ? " · AI label" : "") : "—"),
+      h("td", {}, i ? link("Reel", i.url) : "—"),
+      h("td", {}, p.final ? h("button", { class: "ghost", onclick: () => askClaude(PROMPTS.publish({ brand: BRAND, slug: p.slug, dir: p.dir, done: !!(y && i) })) },
+        y && i ? "Republish / update" : "Publish with Claude") : ""));
+  };
+  return [h("h1", {}, "Publish"),
+    h("p", { class: "lead" }, "YouTube Shorts and Instagram Reels through Zapier. Set up the four links once per brand; then every finished episode goes private to YouTube, you review it, and it goes public on both. Nothing reaches Instagram without your “publish”."),
+    h("div", { class: "row" }, h("button", { class: "ghost", onclick: () => window.api.open(guide) }, "Full guide (docs/PUBLISHING.md)"),
+      b.dir ? h("button", { class: "ghost", onclick: () => window.api.open(b.dir + "/posts.md") }, "Posts and copy (posts.md)") : ""),
+    h("h2", {}, "Once per brand"), h("div", { class: "steps" }, setup),
+    h("h2", {}, "Episodes"),
+    ps.length ? h("table", {}, h("tr", {}, ...["Episode", "Final cut", "Publish copy", "YouTube", "Instagram", ""].map((x) => h("th", {}, x))), ps.map(row))
+      : h("p", { class: "lead" }, "No episodes yet."),
+    h("h2", {}, "Every episode, in order"),
+    h("ol", { class: "lead" }, [
+      "Watch the whole final cut. Look for props that appear or vanish in the narrator's hands; fix by regenerating that one clip.",
+      "Make the publish copy (~50 MB) and upload it with tools/publish_release.py.",
+      "Claude writes the title, caption, hashtags and tags (posts.md), uploads to YouTube as PRIVATE and sets the AI label.",
+      "You review it in YouTube Studio (with the brand channel selected) → Content → Shorts.",
+      "On your OK: YouTube goes public and the Reel is created, processed (~4 min) and published on Instagram.",
+      "The links are saved in the episode's publicado.json and show up here."].map((x) => h("li", {}, x)))];
+};
+
 V.library = async () => [h("h1", {}, "Library"), h("p", { class: "lead" }, "What the system knows: styles, techniques and templates (library/), model notes (docs/models/), every lesson (docs/LEARNINGS.md)."),
   h("h2", {}, "Styles"), h("table", {}, LIB.styles.map((s) => h("tr", {}, h("td", {}, h("b", {}, s.nombre)), h("td", {}, h("div", {}, Object.values(s.tokens || {}).filter((v) => typeof v === "string").map((c) => h("span", { class: "sw", style: "background:" + c }))), (s.reglas || []).slice(0, 4).join(" · "))))),
   h("h2", {}, "Techniques"), h("table", {}, LIB.techniques.map((t) => h("tr", {}, h("td", {}, h("b", {}, t.nombre)), h("td", {}, t.uso), h("td", {}, t.como)))),

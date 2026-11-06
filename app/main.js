@@ -89,7 +89,10 @@ ipcMain.handle("projects", (e, brand) => {
     const cut = [`${base}_AE.mp4`, `${base}.mp4`].map((f) => path.join(W, d, f)).find((f) => fs.existsSync(f)) || null;
     const st = cut ? fs.statSync(cut) : fs.statSync(path.join(W, d, "proyecto.json"));
     return { slug: d, tema: pj.tema || pj.artista, personaje: pj.personaje, look: pj.look, estilo: pj.estilo, plataformas: pj.plataformas || [], done,
-      video: cut, final: !!cut && cut.endsWith("_AE.mp4"), mb: cut ? +(st.size / 1048576).toFixed(1) : 0, when: st.mtimeMs, dir: path.join(W, d) };
+      video: cut, final: !!cut && cut.endsWith("_AE.mp4"), mb: cut ? +(st.size / 1048576).toFixed(1) : 0, when: st.mtimeMs, dir: path.join(W, d),
+      // publishing (docs/PUBLISHING.md): the light copy and where it went
+      pub: fs.existsSync(path.join(W, d, `${base}_pub.mp4`)) ? path.join(W, d, `${base}_pub.mp4`) : null,
+      publicado: readJSON(path.join(W, d, "publicado.json"), null), qc: readJSON(path.join(W, d, "qc.json"), null) };
   }).sort((a, b) => b.when - a.when);
 });
 
@@ -116,6 +119,7 @@ ipcMain.handle("run", (e, { script, args, tag }) => new Promise((resolve) => {
 
 ipcMain.handle("workdir", () => BRANDS.split("\\").join("/"));
 ipcMain.handle("open", (e, p) => shell.openPath(p));
+ipcMain.handle("openUrl", (e, u) => (/^https:\/\//.test(u) ? shell.openExternal(u) : false));
 ipcMain.handle("pickFile", async (e, filters) => (await dialog.showOpenDialog(win, { properties: ["openFile"], filters })).filePaths[0] || null);
 ipcMain.handle("readFile", (e, p) => { try { return fs.readFileSync(p, "utf8"); } catch (x) { return null; } });
 
@@ -169,7 +173,7 @@ app.whenReady().then(() => {
     win.webContents.once("did-finish-load", async () => {
       const wait = (ms) => new Promise((r) => setTimeout(r, ms));
       await wait(3500);
-      for (const v of ["home", "short", "reference", "brand", "character", "assets", "platforms", "projects", "library"]) {
+      for (const v of ["home", "short", "reference", "brand", "character", "assets", "platforms", "projects", "publish", "library"]) {
         await win.webContents.executeJavaScript(`document.querySelector('[data-view="${v}"]').click()`);
         await wait(1800);
         fs.writeFileSync(path.join(dir, v + ".png"), (await win.webContents.capturePage()).toPNG());
