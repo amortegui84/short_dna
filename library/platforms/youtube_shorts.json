@@ -1,0 +1,93 @@
+{
+ "slug": "youtube_shorts",
+ "nombre": "YouTube Shorts",
+ "investigado": "2026-11-05",
+ "specs": {
+  "w": 1080,
+  "h": 1920,
+  "fps": 30,
+  "aspecto": "9:16 (square 1:1 also counts as a Short; 16:9 does not)",
+  "max_s": 180,
+  "ideal_s": [30, 60],
+  "ideal_nota": "Heuristic, not a YouTube figure. Keep under 60 s whenever the Short carries third-party music: a Short over 1 minute with any active Content ID claim is blocked worldwide until the claim is resolved. Go 60-180 s only with royalty-free or own music and a story that needs it.",
+  "safe_area": {
+   "top": 288,
+   "bottom": 672,
+   "left": 48,
+   "right": 192,
+   "nota": "unverified: YouTube publishes no organic Shorts safe zone; these are the most widely cited third-party template values (channel name, Subscribe, title at the bottom; like/dislike/comment/share/remix column on the right). Safe box 840x960 starting at (48, 288)."
+  },
+  "caption_limit": {
+   "titulo": 100,
+   "descripcion": 5000,
+   "nota": "unverified (standard YouTube video limits, not re-fetched this session). The title is what the Shorts feed shows; front-load the keyword in the first ~40 characters."
+  },
+  "cover": "Choose a frame from the Short in the app (pencil icon at upload or Edit after posting). A custom uploaded thumbnail for Shorts was reported rolling out in 2025-2026 (desktop Studio, some accounts only): unverified, check Studio. Design one frame (usually the hook frame) that reads as a cover: subject large, 2-4 words of text inside the safe box."
+ },
+ "algoritmo": [
+  "Shorts and long-form have separate recommendation systems; engagement on one format does not boost the other (YouTube Q&A as reported by Search Engine Journal).",
+  "Since 31 March 2025 a public Shorts view counts on every start or replay, with no minimum watch time; the old metric survives as 'engaged views', which is what YouTube Partner Program revenue uses. Optimise for engaged views and retention, not the public counter.",
+  "Studio's 'Viewed vs. swiped away' is the hook diagnostic: the share of feed impressions where the viewer stayed instead of swiping. YouTube publishes no target value; third-party guides cite 70-80% (unverified, creator-reported).",
+  "Recommendations are personalised from viewer behaviour (watch history, likes/dislikes, satisfaction); YouTube says the system has no preference for a Shorts format (secondary sources).",
+  "Originality: in 2026 YouTube said it is updating Shorts recommendations to prioritise original content and reduce reach of content re-uploaded from other creators; aggregators will likely see less distribution.",
+  "Monetisation: since 15 July 2025 the YPP 'repetitious content' policy is called 'inauthentic content' and targets mass-produced or repetitive videos (e.g. slight variations, slideshows without narration or educational value). It can apply to a whole channel. A templated faceless series must vary script, visuals and argument from episode to episode."
+ ],
+ "estrategia": [
+  "Hook in the first 1-2 seconds with a visual and a spoken line that agree; check Viewed vs. swiped away per episode and A/B the opening line on the next episode, not the topic.",
+  "Loop the ending: last line or image leads back into the first so replays happen naturally (replays now count as views).",
+  "Use the 'Related video' link to send viewers from the Short to a long-form deep dive; say it on screen ('full story linked above the title'). Expect modest click-through (third-party: a few hundred to ~10% of viewers).",
+  "Series with numbered titles ('Hidden details #7') and a playlist; YouTube's search and suggested surfaces reward topical consistency.",
+  "Title = searchable phrase + curiosity ('The skull hidden in The Ambassadors'). Description: 1-2 sentences with names, dates, museum, plus sources; 3 hashtags max.",
+  "Educational value matters for the inauthentic-content policy: narration, a real argument and sources per episode."
+ ],
+ "hooks_preferidos": ["curiosity_gap", "myth_bust", "visual_pattern_interrupt", "cold_open", "find_it_challenge", "question", "numbered_list"],
+ "cta": [
+  "Soft verbal CTA after the payoff, not before: 'Part 2 is in the related video.'",
+  "Subscribe ask tied to the series promise in the last 2 s: 'One hidden detail every week.'",
+  "Pinned comment with the source list and the two-option question."
+ ],
+ "hashtags_seo": {
+  "titulo": "Keyword phrase people would type (artist + artwork + hook word). Titles are indexed by YouTube search; Shorts appear in search results.",
+  "hashtags": "2-3 relevant hashtags (#arthistory, #<artist>); YouTube shows hashtags above the title. Avoid long lists. unverified: exact display/limit rules not re-checked this session.",
+  "descripcion": "Names, dates, places and sources in plain text; also helps the educational value case.",
+  "subtitulos": "Upload the SRT/VTT from the pipeline (voice timeline) for accessibility and search; burned-in captions remain for the feed."
+ },
+ "musica": "Shorts audio library: most songs usable for up to 90 s of a 3-minute Short (some capped at 60 or 30 s). YouTube Audio Library royalty-free tracks get no Content ID claim. Any active claim on a Short longer than 60 s blocks it globally until resolved (no channel penalty). For this pipeline: own/generated music (ACE-Step) or Audio Library; never commercial tracks above 60 s.",
+ "ia_disclosure": {
+  "obligatorio": "Disclose realistic content that is generated or meaningfully altered with AI: real people saying/doing things they did not, altered footage of real events or places, realistic scenes that did not happen, and music that is the main focus.",
+  "no_obligatorio": "Clearly unrealistic/animated content, minor aesthetic edits, beauty filters, captions, upscaling, AI used for ideas, scripts or thumbnails.",
+  "como": "YouTube Studio upload > 'Altered or synthetic content' / 'AI use' = Yes. Label appears in the expanded description, or in the player for photorealistic or AI-music content. YouTube may auto-label from C2PA metadata or its own GenAI tools.",
+  "consecuencias": "Disclosing does not limit audience or monetisation (YouTube's statement). Consistently not disclosing can bring a forced label, content removal or YPP suspension.",
+  "para_esta_app": "A photoreal generated presenter with a synthetic voice is a realistic person who did not exist: set AI use = Yes on every upload. The collage style alone would not require it, but the presenter does."
+ },
+ "publicacion": {
+  "cadencia": "No official Shorts cadence. Heuristic for a series: 3-5 Shorts per week, same days, plus one long-form per week or fortnight if the channel has it. Consistency over volume (unverified; creator consensus).",
+  "horas": "No official best time. Use Studio > Audience > 'When your viewers are on YouTube' once the channel has data; until then publish 2-3 h before the local evening peak of the main audience (unverified heuristic)."
+ },
+ "adaptar_desde_master": [
+  "Keep 9:16 1080x1920; export H.264 high bitrate (YouTube re-encodes).",
+  "Move burned-in subtitles and key text above y=1248 (bottom 672 px are covered by title/channel/Subscribe) and left of x=888 (right action column). The collage style's y_subtitulos=1400 sits inside that zone.",
+  "If music is not royalty-free or own, trim the master to under 60 s or swap the track.",
+  "Write a search-style title (not the TikTok caption).",
+  "Add the Related video link and the AI disclosure toggle.",
+  "Optional: a looping last frame that matches the first frame."
+ ],
+ "fuentes": [
+  "https://support.google.com/youtube/answer/15424877?hl=en",
+  "https://support.google.com/youtube/answer/14328491?hl=en",
+  "https://ppc.land/youtube-changes-how-shorts-views-are-counted-from-march-31/",
+  "https://vidiq.com/blog/post/youtube-view-count-update/",
+  "https://support.google.com/youtube/thread/470890423/prioritizing-original-content-on-shorts?hl=en",
+  "https://www.digitalmusicnews.com/2026/10/02/youtube-shorts-prioritize-original-content/",
+  "https://www.searchenginejournal.com/youtube-targets-mass-produced-content-in-monetization-update/550337/",
+  "https://www.plagiarismtoday.com/2025/07/08/youtube-targets-inauthentic-content/",
+  "https://www.searchenginejournal.com/youtube-shorts-algorithm-explained-in-qa-format/459513",
+  "https://blog.youtube/creator-and-artist-stories/youtube-related-videos-traffic-guide/",
+  "https://www.creatoressentials.com/glossary/viewed-vs-swiped-away/",
+  "https://1of10.com/blog/youtube-shorts-analytics/",
+  "https://www.socialync.io/tools/safe-zones/youtube-shorts",
+  "https://vidiq.com/blog/post/youtube-shorts-custom-thumbnails",
+  "https://alternativeto.net/news/2026/7/youtube-introduces-custom-thumbnails-for-shorts-and-ask-studio-ai-thumbnail-generation/",
+  "https://outlierkit.com/resources/youtube-shorts-to-long-form/"
+ ]
+}

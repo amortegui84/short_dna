@@ -1,0 +1,25 @@
+{
+ "_readme": "Price table used to show the estimated cost before anything paid runs. Prices change and depend on your plan: VERIFY each one on the provider's pricing page and edit here. 'verificado' = date you checked it (null = not checked). Local providers cost 0 (GPU time only).",
+ "moneda": "USD",
+ "proveedores": {
+  "comfy_klein": {"unidad": "image", "usd": 0, "local": true},
+  "comfy_h3": {"unidad": "second of video", "usd": 0, "local": true},
+  "comfy_ace": {"unidad": "track", "usd": 0, "local": true},
+  "zimage": {"unidad": "image", "usd": 0, "local": true},
+  "qwen_style": {"unidad": "image", "usd": 0, "local": true},
+  "elevenlabs_tts": {"unidad": "1000 characters", "usd": 0.30, "verificado": null, "nota": "credits per character on eleven_v3; the effective price depends on the subscription tier"},
+  "elevenlabs_sts": {"unidad": "minute of audio", "usd": 0.30, "verificado": null, "nota": "speech-to-speech is billed by audio length in credits"},
+  "nano_banana": {"unidad": "image", "usd": 0.04, "verificado": null, "nota": "Gemini image output, per generated image at ~1 MP"},
+  "seedance": {"unidad": "second of video", "usd": 0.15, "verificado": null, "nota": "depends on model tier (lite/pro) and resolution; resellers differ"},
+  "suno": {"unidad": "track", "usd": 0.05, "verificado": null, "nota": "via a gateway; plus the Suno plan needed for commercial use"},
+  "generic_http": {"unidad": "call", "usd": 0.05, "verificado": null},
+  "krea": {"unidad": "image", "usd": 0.03, "verificado": null, "nota": "compute units; the MCP shows real cost"},
+  "flora": {"unidad": "generation", "usd": 0.05, "verificado": null, "nota": "the Flora MCP returns run_cost in USD: trust that over this"},
+  "claude": {"unidad": "1M tokens (in+out blended)", "usd": 0, "verificado": null, "nota": "0 when Claude Code runs on a subscription; set your API rate if you use an API key"}
+ },
+ "uso_tipico_artist_short": {
+  "_readme": "What one artist Short consumes; the estimator uses the real script when it exists.",
+  "caracteres_voz": 1100, "tomas_voz": 1.5, "minutos_sts": 0.8, "segundos_clips": 40, "semillas_clips": 1.6,
+  "imagenes_inicios": 5, "imagenes_looks": 2, "pistas_musica": 2, "tokens_claude_M": 1.5
+ }
+}

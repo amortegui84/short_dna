@@ -1,0 +1,73 @@
+{
+ "slug": "linkedin",
+ "nombre": "LinkedIn video",
+ "investigado": "2026-11-05",
+ "specs": {
+  "w": 1080,
+  "h": 1920,
+  "fps": 30,
+  "aspecto": "1:2.4 to 2.4:1 allowed (9:16 fits); 9:16 shows full-screen in the vertical video feed on mobile",
+  "max_s": 900,
+  "max_nota": "LinkedIn help: max 15 minutes, min 3 s desktop / 2 s mobile app, resolution 256x144 to 4096x2304. Some guides say 10 min from mobile (unverified).",
+  "ideal_s": [30, 90],
+  "ideal_nota": "Third-party guides only (30-60 s for a single idea, up to 90 s); no LinkedIn figure found.",
+  "safe_area": {
+   "top": 240,
+   "bottom": 480,
+   "left": 60,
+   "right": 140,
+   "nota": "unverified estimate: LinkedIn publishes no organic safe zone; vertical feed overlays (author, caption, reactions column) are similar to other vertical feeds. In the main feed the video may be shown cropped toward 4:5 (unverified): keep the subject and text in the centre 1080x1350 band."
+  },
+  "caption_limit": {
+   "descripcion": 3000,
+   "nota": "unverified (long-standing post limit). The first ~2 lines show before 'see more'."
+  },
+  "cover": "Upload a thumbnail on desktop (unverified for all accounts); otherwise the first frame: make frame 0 readable."
+ },
+ "algoritmo": [
+  "LinkedIn reported video uploads up 36% year over year and expanded vertical video tools in 2025 (press coverage); a dedicated full-screen vertical video feed exists on mobile (desktop availability conflicts between sources).",
+  "No official ranking statement for video found this session; dwell time and comments are commonly cited (unverified)."
+ ],
+ "estrategia": [
+  "Frame art history as a lesson with a professional angle: patronage as business, how a workshop scaled, a forger's method, what a painting teaches about attention or branding.",
+  "The post text matters as much as the video: a 2-3 line insight above it, sources below.",
+  "Silent autoplay is the norm: burned-in captions are mandatory; upload an SRT too.",
+  "Post from a personal profile when possible; company pages reach less (unverified heuristic)."
+ ],
+ "hooks_preferidos": ["contrarian", "modern_parallel", "numbered_list", "story_character", "superlative"],
+ "cta": [
+  "Ask for a perspective: 'What is the modern version of this patron?'",
+  "Follow for the weekly series."
+ ],
+ "hashtags_seo": {
+  "caption": "Insight first; names and dates in text; 0-3 hashtags.",
+  "busqueda": "LinkedIn search indexes post text (unverified)."
+ },
+ "musica": "No music library; you must own or license any music. Many viewers watch muted, so the video must work without sound.",
+ "ia_disclosure": {
+  "obligatorio": "No creator self-disclosure toggle found this session (unverified). LinkedIn's Professional Community Policies forbid deceptive or fake content (not re-checked).",
+  "como": "LinkedIn is reported to show Content Credentials (C2PA) for media that carries them (unverified this session). Say it in the post: 'Presenter and voice are AI-generated; facts and sources below.'",
+  "consecuencias": "unverified",
+  "para_esta_app": "State AI generation in the post text and keep C2PA metadata in the file."
+ },
+ "publicacion": {
+  "cadencia": "1-2 videos per week (unverified heuristic); weekday business hours of the audience's time zone (unverified).",
+  "horas": "unverified: weekday mornings local time are the usual heuristic."
+ },
+ "adaptar_desde_master": [
+  "Keep the 9:16 master for the vertical feed; optionally a 4:5 or 1:1 crop (1080x1350 / 1080x1080) for the main feed.",
+  "Subtitles must carry everything (muted autoplay); keep them inside the centre band.",
+  "Cut a 30-60 s version focused on one idea; replace the playful comment bait with a professional question.",
+  "Write the insight text above the video; AI disclosure line in the text."
+ ],
+ "fuentes": [
+  "https://www.linkedin.com/help/linkedin/answer/a548372",
+  "https://www.linkedin.com/help/linkedin/answer/85306",
+  "https://techcrunch.com/2025/02/04/linkedin-amps-up-vertical-video-tools-as-uploads-jump-36",
+  "https://digiday.com/media/linkedins-video-push-appears-to-be-working-in-2025/",
+  "https://www.kapwing.com/resources/linkedin-shorts-video-guide-limit-aspect-ratio-and-how-to-download/",
+  "https://www.mediapost.com/publications/article/403132/linkedin-takes-on-tiktok-with-new-vertical-video-f.html",
+  "https://www.opus.pro/blog/ideal-linkedin-video-length-format-for-retention",
+  "https://www.brandwatch.com/blog/linkedin-video-specs/"
+ ]
+}

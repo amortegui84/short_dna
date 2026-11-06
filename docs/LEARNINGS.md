@@ -69,3 +69,14 @@ section the moment a review note arrives.
 ## QA that must pass (docs/QA.md)
 - `blackdetect=d=0.04` → 0; loudness -20 ± 1.5 LUFS; Motion DNA `motion_qa.py`: jumps at y ≈ 0.73 are subtitle changes, the rest must be explained.
 - Look at frames of every cut, slide, card and the quote before sending.
+
+## Platforms (docs/PLATFORMS.md, with sources)
+- **Subtitles at y 1400 may sit under the bottom UI** of YouTube Shorts and Reels (overlays from about y 1248); clear on TikTok. Check in
+  each platform's preview before changing the approved style; the union of safe margins is about x 65-888, y 288-1248 (unverified px).
+- **TikTok pays Creator Rewards only for originals over 1 minute** → keep TikTok cuts at 61 s or more.
+- **Templated AI series risk "inauthentic content"** (YouTube, July 2025) and repost demotion (Meta) → every episode its own script, argument and visuals.
+- **Facebook demotes engagement bait, even spoken** ("comment YES") → ask for an opinion ("Genius or fraud?"), never "comment 1 or 2".
+
+## App and Claude
+- **A one-word reply cost $0.70** → the Agent SDK loaded every connector of the account (~80 MCP servers) → strict MCP config with only
+  Motion DNA, Blender and Figma: $0.08; the account's connectors only when the user ticks them.

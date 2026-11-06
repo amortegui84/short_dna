@@ -5,6 +5,7 @@
                         [--style collage_v10c] [--look 05_corse_camisa]
   python factory.py run <slug|folder> [--from STAGE] [--to STAGE] [--only STAGE] [--force]
   python factory.py status <slug|folder>
+  python factory.py estimate <slug|folder>                  estimated USD of the remaining stages
 
 A project is a folder under config work_dir with proyecto.json (docs/PROJECT_SCHEMA.md). Every stage leaves a mark
 .done_<stage>; run resumes where it stopped. The "creative" stages (research, script, design) are done by Claude with the
@@ -75,6 +76,16 @@ def check(name, carpeta, pj):
 def run(args):
     carpeta = carpeta_de(args.proyecto)
     i0 = NAMES.index(args.only or args.desde or NAMES[0]); i1 = NAMES.index(args.only or args.hasta or NAMES[-1])
+    # the user's rule: with paid providers, show the estimated cost first and run only after a yes
+    est = json.loads(subprocess.run([sys.executable, str(E / "costo.py"), "proyecto", str(carpeta)], capture_output=True, text=True).stdout or "{}")
+    rango = set(NAMES[i0:i1 + 1])
+    pago = [f for f in est.get("filas", []) if f["usd"] > 0 and f["etapa"] in rango]
+    if pago and not args.yes:
+        print("ESTIMATED COST before running:")
+        for f in pago:
+            print(f"  {f['etapa']:9s} {f['proveedor']:16s} {f['cantidad']:>9} {f['unidad']:10s} ~ ${f['usd']:.2f}" + ("" if f["verificado"] else "  (price not verified)"))
+        print(f"  total ~ ${sum(f['usd'] for f in pago):.2f}   (library/costs.json). Run again with --yes to accept.")
+        return 3
     log = (carpeta / "factory.log").open("a", encoding="utf-8")
     for name, kind, what, cmd in STAGES[i0:i1 + 1]:
         mark = carpeta / f".done_{name}"
@@ -125,7 +136,8 @@ sub.add_parser("stages")
 n = sub.add_parser("new"); n.add_argument("slug"); n.add_argument("--topic", required=True); n.add_argument("--template", default="artist_short")
 n.add_argument("--character", default="green_hair_presenter"); n.add_argument("--style", default="collage_v10c"); n.add_argument("--look")
 r = sub.add_parser("run"); r.add_argument("proyecto"); r.add_argument("--from", dest="desde", choices=NAMES); r.add_argument("--to", dest="hasta", choices=NAMES)
-r.add_argument("--only", choices=NAMES); r.add_argument("--force", action="store_true")
+r.add_argument("--only", choices=NAMES); r.add_argument("--force", action="store_true"); r.add_argument("--yes", action="store_true", help="accept the estimated cost of paid stages")
+es = sub.add_parser("estimate"); es.add_argument("proyecto")
 s = sub.add_parser("status"); s.add_argument("proyecto")
 a = ap.parse_args()
 if a.cmd == "stages":
@@ -133,6 +145,8 @@ if a.cmd == "stages":
         print(f"{name:9s} {kind:10s} {what}")
 elif a.cmd == "new":
     new(a)
+elif a.cmd == "estimate":
+    print(subprocess.run([sys.executable, str(E / "costo.py"), "proyecto", str(carpeta_de(a.proyecto))], capture_output=True, text=True).stdout)
 elif a.cmd == "run":
     sys.exit(run(a))
 else:

@@ -17,6 +17,7 @@ PROVIDERS = {
     "elevenlabs": "factory.providers.elevenlabs",     # voice, speech-to-speech
     "seedance": "factory.providers.seedance",         # video (text/image to video): b-roll, animated assets
     "suno": "factory.providers.suno",                 # music (via a gateway; Suno has no official public API)
+    "nano_banana": "factory.providers.nano_banana",   # image generation/editing (Gemini), paid
     "generic_http": "factory.providers.generic_http", # any image/video/asset API described in config
 }
 

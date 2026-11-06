@@ -1,0 +1,264 @@
+{
+ "investigado": "2026-11-05",
+ "nota": "Hook patterns for short-form, with two example lines each for an art-history channel. Evidence for individual hook types is mostly practitioner consensus: no platform publishes a study per hook. What platforms do state: TikTok's ad research says over 63% of the highest-CTR videos put the key message in the first 3 s and advises landing the hook within 6 s (ads, correlational); YouTube's 'Viewed vs. swiped away' metric and TikTok's weight on full watches make the opening the main lever. Example facts must pass the research stage's fact check before use (claims marked 'debated' are framed as debate).",
+ "evidencia_general": [
+  {"claim": "Over 63% of the highest-CTR TikTok ads highlight the key message in the first 3 s; introduce the main idea in 3 s and the hook within 6 s.", "estado": "platform statement, ads, correlational (no sample or method published)", "fuente": "https://ads.tiktok.com/business/en-US/blog/9-creative-tips-to-drive-auction-ad-performance"},
+  {"claim": "Finishing a longer video from beginning to end is a stronger For You signal than weaker interactions.", "estado": "platform statement", "fuente": "https://newsroom.tiktok.com/en-us/how-tiktok-recommends-videos-for-you"},
+  {"claim": "Viewed vs. swiped away measures whether the opening holds feed viewers; no official benchmark.", "estado": "platform metric, benchmarks third-party", "fuente": "https://www.creatoressentials.com/glossary/viewed-vs-swiped-away/"},
+  {"claim": "Curiosity is a response to a perceived, closeable gap between what one knows and wants to know (information-gap theory, Loewenstein 1994).", "estado": "academic, widely cited", "fuente": "https://doi.org/10.1037/0033-2909.116.1.75"},
+  {"claim": "The Zeigarnik effect (better memory for unfinished tasks), often used to justify open loops, did not hold up in a 2025 meta-analysis; the tendency to resume interrupted tasks (Ovsiankina effect) did.", "estado": "academic meta-analysis", "fuente": "https://ideas.repec.org/a/pal/palcom/v12y2025i1d10.1057_s41599-025-05000-w.html"},
+  {"claim": "Facebook demotes engagement bait (asking for likes, comments, shares, votes), including in video audio; asking for advice or recommendations is fine.", "estado": "platform statement", "fuente": "https://about.fb.com/news/2017/12/news-feed-fyi-fighting-engagement-bait-on-facebook/"}
+ ],
+ "hooks": [
+  {
+   "id": "curiosity_gap",
+   "nombre": "Curiosity gap",
+   "definicion": "State that something surprising exists and withhold what it is; the answer comes later in the video.",
+   "ejemplos": ["This mirror is hiding the painter himself.", "There is a second painting under this one, and X-rays found it."],
+   "cuando": "Default opener for detail-driven episodes; the gap must be specific and closable within the video.",
+   "evidencia": "Information-gap theory (curiosity needs a specific, closable gap); practitioner consensus for short-form. Overpromising raises swipe-aways and hurts trust.",
+   "fuente": "https://doi.org/10.1037/0033-2909.116.1.75"
+  },
+  {
+   "id": "contrarian",
+   "nombre": "Contrarian take",
+   "definicion": "Open against the common view, then earn it with evidence.",
+   "ejemplos": ["The Mona Lisa didn't become famous for its painting. It became famous for a theft.", "Impressionism was named as an insult."],
+   "cuando": "Topics with a strong popular myth or consensus; good on TikTok and LinkedIn. Must be defensible: frame debated points as debate.",
+   "evidencia": "Practitioner consensus (pattern violation draws attention); no platform study. Drives comments, which TikTok counts as an interaction.",
+   "fuente": "https://newsroom.tiktok.com/en-us/how-tiktok-recommends-videos-for-you"
+  },
+  {
+   "id": "numbered_list",
+   "nombre": "Numbered list",
+   "definicion": "Promise a fixed count of items ('3 details...') so the viewer knows the length of the commitment.",
+   "ejemplos": ["3 details in The Garden of Earthly Delights almost everyone misses.", "5 colours that were once worth more than the painting."],
+   "cuando": "Save-worthy explainers; Instagram and LinkedIn; pairs with a save CTA. Put the best item last or second to keep the full watch.",
+   "evidencia": "Practitioner consensus; lists set expectations and encourage saves. unverified as a ranking advantage.",
+   "fuente": "https://about.instagram.com/blog/announcements/instagram-ranking-explained"
+  },
+  {
+   "id": "you_have_been_wrong",
+   "nombre": "You've been doing it wrong",
+   "definicion": "Tell the viewer their current understanding or habit is mistaken and promise the correct version.",
+   "ejemplos": ["You've been looking at Las Meninas from the wrong side: the real subject is where you're standing.", "You're reading this painting left to right. Its painter wanted you to read it right to left."],
+   "cuando": "Famous works the viewer already knows; strong on TikTok. Keep the tone inviting, not scolding.",
+   "evidencia": "Practitioner consensus (self-relevance + correction); no platform study.",
+   "fuente": "https://ads.tiktok.com/business/en-US/blog/9-creative-tips-to-drive-auction-ad-performance"
+  },
+  {
+   "id": "myth_bust",
+   "nombre": "Myth bust",
+   "definicion": "Name a widely believed claim and say it is false in the first line.",
+   "ejemplos": ["Michelangelo didn't paint the Sistine ceiling lying on his back.", "Medieval people knew the Earth was round, and their paintings show it."],
+   "cuando": "When a myth is common and the correction is documented; very good for YouTube search (people search the myth).",
+   "evidencia": "Practitioner consensus; doubles as a searchable title. Requires sources on screen or in the description.",
+   "fuente": "https://www.searchenginejournal.com/youtube-shorts-algorithm-explained-in-qa-format/459513"
+  },
+  {
+   "id": "visual_pattern_interrupt",
+   "nombre": "Visual pattern interrupt",
+   "definicion": "A sudden visual change in frame 0-1 s (snap zoom into a detail, hard cut from black, an object entering) before any words.",
+   "ejemplos": ["Snap zoom from the full Arnolfini Portrait into the convex mirror, line: 'Look closer.'", "Hard cut from black to a skull smeared across the floor of The Ambassadors."],
+   "cuando": "Always useful as the visual layer under a spoken hook; essential where viewers watch muted (Instagram, LinkedIn).",
+   "evidencia": "Practitioner consensus; supports TikTok's 'key message in 3 s' guidance. unverified as a standalone effect.",
+   "fuente": "https://ads.tiktok.com/business/en-US/blog/9-creative-tips-to-drive-auction-ad-performance"
+  },
+  {
+   "id": "cold_open",
+   "nombre": "Cold open mid-action",
+   "definicion": "Start inside the story at its most dramatic moment, with no intro or greeting; context comes after.",
+   "ejemplos": ["Paris, August 1911. The wall where the Mona Lisa hung is empty.", "Rome, 1606. Caravaggio has just killed a man, and he has to run."],
+   "cuando": "Story episodes; TikTok and YouTube. Never open with 'Hi, today we'll talk about...'.",
+   "evidencia": "Practitioner consensus; TikTok advises the main idea within 3 s.",
+   "fuente": "https://ads.tiktok.com/business/en-US/blog/9-creative-tips-to-drive-auction-ad-performance"
+  },
+  {
+   "id": "question",
+   "nombre": "Direct question",
+   "definicion": "Ask the question the viewer already half-wonders about; answer it in the video.",
+   "ejemplos": ["Why do babies in medieval paintings look like tiny old men?", "Why is there a dog in so many wedding portraits?"],
+   "cuando": "When the question is genuinely common (check search suggestions); good for YouTube and TikTok search.",
+   "evidencia": "Practitioner consensus; matches search queries. A question the viewer does not care about underperforms a statement.",
+   "fuente": "https://www.searchenginejournal.com/youtube-shorts-algorithm-explained-in-qa-format/459513"
+  },
+  {
+   "id": "stakes",
+   "nombre": "Stakes",
+   "definicion": "Open with what was at risk: loss, danger, money, a reputation.",
+   "ejemplos": ["This painting was labelled 'degenerate' and nearly lost forever.", "One brushstroke decided whether this was a 450-million-dollar Leonardo or a workshop copy."],
+   "cuando": "Restitution, forgery, theft, restoration stories; Facebook and YouTube audiences.",
+   "evidencia": "Practitioner consensus; no platform study.",
+   "fuente": "https://newsroom.tiktok.com/en-us/how-tiktok-recommends-videos-for-you"
+  },
+  {
+   "id": "secret_reveal",
+   "nombre": "Hidden or secret",
+   "definicion": "Promise something hidden in plain sight or revealed by science (X-ray, infrared, restoration).",
+   "ejemplos": ["X-rays found a man in a bow tie under Picasso's The Blue Room.", "There's a song written on a sinner's backside in Bosch's hell, and someone played it."],
+   "cuando": "Strong send/share potential ('look at this'); Instagram and TikTok.",
+   "evidencia": "Practitioner consensus; matches Instagram's emphasis on sends. Avoid 'they don't want you to know' framing (misleading-content risk).",
+   "fuente": "https://about.instagram.com/blog/announcements/instagram-ranking-explained"
+  },
+  {
+   "id": "find_it_challenge",
+   "nombre": "Find it challenge",
+   "definicion": "Ask the viewer to spot something before the reveal; a countdown or zoom pays it off.",
+   "ejemplos": ["There's a skull in this painting. Find it before I do.", "One face in this crowd is the painter. Three seconds."],
+   "cuando": "Detail-rich artworks; drives rewatches (loop) and comments. Reveal no later than 60-70% of the runtime.",
+   "evidencia": "Practitioner consensus; replays count as Shorts views since March 2025.",
+   "fuente": "https://ppc.land/youtube-changes-how-shorts-views-are-counted-from-march-31/"
+  },
+  {
+   "id": "pov",
+   "nombre": "POV / role play",
+   "definicion": "Put the viewer inside a historical situation in second person.",
+   "ejemplos": ["POV: you're a painter in 1660 and your blue costs a fortune.", "POV: you're the model, and the painter just made you a saint."],
+   "cuando": "TikTok native format; works with a presenter or avatar acting it. Less suited to LinkedIn.",
+   "evidencia": "Platform-native format on TikTok; practitioner consensus. unverified as a ranking advantage.",
+   "fuente": "https://newsroom.tiktok.com/en-us/how-tiktok-recommends-videos-for-you"
+  },
+  {
+   "id": "modern_parallel",
+   "nombre": "Modern parallel",
+   "definicion": "Link the artwork to something current (memes, influencers, branding, tech).",
+   "ejemplos": ["Renaissance patrons were the first influencers, and this painting is a sponsored post.", "This 500-year-old painting already has a meme in it."],
+   "cuando": "Non-specialist audiences; LinkedIn (business parallel) and Instagram (shareability).",
+   "evidencia": "Practitioner consensus (relevance to the viewer); no platform study.",
+   "fuente": "https://about.instagram.com/blog/announcements/instagram-ranking-explained"
+  },
+  {
+   "id": "before_after",
+   "nombre": "Before / after",
+   "definicion": "Show the change first: restoration, original colours, the sketch versus the final.",
+   "ejemplos": ["The Sistine ceiling before and after its cleaning.", "This statue was once painted in bright colours."],
+   "cuando": "Visual transformations; works muted; Instagram and Facebook.",
+   "evidencia": "Practitioner consensus; visual-first hooks suit sound-off viewing.",
+   "fuente": "https://www.adstellar.ai/blog/vertical-video-ad-best-practices"
+  },
+  {
+   "id": "story_character",
+   "nombre": "Character in trouble",
+   "definicion": "Lead with a person and their problem, not the artwork.",
+   "ejemplos": ["He sold almost nothing while alive. Now one sunflower sells for millions.", "Banned from Rome for murder, he kept painting saints."],
+   "cuando": "Biography episodes (the artist_short template); Facebook and LinkedIn.",
+   "evidencia": "Practitioner consensus (narrative transport); no platform study.",
+   "fuente": "https://newsroom.tiktok.com/en-us/how-tiktok-recommends-videos-for-you"
+  },
+  {
+   "id": "superlative",
+   "nombre": "Superlative or record",
+   "definicion": "Open with the most, first, only or biggest, backed by a source.",
+   "ejemplos": ["The most expensive painting ever sold might not be by Leonardo at all.", "The painter who claimed he was tied to a ship's mast to paint this storm (historians doubt it)."],
+   "cuando": "When the record is real and sourced; say 'might' or 'claimed' where it is debated.",
+   "evidencia": "Practitioner consensus; risk of misleading claims if unsourced.",
+   "fuente": "https://www.tiktok.com/community-guidelines/en/integrity-authenticity"
+  },
+  {
+   "id": "versus",
+   "nombre": "Versus / comparison",
+   "definicion": "Two works, artists or versions side by side with a verdict to come.",
+   "ejemplos": ["Same story, two painters: Caravaggio's Judith versus Gentileschi's.", "Original or copy? One of these sold for millions."],
+   "cuando": "Natural setup for the two-option comment question at the end.",
+   "evidencia": "Practitioner consensus; produces opinion comments.",
+   "fuente": "https://about.fb.com/news/2017/12/news-feed-fyi-fighting-engagement-bait-on-facebook/"
+  },
+  {
+   "id": "payoff_first",
+   "nombre": "Payoff first",
+   "definicion": "Show the most striking image or fact at 0 s, then explain how it came to be.",
+   "ejemplos": ["This is a 15th-century painting. Yes, really.", "This church's dome isn't a dome. It's a flat painted canvas."],
+   "cuando": "When the visual is the hook; works on every platform and muted.",
+   "evidencia": "Practitioner consensus; aligns with 'key message in 3 s'.",
+   "fuente": "https://ads.tiktok.com/business/en-US/blog/9-creative-tips-to-drive-auction-ad-performance"
+  },
+  {
+   "id": "series_callback",
+   "nombre": "Series callback",
+   "definicion": "Open with the series name and number so returning viewers recognise it ('Hidden details, part 12').",
+   "ejemplos": ["Hidden details, part 12: the fly on the frame.", "Paintings with a crime behind them, number 4."],
+   "cuando": "From episode 3 on; combine with a content hook in the same second, never alone.",
+   "evidencia": "Practitioner consensus; series aid recognition and follows. unverified as a ranking advantage.",
+   "fuente": "https://blog.youtube/creator-and-artist-stories/youtube-related-videos-traffic-guide/"
+  },
+  {
+   "id": "bold_number",
+   "nombre": "Surprising number",
+   "definicion": "Lead with a specific, surprising number (price, years, size, count).",
+   "ejemplos": ["It took 2 years to paint, and 1 day for critics to hate it.", "Ultramarine blue once cost more than the painter's fee."],
+   "cuando": "Any platform; numbers read well as on-screen text. Use real, sourced numbers only.",
+   "evidencia": "Practitioner consensus; specificity supports the curiosity gap.",
+   "fuente": "https://doi.org/10.1037/0033-2909.116.1.75"
+  }
+ ],
+ "retencion": [
+  {
+   "id": "open_loop",
+   "nombre": "Open loop",
+   "definicion": "Raise a specific question in the hook and close it near the end; open a smaller second loop before closing the first.",
+   "regla_app": "Every script declares the loop in L01 and closes it at 70-85% of the runtime (heuristic); a mini payoff every 8-12 s keeps the middle alive.",
+   "evidencia": "Information-gap theory supports curiosity from a closable gap. The Zeigarnik memory effect often cited for this did not replicate in a 2025 meta-analysis; treat open loops as a curiosity device, not a memory one.",
+   "fuente": ["https://doi.org/10.1037/0033-2909.116.1.75", "https://ideas.repec.org/a/pal/palcom/v12y2025i1d10.1057_s41599-025-05000-w.html"]
+  },
+  {
+   "id": "payoff_timing",
+   "nombre": "Payoff timing",
+   "definicion": "Deliver the promised answer late enough to hold the watch, early enough not to frustrate. Never after a CTA.",
+   "regla_app": "Main payoff before the closing question; for TikTok over-60 s cuts the payoff sits after 50 s. heuristic, unverified.",
+   "evidencia": "TikTok weights full watches of longer videos; watch time is a named Instagram signal.",
+   "fuente": ["https://newsroom.tiktok.com/en-us/how-tiktok-recommends-videos-for-you", "https://about.instagram.com/blog/announcements/instagram-ranking-explained"]
+  },
+  {
+   "id": "loop_ending",
+   "nombre": "Loop ending",
+   "definicion": "The last line or image flows into the first (the sentence ends where the video begins), so replays feel seamless.",
+   "regla_app": "Optional per template; match last frame to first frame composition; the last spoken line can complete the first.",
+   "evidencia": "Replays count as Shorts views since March 2025; rewatching is part of watch time on TikTok and Instagram (practitioner consensus).",
+   "fuente": ["https://ppc.land/youtube-changes-how-shorts-views-are-counted-from-march-31/"]
+  },
+  {
+   "id": "rehook",
+   "nombre": "Re-hook",
+   "definicion": "A second hook around 35-50% of the runtime ('But that's not the strange part').",
+   "regla_app": "The artist_short template's L05 'the turn' is the re-hook slot.",
+   "evidencia": "Practitioner consensus; unverified.",
+   "fuente": ["https://www.creatoressentials.com/glossary/viewed-vs-swiped-away/"]
+  },
+  {
+   "id": "visual_cadence",
+   "nombre": "Visual cadence",
+   "definicion": "Change something on screen every 2-4 s (cut, zoom, insert, text) without breaking the line of thought.",
+   "regla_app": "Already covered by the collage style's section grammar; check in motion QA.",
+   "evidencia": "Practitioner consensus; unverified.",
+   "fuente": ["https://ads.tiktok.com/business/en-US/blog/9-creative-tips-to-drive-auction-ad-performance"]
+  },
+  {
+   "id": "sound_off_design",
+   "nombre": "Sound-off design",
+   "definicion": "Burned-in captions and visuals that tell the story without audio.",
+   "regla_app": "Subtitles always on, inside the platform safe area.",
+   "evidencia": "Muted reels are made less visible on Instagram (so always ship audio), yet many feeds autoplay muted (LinkedIn especially); design for both.",
+   "fuente": ["https://about.instagram.com/blog/announcements/instagram-ranking-explained", "https://www.kapwing.com/resources/linkedin-video-size-guide-aspect-ratios-resolution-length-and-best-practices-3/"]
+  }
+ ],
+ "cta": [
+  {"id": "cta_after_payoff", "regla": "Put any CTA after the payoff, in the last 2-3 s; an early CTA gives the viewer a reason to leave.", "evidencia": "Practitioner consensus; unverified."},
+  {"id": "cta_series_promise", "regla": "Follow/subscribe asks tied to a concrete promise ('one hidden detail every Tuesday').", "evidencia": "Practitioner consensus; unverified."},
+  {"id": "cta_send", "regla": "On Instagram ask for a send to one person ('send this to the friend who...'); sends per reach is a named signal.", "evidencia": "Secondary reports of the head of Instagram's January 2025 statement.", "fuente": "https://instantdm.com/blog/instagrams-ceo-just-revealed-exactly-how-the-algorithm-works-heres-how-to-use-it"},
+  {"id": "cta_save", "regla": "Save prompt only on reference content (lists, how-to-look guides).", "evidencia": "Practitioner consensus; unverified."},
+  {"id": "cta_related", "regla": "On YouTube point to the Related video link for the long version, on screen and in voice.", "fuente": "https://blog.youtube/creator-and-artist-stories/youtube-related-videos-traffic-guide/"},
+  {"id": "cta_no_bait", "regla": "Never 'like/comment/share if...' or 'comment YES': Facebook demotes engagement bait including in the audio; ask for an opinion or advice instead.", "fuente": "https://about.fb.com/news/2017/12/news-feed-fyi-fighting-engagement-bait-on-facebook/"}
+ ],
+ "preguntas_comentario": {
+  "regla": "End with a genuine two-option opinion question tied to the episode's debate (the artist_short template's L10). Options must be balanced, short, and each defensible. Phrase it as a question to answer, not as an instruction to comment.",
+  "ejemplos": [
+   "Genius or fraud: which was he?",
+   "Would you hang this in your living room, or keep it in a museum?",
+   "Original or workshop copy: what does your eye say?",
+   "Was the restoration a rescue or a mistake?",
+   "Masterpiece or overrated?"
+  ],
+  "evitar": ["'Comment 1 or 2'", "'Type YES if you agree'", "'Like if you knew this'"],
+  "fuente": "https://about.fb.com/news/2017/12/news-feed-fyi-fighting-engagement-bait-on-facebook/"
+ }
+}

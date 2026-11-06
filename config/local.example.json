@@ -27,5 +27,38 @@
     "voice": "elevenlabs",
     "music": "comfy_ace",
     "research": "claude"
-  }
+  },
+  "zimage": {
+    "script": "D:/minimax/scripts/zimage_gen.py"
+  },
+  "qwen": {
+    "url": "http://127.0.0.1:7860"
+  },
+  "nano_banana": {
+    "model": "gemini-2.5-flash-image"
+  },
+  "seedance": {
+    "model": "seedance-1-0-pro-250528"
+  },
+  "blender": "C:/Program Files/Blender Foundation/Blender 5.0/blender.exe",
+  "mcp": {
+    "motion-dna": {
+      "command": "python",
+      "args": [
+        "{motion_dna}/tools/mcp/ss_motion_mcp.py"
+      ]
+    },
+    "motion-dna-blender": {
+      "command": "python",
+      "args": [
+        "D:/motion category ai library - platforms/research/platforms/blender/mcp_blender.py"
+      ]
+    },
+    "figma": {
+      "type": "http",
+      "url": "https://mcp.figma.com/mcp"
+    }
+  },
+  "_mcp_readme": "MCP servers the app gives Claude (strict: only these). Set claude_todos_los_conectores true (or tick it in the app) to also load every connector of the Claude account (Krea, Flora...): heavier context, higher cost per message.",
+  "claude_todos_los_conectores": false
 }

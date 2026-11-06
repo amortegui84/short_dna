@@ -8,6 +8,17 @@ description: Make a vertical Short end to end with a generated presenter (resear
 The user says **who** (character + look), **how** (style) and **what** (topic). You run the rest with `factory.py` and the
 libraries, and stop at the checkpoints. Read `docs/LEARNINGS.md` before working: every rule in it came from a review.
 
+## Paths (the app's views; the same from chat)
+- **Topic → Short**: below, steps 0-7. Pick the hook with `library/hooks.json` and the rules of each platform in
+  `library/platforms/<p>.json` + docs/PLATFORMS.md (length, safe area, CTA, AI disclosure: always label a generated presenter).
+- **Reference → Style**: `engine/referencia.py <url|file> <slug>` → read hoja.jpg + analisis.json → Motion DNA reference profile →
+  `match_reference` → a style file (docs/NEW_STYLE.md). Create new presets only after the user agrees.
+- **Brand → Kit**: `engine/marca.py <url> <slug>` → confirm logo/colours/fonts → Motion DNA brand (`tools/brand.py`) → components with
+  `apply_brand` and kit pieces; Figma frames on request. Never put a brand logo in library examples.
+- **Character**: pick from the library, describe a new one, or propose 3 for an idea (docs/NEW_CHARACTER.md).
+- **Assets**: `engine/assets.py` (local or paid); Krea/Flora through their MCP.
+- **Cost**: before any paid step, `engine/costo.py` (prices in library/costs.json) and the user's yes. Never run a paid stage without it.
+
 ## 0. Set up the project
 - Pick from the libraries (list them for the user if they did not choose): `library/characters/*/character.json` (and its `looks`),
   `library/styles/*.json`, `library/templates/*/template.json`.

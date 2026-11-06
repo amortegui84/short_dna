@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' file: data:; img-src 'self' file: data:; media-src 'self' file:; style-src 'self' 'unsafe-inline'">
+<title>shorts-factory</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<aside id="nav">
+  <div class="brand">shorts<b>factory</b></div>
+  <button data-view="home" class="on">Start</button>
+  <button data-view="short">New Short</button>
+  <button data-view="reference">Reference video</button>
+  <button data-view="brand">Brand</button>
+  <button data-view="character">Characters</button>
+  <button data-view="assets">Assets</button>
+  <button data-view="platforms">Platforms</button>
+  <button data-view="projects">Projects</button>
+  <button data-view="library">Library</button>
+  <div class="spacer"></div>
+  <div id="conn-mini"></div>
+</aside>
+<main id="view"></main>
+<section id="side">
+  <div class="tabs"><button data-side="chat" class="on">Claude</button><button data-side="log">Log</button></div>
+  <div id="chat" class="pane">
+    <div id="msgs"></div>
+    <div id="perm"></div>
+    <form id="ask"><textarea id="q" rows="3" placeholder="Ask Claude (it knows the repo, the skill and Motion DNA)…"></textarea>
+      <div class="row"><button type="submit">Send</button><button type="button" id="stop" class="ghost">Stop</button><label class="small"><input type="checkbox" id="fresh"> new conversation</label><label class="small" title="Also load every connector of your Claude account (Krea, Flora...). Heavier context, higher cost per message; starts a new conversation."><input type="checkbox" id="allconn"> all my connectors</label></div></form>
+  </div>
+  <pre id="log" class="pane hidden"></pre>
+</section>
+<script src="prompts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

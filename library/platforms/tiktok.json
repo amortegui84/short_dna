@@ -1,0 +1,93 @@
+{
+ "slug": "tiktok",
+ "nombre": "TikTok",
+ "investigado": "2026-11-05",
+ "specs": {
+  "w": 1080,
+  "h": 1920,
+  "fps": 30,
+  "aspecto": "9:16",
+  "max_s": 600,
+  "max_nota": "unverified: third-party guides report 10 min in-app recording, uploads up to 30-60 min for many accounts (staged rollout). The app shows each account's real limit. 600 s is the safe value for this pipeline.",
+  "ideal_s": [61, 90],
+  "ideal_nota": "Creator Rewards Program pays only for original videos longer than 1 minute, so an educational series that wants monetisation should land at 61-90 s. For pure reach tests, 20-45 s is the usual heuristic (unverified). TikTok's own statement: finishing a longer video from beginning to end is a heavier signal than weaker interactions.",
+  "safe_area": {
+   "top": 130,
+   "bottom": 380,
+   "left": 60,
+   "right": 140,
+   "nota": "unverified: TikTok publishes safe zones for ads in Ads Manager; organic values here are a conservative mix of third-party templates (top 100-130 status/tabs, bottom 250-380 caption + sound, right ~100-140 action column). Check in the app preview before a new layout."
+  },
+  "caption_limit": {
+   "descripcion": 4000,
+   "nota": "4000 characters in the app (raised from 2200); some schedulers report 2200 through the Content Posting API (unverified). Only the first ~55 characters show in the feed before 'more' (unverified)."
+  },
+  "cover": "Pick a cover frame and add cover text in the app. The cover shows on the profile grid (cropped toward 3:4, unverified) and in search results: keep the title text centred, inside the middle 1080x1440 band."
+ },
+ "algoritmo": [
+  "TikTok's own statement: recommendations rank on user interactions (likes, shares, follows, comments, content created), video information (captions, sounds, hashtags) and, with lower weight, device and account settings (language, country, device).",
+  "Stronger signals weigh more: 'whether a user finishes watching a longer video from beginning to end' receives greater weight than weaker ones.",
+  "Neither follower count nor previous high-performing videos are direct factors: every video starts from zero, which suits a new faceless/avatar channel.",
+  "Captions, on-screen keywords and sounds feed both recommendations and TikTok search; plain-text keywords matter as much as hashtags (third-party consensus).",
+  "STEM feed: educational science/tech content that passes two checks (appropriateness by Common Sense Networks, reliability by the Poynter Institute) can enter a dedicated STEM feed in the US, Europe and other markets. Art history is not STEM; art-science crossovers (pigment chemistry, X-ray conservation) may qualify (unverified for art topics).",
+  "Creator Rewards Program: original videos over 1 minute; 18+, 10,000 followers and 100,000 views in the last 30 days (criteria from 2024 coverage, may have changed)."
+ ],
+ "estrategia": [
+  "Say the key idea within the first 3 seconds and land the full hook within 6 (TikTok's ad creative guidance; directional for organic).",
+  "Write the spoken hook, the on-screen hook text and the caption's first 5 words as three versions of the same promise.",
+  "Keyword the caption like a search query: '<artist> <artwork> hidden detail explained'.",
+  "Series: 'Part N' in on-screen text and caption; use TikTok playlists by series (Series/Collections on the profile).",
+  "Reply-with-video to good comments: a cheap second episode with a built-in audience.",
+  "Over-1-minute versions for Creator Rewards; keep the payoff after the 60 s mark so the full watch is earned, but never pad."
+ ],
+ "hooks_preferidos": ["cold_open", "contrarian", "pov", "find_it_challenge", "you_have_been_wrong", "visual_pattern_interrupt", "secret_reveal", "modern_parallel"],
+ "cta": [
+  "'Follow for part 2' only when part 2 exists or is scheduled (series cliffhanger).",
+  "Two-option comment question at the end, framed as an opinion ('Genius or fraud?'), not 'comment YES'.",
+  "Save prompt for list-style content: 'Save this for your next museum visit.'"
+ ],
+ "hashtags_seo": {
+  "caption": "Lead with the keyword phrase; 1-2 sentences; 3-5 focused hashtags (#arthistory #<artist> #<museum> #learnontiktok). One scheduler claims only the first 5 hashtags count (unverified).",
+  "texto_en_pantalla": "Say and show the searchable terms (artist, artwork); on-screen text and speech are read for search (third-party consensus, unverified).",
+  "busqueda": "Check TikTok search suggestions for the artist name to choose the exact phrasing."
+ },
+ "musica": "Personal accounts: general sound library (licensed for personal, non-commercial use). Business accounts: only the Commercial Music Library in the app (pre-cleared, 1M+ tracks per vendors). Music added before upload must be licensed by you. For this pipeline: own/generated music; avoid trending commercial songs on a business account; post as a personal/creator account if trending sounds are part of the strategy.",
+ "ia_disclosure": {
+  "obligatorio": "TikTok requires creators to label AI-generated or significantly edited content that shows realistic-looking scenes or people (Community Guidelines, Integrity and Authenticity).",
+  "como": "Toggle 'AI-generated content' in the post settings before publishing. TikTok also auto-labels content carrying C2PA Content Credentials (since May 2024) and adds an invisible watermark to content made with its tools.",
+  "consecuencias": "Unlabeled content may be removed, restricted, or labeled by TikTok depending on harm. Labels do not make misleading content about matters of public importance allowed.",
+  "para_esta_app": "Photoreal presenter = realistic-looking person: always toggle the AI label. Keep C2PA metadata if the generators write it (it triggers the label automatically anyway)."
+ },
+ "publicacion": {
+  "cadencia": "Widely attributed to TikTok creator resources: 1-4 posts per day to test (unverified, no primary page found). For a produced series: 1 per day or 4-5 per week, plus cheap reply videos.",
+  "horas": "No official best time. Use TikTok Studio analytics (follower activity by hour) after ~2 weeks of posting (unverified heuristic)."
+ },
+ "adaptar_desde_master": [
+  "Keep 9:16 1080x1920 30 fps; upload the master file, not a re-export with a watermark from another app (Instagram demotes watermarked reposts, and TikTok-watermarked files are a cross-posting tell).",
+  "Keep burned-in subtitles above y=1540 and text left of x=940; the bottom 380 px hold caption and sound.",
+  "If the episode is over 60 s keep it (Creator Rewards); if under, consider extending with a second beat only if it adds real content.",
+  "Caption: keyword-first description (not the YouTube title).",
+  "Toggle the AI-generated content label.",
+  "Swap the music if the account is a business account and the track is not cleared commercially."
+ ],
+ "fuentes": [
+  "https://newsroom.tiktok.com/en-us/how-tiktok-recommends-videos-for-you",
+  "https://www.tiktok.com/community-guidelines/en/integrity-authenticity",
+  "https://siliconangle.com/2024/05/09/tiktok-announces-new-tools-automatically-flag-ai-generated-content/",
+  "https://www.theregister.com/2024/05/10/tiktok_ai_watermarks/",
+  "https://ads.tiktok.com/business/en-US/blog/9-creative-tips-to-drive-auction-ad-performance",
+  "https://www.socialmediatoday.com/news/tiktok-announces-revamped-creator-rewards-program-to-incentivize-longer-u/710639/",
+  "https://buffer.com/resources/tiktok-creativity-program/",
+  "https://openclip.app/guides/tiktok-video-length",
+  "https://ttcalculator.net/learn/tiktok-video-length-limits/",
+  "https://lindseygamble.com/blog/tiktok-expands-the-character-limit-for-video-descriptions",
+  "https://recurpost.com/tiktok-scheduler/tiktok-character-limits-and-hashtags/",
+  "https://www.trymypost.com/blog/tiktok-ad-specs-2026-safe-zones",
+  "https://adkit.so/tools/safe-zones/tiktok",
+  "https://www.soundstripe.com/blogs/tiktok-music-library-explained",
+  "https://www.socialmediatoday.com/news/tiktok-changes-rules-on-music-usage-by-businesses/577734/",
+  "https://www.lilachbullock.com/how-many-times-a-day-should-you-post-on-tiktok/",
+  "https://newsroom.tiktok.com/tiktok-launches-dedicated-feed-for-stem-content-across-europe",
+  "https://newsroom.tiktok.com/tiktok-stem-feed-launches-in-ssa?lang=en-ZA"
+ ]
+}

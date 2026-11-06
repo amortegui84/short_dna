@@ -1,0 +1,73 @@
+{
+ "slug": "facebook_reels",
+ "nombre": "Facebook Reels",
+ "investigado": "2026-11-05",
+ "specs": {
+  "w": 1080,
+  "h": 1920,
+  "fps": 30,
+  "aspecto": "9:16 recommended; since June 2025 every Facebook video is a reel, any length or orientation",
+  "max_s": null,
+  "max_nota": "No length cap for reels since the June 2025 change (Meta: from a 30-second vertical clip to a 20-minute-plus horizontal episode). Rolled out over the following months.",
+  "ideal_s": [30, 90],
+  "ideal_nota": "Heuristic (no Meta figure). Facebook's audience skews older and tolerates longer explanations; 60-90 s works for an educational episode (unverified).",
+  "safe_area": {
+   "top": 270,
+   "bottom": 670,
+   "left": 65,
+   "right": 65,
+   "nota": "unverified: same Meta Stories/Reels ad safe-zone reading as Instagram (top 14%, bottom 35%, sides 6%)."
+  },
+  "caption_limit": {
+   "descripcion": 63206,
+   "nota": "unverified (long-standing Facebook post limit). Only the first line or two show; write it like the Instagram first line."
+  },
+  "cover": "Frame or uploaded thumbnail; same centred-text rule as Instagram."
+ },
+ "algoritmo": [
+  "Meta says the 2025 'all videos are reels' change does not change which videos are recommended; recommendations stay personalised by interests.",
+  "Facebook demotes engagement bait: posts, comments and videos (including in the audio) that push likes, shares, comments or votes to boost reach ('LIKE this if...'); Pages that repeat it get Page-level demotion. Posts that ask for help, advice or recommendations are not affected.",
+  "Shared Meta signals apply (watch time, shares/sends, originality, watermark and low-quality demotions) per Instagram's explainer; Facebook-specific ranking documents not re-checked this session (unverified)."
+ ],
+ "estrategia": [
+  "Cross-post from Instagram (Accounts Center) or upload natively; native upload lets you set a Facebook-specific caption.",
+  "Phrase the closing question as a genuine opinion request, never as 'comment A or B' vote bait (spoken bait is detected too).",
+  "Longer 'story' cuts (90-180 s) of the same episode can work here because there is no cap; test one."
+ ],
+ "hooks_preferidos": ["story_character", "question", "curiosity_gap", "before_after", "superlative"],
+ "cta": [
+  "'Which one would you hang at home, and why?' (opinion, not vote bait).",
+  "Follow the Page for the series.",
+  "Share to a group about art or history (share prompt framed as usefulness)."
+ ],
+ "hashtags_seo": {
+  "caption": "Hook line + 1-2 sentences; 1-3 hashtags at most (low value on Facebook, unverified).",
+  "busqueda": "Facebook search reads captions; names and places in plain text."
+ },
+ "musica": "Same Meta music licensing as Instagram (personal vs business accounts; Meta Sound Collection for commercial use). Own/generated music is the safe default.",
+ "ia_disclosure": {
+  "obligatorio": "Same Meta policy as Instagram: disclose photorealistic video or realistic-sounding audio that was digitally created or altered.",
+  "como": "AI label toggle when posting; 'AI info' auto-label from industry signals (C2PA/IPTC).",
+  "consecuencias": "Meta 'may apply penalties'; altered content rated by fact-checkers is shown lower.",
+  "para_esta_app": "Always toggle the AI label for the photoreal presenter."
+ },
+ "publicacion": {
+  "cadencia": "No official figure. 3-5 per week for a series when cross-posting from Instagram (unverified heuristic).",
+  "horas": "Meta Business Suite insights for the Page's audience activity."
+ },
+ "adaptar_desde_master": [
+  "Same file as Instagram (9:16, no watermarks, subtitles above y=1250).",
+  "Rewrite the closing CTA as an opinion request; remove any 'comment/like/share if' line from the voice-over if one exists.",
+  "Optional longer story cut (no cap).",
+  "AI label toggle."
+ ],
+ "fuentes": [
+  "https://www.tubefilter.com/2025/06/17/meta-facebook-reels-all-videos-update/",
+  "https://www.engadget.com/social-media/facebook-videos-are-all-just-going-to-be-reels-now-185807805.html",
+  "https://about.fb.com/news/2017/12/news-feed-fyi-fighting-engagement-bait-on-facebook/",
+  "https://about.instagram.com/blog/announcements/instagram-ranking-explained",
+  "https://about.fb.com/news/2024/04/metas-approach-to-labeling-ai-generated-content-and-manipulated-media/",
+  "https://www.facebook.com/business/help/980593475366490",
+  "https://billo.app/?p=50654"
+ ]
+}

@@ -1,0 +1,92 @@
+{
+ "slug": "instagram_reels",
+ "nombre": "Instagram Reels",
+ "investigado": "2026-11-05",
+ "specs": {
+  "w": 1080,
+  "h": 1920,
+  "fps": 30,
+  "aspecto": "9:16",
+  "max_s": 180,
+  "max_nota": "3 minutes since January 2025 (announced by the head of Instagram, reported widely). One 2026 source claims 20 minutes: unverified.",
+  "ideal_s": [30, 90],
+  "ideal_nota": "Heuristic (no Instagram figure). Length is not a stated ranking factor; watch time is, so the shortest version that delivers the payoff wins.",
+  "safe_area": {
+   "top": 270,
+   "bottom": 670,
+   "left": 65,
+   "right": 65,
+   "nota": "unverified: Meta's Business Help Center has a Stories/Reels safe-zone page for ads (content not readable this session); values are a 2026 agency reading of it (top 14%, bottom 35%, sides 6%). The right action column sits inside the bottom-right; keep text left of x=900 in the lower half too."
+  },
+  "caption_limit": {
+   "descripcion": 2200,
+   "hashtags_max": 5,
+   "nota": "Hashtags capped at 5 per post/Reel since December 2025 (news coverage; whether comments count is disputed). 2200 characters: unverified this session (long-standing figure)."
+  },
+  "cover": "Choose a frame or upload a cover; the profile grid crops Reels toward 3:4 (unverified exact ratio), so keep cover text in the centre 1080x1440 band."
+ },
+ "algoritmo": [
+  "Instagram's ranking explainer: Reels ranking predicts how likely you are to reshare, watch all the way through, like, or visit the audio page. Inputs in rough order: your activity, your history with the poster, information about the reel (audio, visuals, popularity), information about the poster.",
+  "The three signals the head of Instagram named in January 2025: watch time, likes per reach, sends per reach (DM shares). Sends weigh most for reaching non-followers (secondary sources; exact wording not seen on a primary page).",
+  "Made less visible: low-resolution or watermarked reels, muted reels, reels with borders, reels that are mostly text, and reels already posted on Instagram.",
+  "Originality: since 2024 Instagram swaps reposts for the original in recommendations and penalises aggregators; in 2026 this extended to photos/carousels, with accounts judged over a month (press coverage).",
+  "Trial reels (December 2024): show a reel to non-followers first; insights in 24 h; can be shared to followers after if it performs."
+ ],
+ "estrategia": [
+  "Optimise for sends: content people want to show one friend ('you need to see this detail'). End with a line that invites the send, not the like.",
+  "Do not let the reel be 'mostly text': the presenter, the artwork in motion and voice carry it; text is support.",
+  "Use trial reels to test two hooks for the same episode with non-followers before committing.",
+  "Carousel companion: the same episode as a 5-8 slide carousel (artwork, detail crops, source) for saves.",
+  "Post the native master without TikTok/CapCut watermarks."
+ ],
+ "hooks_preferidos": ["curiosity_gap", "secret_reveal", "before_after", "modern_parallel", "story_character", "contrarian"],
+ "cta": [
+  "Send prompt: 'Send this to the friend who walks past this painting.'",
+  "Save prompt for list episodes.",
+  "Two-option question in the caption and on screen; avoid 'comment X to get Y' bait on Meta surfaces."
+ ],
+ "hashtags_seo": {
+  "caption": "First line = hook + keyword (visible before 'more'); then 1-2 sentences with names and places; up to 5 hashtags (hard cap).",
+  "busqueda": "Instagram search reads captions, alt text and on-screen text (secondary sources, unverified). Write a manual alt text describing the artwork.",
+  "hashtags": "3-5 specific tags; topic over volume."
+ },
+ "musica": "Main music library licensed for personal, non-commercial use; certain business accounts are limited to the Meta Sound Collection (cleared for commercial use). Instagram's licenses do not travel: a file exported with Instagram audio is not cleared for TikTok or YouTube. Muted reels are made less visible, so always ship with audio. For this pipeline: own/generated music, voice always present.",
+ "ia_disclosure": {
+  "obligatorio": "Meta requires people to disclose organic posts with photorealistic video or realistic-sounding audio that was digitally created or altered (policy since 2024; secondary sources for the exact scope). Still images are not required but may be auto-labeled.",
+  "como": "Use the 'AI info' / AI label toggle when posting (mobile app). Meta also labels automatically when it detects industry-standard AI signals (C2PA/IPTC). Content only edited with AI shows the label in the post menu; AI-generated content shows it directly (September 2024 update).",
+  "consecuencias": "Meta 'may apply penalties' for not disclosing (not specified publicly); high-risk deceptive content may get a more prominent label; fact-checked 'Altered' content is shown lower.",
+  "para_esta_app": "Photoreal presenter + synthetic voice: always toggle the AI label on Instagram and Facebook."
+ },
+ "publicacion": {
+  "cadencia": "No universal number (head of Instagram: some creators succeed posting once a month, others five reels a day). Instagram's creator FAQ is reported to say the fastest-growing creators post 10+ reels per month (secondary, unverified): ~3 per week for a series.",
+  "horas": "Use Professional dashboard > Insights > 'Most active times'; Instagram's Best Practices hub gives per-account frequency guidance."
+ },
+ "adaptar_desde_master": [
+  "Keep 9:16 1080x1920, no other app's watermark, no borders or letterbox.",
+  "Move subtitles and key text above y=1250 and inside x 65-1015; the bottom 35% holds caption, audio and actions (collage style y_subtitulos=1400 is inside it).",
+  "Cut to the tightest version that keeps the payoff (watch time is the signal); 3-minute cap.",
+  "Replace the CTA with a send prompt.",
+  "Caption: hook line + keywords + up to 5 hashtags; alt text.",
+  "Toggle the AI label; check music is cleared for the account type."
+ ],
+ "fuentes": [
+  "https://about.instagram.com/blog/announcements/instagram-ranking-explained",
+  "https://metricool.com/instagram-reels-length",
+  "https://davidzucker.substack.com/p/three-minute-instagram-reels-have",
+  "https://instantdm.com/blog/instagrams-ceo-just-revealed-exactly-how-the-algorithm-works-heres-how-to-use-it",
+  "https://www.fanpagekarma.com/insights/?p=9293",
+  "https://www.engadget.com/instagrams-algorithm-overhaul-will-reward-original-content-and-penalize-aggregators-130018977.html",
+  "https://petapixel.com/2026/04/30/new-instagram-policies-target-reposted-content/",
+  "https://petapixel.com/2024/12/13/instagram-launches-trial-reels-so-you-can-test-content-with-non-followers",
+  "https://www.businesstoday.in/technology/news/story/no-more-hashtag-stuffing-instagram-limits-hashtag-usage-to-just-5-per-reel-and-post-507444-2025-12-19",
+  "https://routenote.com/blog/how-often-you-should-post-on-instagram/",
+  "https://creators.instagram.com/blog/best-practices-for-creators",
+  "https://about.fb.com/news/2024/04/metas-approach-to-labeling-ai-generated-content-and-manipulated-media/",
+  "https://www.clipspeed.ai/blog/ai-generated-video-disclosure-rules.html",
+  "https://www.facebook.com/business/help/980593475366490",
+  "https://billo.app/?p=50654",
+  "https://www.lilachbullock.com/?p=194938",
+  "https://www.foximusic.com/blog/instagram-reels-music-copyright-legal-guide/",
+  "https://about.fb.com/news/2017/12/news-feed-fyi-fighting-engagement-bait-on-facebook/"
+ ]
+}

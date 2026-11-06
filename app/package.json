@@ -1,0 +1,10 @@
+{
+  "name": "shorts-factory-app",
+  "version": "0.1.0",
+  "description": "Desktop app for shorts-factory: paths from a topic, a reference video, a brand, a character or an asset prompt to finished Shorts, with Claude, Motion DNA, After Effects, Blender and Figma.",
+  "main": "main.js",
+  "private": true,
+  "scripts": { "start": "electron ." },
+  "dependencies": { "@anthropic-ai/claude-agent-sdk": "latest" },
+  "devDependencies": { "electron": "^38.0.0" }
+}

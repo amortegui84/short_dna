@@ -20,6 +20,13 @@ flowchart LR
   AE --> RE[render + QA] --> Q[QC] --> CO[light collect + zip]
 ```
 
+## The app
+`start_app.bat` opens the desktop app (docs/APP.md): paths from a **topic**, a **reference video**, a **brand** website, a
+**character** (pick, describe or let Claude propose), **assets** with local models or paid APIs, and **platform** plans, with Claude,
+Motion DNA (After Effects), Blender and Figma connected, and the estimated cost shown before anything paid runs.
+
+![The app](docs/screens/app_short.jpg)
+
 ## What is in here
 | Folder | What |
 |---|---|
@@ -33,7 +40,10 @@ flowchart LR
 | `library/templates/` | video templates: section grammar and the empty project |
 | `library/kit/` | the collage kit (paper, concrete, tape, plaster hand, frames, painter's tools, halftone, craquelure) |
 | `examples/` | the two finished videos as complete projects (El Bosco, Odilon Redon) |
-| `docs/` | architecture, the end-to-end recipe, style, learnings, providers, project schema, Figma |
+| `app/` | the Electron app (main process, Claude Agent SDK, renderer) |
+| `library/platforms/`, `library/hooks.json` | strategy per network (specs, safe areas, length, CTA, AI disclosure) and the hook catalogue, with sources |
+| `library/costs.json` | the price table behind every cost estimate |
+| `docs/` | architecture, app, the end-to-end recipe, style, learnings, providers, models (MiniMax H3, Z-Image, Qwen, Klein, ACE-Step, APIs), platforms, QA, Figma |
 | `.claude/skills/shorts-factory/` | the skill Claude follows |
 
 ## Quick start
