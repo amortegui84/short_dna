@@ -412,7 +412,7 @@ OBRAS_ARTISTA = [(carpeta / "obras" / f).as_posix() for f in sorted(os.listdir(c
 DATA = {"retrato": RETRATO, "obrasArtista": OBRAS_ARTISTA, "piezasRelleno": piezas(ENJAMBRE, 18) + piezas(CORRIENTE, 8), "comp": COMP, "total": total, "secciones": secciones, "subs": subs, "yBarra": Y_BARRA, "marcos": marcos, "numero": f"{pj['numero']:02d}",
         "artista": pj["artista"], "fechas": pj["fechas"], "lema": pj["lema"], "barrido": fz0, "musica": MUSICA,
         "voces": [{"id": s["id"], "wav": Path(s["wav"]).as_posix(), "start": s["start"]} for s in segs], "desaturar": 0, "kit": KIT,
-        "estilo": ESTILO, "estatica": ESTATICA, "relleno": RELLENO, "autodestruccion": (pj.get("autodestruccion") or {}).get("tipo")}
+        "estilo": ESTILO, "estatica": ESTATICA, "relleno": RELLENO, "marcas_docs": pj.get("marcas_docs", {}), "autodestruccion": (pj.get("autodestruccion") or {}).get("tipo")}
 (carpeta / "datos_ae.json").write_text(json.dumps(DATA, indent=1), encoding="utf-8")
 print(COMP, "|", len(secciones), "secciones |", len(subs), "subtitulos | total", total)
 print("subtitulos:", " / ".join(" ".join(w["w"] for w in s["words"]) for s in subs))

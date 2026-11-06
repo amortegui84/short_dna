@@ -375,6 +375,7 @@ var COLLAGE = (function () {
     }
     // silueta del artista que se llena (la mujer del referente 4-12 s): eco fantasma, bloques de color, sus obras en Multiply, piezas que se
     // amontonan de abajo arriba y el retrato en B/N encima; todo dentro de su silueta
+    function fondoOscuro() { var tk = (D.estilo && D.estilo.tokens) || {}; if (!tk.fondo) return false; var c0 = rgb(tk.fondo); return 0.3 * c0[0] + 0.59 * c0[1] + 0.11 * c0[2] < 0.3; }
     function siluetaArtista(s, q) {
         var v = viva(s), t = q.ini, rp = D.retrato, ri = imp(rp, true); if (!ri) return;
         var ancho = Math.min(860, 1150 * ri.width / ri.height), e = ancho / ri.width * 100, cx = 540, cy = 760;
@@ -389,11 +390,11 @@ var COLLAGE = (function () {
         var se = imp("componentes_ae/mates_png/semitono_parejo_4K_alfa.png", true); if (se) { var hs = c.layers.add(se); S(hs).setValue([32, 32]); tab(hs, cx, cy + 300, s, 1); mult(hs, 55); dentro(hs); vida(hs, t + 0.5, v[1]); }
         var herr = ["tubo_1", "pincel_1", "tubo_2", "frasco", "carboncillos", "tubo_3", "pincel_2", "espatula", "paleta", "compas", "regla", "bote_pinceles"];
         for (var i = 0; i < 18; i++) {   // se amontonan de abajo arriba
-            var pi = D.relleno && D.relleno.length ? imp(D.relleno[i % D.relleno.length], true) : imp(G + "alfa3/" + herr[i % herr.length] + ".png", true);   // relleno: piezas del kit de la marca if (!pi) continue; var Lp = c.layers.add(pi), kp = (110 + (i * 23) % 70) / Math.max(pi.width, pi.height) * 100; S(Lp).setValue([kp, kp]); R(Lp).setValue((i * 47) % 70 - 35); foto(Lp, 30); mult(Lp, 92);
+            var pi = D.relleno && D.relleno.length ? imp(D.relleno[i % D.relleno.length], true) : imp(G + "alfa3/" + herr[i % herr.length] + ".png", true); if (!pi) continue; var Lp = c.layers.add(pi), kp = (110 + (i * 23) % 70) / Math.max(pi.width, pi.height) * 100; S(Lp).setValue([kp, kp]); R(Lp).setValue((i * 47) % 70 - 35); if (fondoOscuro()) { O(Lp).setValue(95); } else { foto(Lp, 30); mult(Lp, 92); }
             var x = cx - ancho * 0.42 + (i * 131) % Math.round(ancho * 0.84), y = cy + 520 - Math.floor(i / 6) * 85 - (i * 31) % 36, t0 = t + 0.6 + i * 0.05;
             P(Lp).expression = exprTab(s, 1, "[" + x + "," + y + "-Math.max(0,1-(time-" + t0 + ")/0.22)*300]"); dentro(Lp); vida(Lp, t0, v[1]);
         }
-        var bw = c.layers.add(ri); bw.name = "retrato en Multiply"; S(bw).setValue([e, e]); tab(bw, cx, cy, s, 1); foto(bw, 70); mult(bw, 88); dentro(bw); vida(bw, t, v[1]);
+        var bw = c.layers.add(ri); bw.name = "retrato en Multiply"; S(bw).setValue([e, e]); tab(bw, cx, cy, s, 1); foto(bw, 70); if (fondoOscuro()) { O(bw).setValue(55); } else mult(bw, 88);   // en fondo oscuro el retrato va encima a media opacidad para que se vean las piezas debajo dentro(bw); vida(bw, t, v[1]);
     }
     // silueta de papel blanca sobre bloque oscuro, llena de la obra que sube (la mano del referente 81-85 s)
     function manoPapel(s, q, x, y, ancho) {
@@ -473,7 +474,9 @@ var COLLAGE = (function () {
                 // v10b: de una obra a la siguiente con un fundido lento de 0.9 s (antes un corte seco) y la siguiente debajo
                 var o = q.obras[i], t0 = i === 0 ? q.corte : Math.max(o.t, q.corte + 0.8), tn = i + 1 < q.obras.length ? Math.max(q.obras[i + 1].t, q.corte + 0.8) : -1, t1 = tn > 0 ? tn + 0.9 : v[1];
                 var oi0 = imp(o.img, false), sube = oi0 ? Math.max(W / oi0.width, H / oi0.height) : 1, Lo = null;
-                if (sube > 1.9) { var lm = lamina(s, o.img, 540, 700, 940, 1150, i % 2 ? -1 : 1, 0.98, t0); if (lm) { vida(lm.obra, t0, t1); Lo = lm.obra; } }   // poca resolucion: en lamina
+                var mdo = D.marcas_docs && D.marcas_docs[o.stem];
+                if (mdo) { var dp = docPage(s, o.img, t0, t1, mdo); if (dp) Lo = dp.obra; }
+                else if (sube > 1.9) { var lm = lamina(s, o.img, 540, 700, 940, 1150, i % 2 ? -1 : 1, 0.98, t0); if (lm) { vida(lm.obra, t0, t1); Lo = lm.obra; } }   // poca resolucion: en lamina
                 else { var ob = obraSangre(s, { img: o.img, ini: t0, fin: t1 }, t0); if (ob) { vida(ob.obra, t0, t1); ob.obra.moveToEnd(); ob.obra.moveBefore(c.layer("papel")); Lo = ob.obra; } }
                 if (Lo && tn > 0) { var op0 = O(Lo); op0.setValueAtTime(tn, 100); op0.setValueAtTime(tn + 0.9, 0); var ez = new KeyframeEase(0, 50); op0.setTemporalEaseAtKey(op0.numKeys - 1, [ez], [ez]); op0.setTemporalEaseAtKey(op0.numKeys, [ez], [ez]); }
             }
@@ -494,7 +497,9 @@ var COLLAGE = (function () {
     }
     function obra(s, q) {   // v7: la obra a sangre, con un solo acento; nada de relleno
         var oi0 = imp(q.img, false), sube = oi0 ? Math.max(W / oi0.width, H / oi0.height) : 1, ob;
-        if (sube > 1.9) ob = lamina(s, q.img, 540, 700, 940, 1150, s % 2 ? -1 : 1, 0.98, Math.max(0, q.ini - 1.2));   // obra de poca resolucion: a sangre se ve borrosa
+        var md = D.marcas_docs && D.marcas_docs[q.stem];
+        if (md) ob = docPage(s, q.img, Math.max(0, q.ini - 1.2), viva(s)[1], md);   // documento: collage con resaltador, notas y sello
+        else if (sube > 1.9) ob = lamina(s, q.img, 540, 700, 940, 1150, s % 2 ? -1 : 1, 0.98, Math.max(0, q.ini - 1.2));   // obra de poca resolucion: a sangre se ve borrosa
         else ob = obraSangre(s, q, Math.max(0, q.ini - 1.2));   // v10c: ya esta en su sitio cuando empieza el deslizamiento (antes aparecia al llegar: parecia un corte)
         // v8: la obra no se interviene: ni figuras que se mueven, ni lapiz, ni lupa encima
         cartela(s, 250, 1250, q.titulo, q.fecha ? [q.fecha] : [" "], q.ini + 0.3, s % 2 ? 1.5 : -1.5);
@@ -744,6 +749,48 @@ var COLLAGE = (function () {
         var t2 = texto("SP 0:00:00", "CourierNewPS-BoldMT", 26, "#F7F8F4", ParagraphJustification.LEFT_JUSTIFY); t2.name = "VHS contador"; P(t2).setValue([60, 150]); O(t2).setValue(80);
         t2.property("ADBE Text Properties").property("ADBE Text Document").expression = "var s=Math.floor(time); 'SP 0:'+('0'+Math.floor(s/60)).slice(-2)+':'+('0'+(s%60)).slice(-2);";
         var e1 = fx(t1, "ADBE Glo2"); try { e1.property(3).setValue(0.4); } catch (e) {}
+    }
+    // documento con animacion de collage: hoja con cinta y giro leve, empuje hacia lo importante, resaltador que se dibuja,
+    // circulo rojo a mano, nota manuscrita con flecha y sello DECLASSIFIED. Marcas en coordenadas 0-1 de la pagina (proyecto "marcas_docs").
+    function docPage(s, img, t, fin, marcas) {
+        var oi = imp(img, false); if (!oi) return null; var v = viva(s);
+        var k = Math.min(940 / oi.width, 1300 / oi.height), w = oi.width * k, h = oi.height * k, cx = 540, cy = 760;
+        var sombra = shp("sombra hoja"), sg = grp(sombra, "s"); rect(sg, w + 30, h + 30, 4); fill(sg, "#000000"); tab(sombra, cx + 14, cy + 18, s, 1); O(sombra).setValue(45);
+        try { fx(sombra, "ADBE Gaussian Blur 2").property(1).setValue(30); } catch (e) {}
+        var ob = c.layers.add(oi); ob.name = "obra " + s + " " + (++nObra) + " doc"; S(ob).setValue([k * 100, k * 100]); tab(ob, cx, cy, s, 1); R(ob).setValue(-1.5); R(sombra).setValue(-1.5);
+        foto(ob, 18, "#1A1A1A", "#F3EAD6");   // papel envejecido (la pagina no es una obra de arte: se puede tintar)
+        vida(sombra, t, fin); vida(ob, t, fin); caer(ob, t); caer(sombra, t);
+        // empuje lento hacia la primera marca
+        var m0 = marcas.length ? marcas[0] : null;
+        if (m0) { var fxp = ((m0.rect[0] + m0.rect[2]) / 2 - 0.5) * w, fyp = ((m0.rect[1] + m0.rect[3]) / 2 - 0.5) * h;
+            S(ob).expression = "var b=ease(time," + (t + 0.6) + "," + Math.min(fin, t + 6) + ",0,1); value*(1+0.35*b);";
+            P(ob).expression = P(ob).expression.replace("value-d", "value-[" + Math.round(fxp) + "," + Math.round(fyp) + "]*0.35*ease(time," + (t + 0.6) + "," + Math.min(fin, t + 6) + ",0,1)-d"); }
+        for (var i = 0; i < marcas.length; i++) {
+            var mk = marcas[i], ti = t + (mk.t || (0.9 + i * 0.9)), r = mk.rect;
+            var x0 = r[0] * oi.width, y0 = r[1] * oi.height, x1 = r[2] * oi.width, y1 = r[3] * oi.height, rw = x1 - x0, rh = y1 - y0;
+            var L = shp(mk.tipo === "circulo" ? "circulo rojo" : "resaltador"), g = grp(L, "m");
+            if (mk.tipo === "circulo") { ell(g, rw * 1.25 + 30, rh * 2.4 + 20); stroke(g, "#D21F3C", 7 / k); var tr = trim(g);
+                tr.property("ADBE Vector Trim End").expression = "posterizeTime(12); Math.min(100,Math.max(0,(time-" + ti.toFixed(2) + ")*240));"; aspero(L, 2 / k, 30, 8); }
+            else { rect(g, rw + 16, rh * 1.35, 2); fill(g, "#F4E07C"); L.blendingMode = BlendingMode.MULTIPLY; O(L).setValue(85);
+                var lw = fx(L, "ADBE Linear Wipe"); lw.property(2).setValue(270); lw.property(3).setValue(10); lw.property(1).setValueAtTime(ti, 100); lw.property(1).setValueAtTime(ti + 0.45, 0); }
+            L.parent = ob; P(L).setValue([(x0 + x1) / 2, (y0 + y1) / 2]); S(L).setValue([100, 100]); R(L).setValue(0); vida(L, ti, fin);
+            if (mk.nota) {   // nota manuscrita con flecha, al lado de la marca, dentro del cuadro
+                var nx = mk.lado === "izq" ? 210 : 860, ny = Math.max(260, Math.min(1250, cy + ((r[1] + r[3]) / 2 - 0.5) * h * 1.2 - 120));
+                var nt = texto(mk.nota, "InstrumentSerif-Italic", 58, "#D21F3C"); centrar(nt); tab(nt, nx, ny, s, 1.03); R(nt).setValue(mk.lado === "izq" ? -6 : 5); vida(nt, ti + 0.3, fin);
+                var lt = nt.property("ADBE Text Properties").property("ADBE Text Animators").addProperty("ADBE Text Animator"); lt.property("ADBE Text Animator Properties").addProperty("ADBE Text Opacity").setValue(0);
+                lt.property("ADBE Text Selectors").addProperty("ADBE Text Selector").property("ADBE Text Percent Start").expression = "linear(time," + (ti + 0.3).toFixed(2) + "," + (ti + 0.9).toFixed(2) + ",0,100);";
+                var fl = shp("flecha nota"), fg = grp(fl, "f"); linea(fg, [[0, 0], [mk.lado === "izq" ? 90 : -90, 60]]); stroke(fg, "#D21F3C", 5); var ftr = trim(fg);
+                ftr.property("ADBE Vector Trim End").expression = "Math.min(100,Math.max(0,(time-" + (ti + 0.5).toFixed(2) + ")*300));"; tab(fl, nx + (mk.lado === "izq" ? 60 : -60), ny + 50, s, 1.03); aspero(fl, 1.5, 30, 8); vida(fl, ti + 0.5, fin);
+            }
+        }
+        // sello
+        var st = shp("sello"), sgp = grp(st, "s"); rect(sgp, 470, 110, 8); stroke(sgp, "#D21F3C", 8); tab(st, 700, 1180, s, 1.02); R(st).setValue(-9); O(st).setValue(80);
+        var stx = texto("DECLASSIFIED", "CourierNewPS-BoldMT", 56, "#D21F3C"); centrar(stx); tab(stx, 700, 1180, s, 1.02); R(stx).setValue(-9); O(stx).setValue(85);
+        var ts = t + (marcas.length ? 0.9 + marcas.length * 0.9 : 1.2); vida(st, ts, fin); vida(stx, ts, fin);
+        S(st).setValueAtTime(ts, [180, 180]); S(st).setValueAtTime(ts + 0.12, [96, 96]); S(st).setValueAtTime(ts + 0.2, [100, 100]); S(stx).setValueAtTime(ts, [180, 180]); S(stx).setValueAtTime(ts + 0.12, [96, 96]); S(stx).setValueAtTime(ts + 0.2, [100, 100]);
+        var ci = pon(G + "alfa3/cinta.png", s, cx - w / 2 + 30, cy - h / 2 + 10, 150, 1, -30); if (ci) { mult(ci, 90); vida(ci, t + 0.1, fin); }
+        var ci2 = pon(G + "alfa3/cinta.png", s, cx + w / 2 - 30, cy - h / 2 + 10, 150, 1, 28); if (ci2) { mult(ci2, 90); vida(ci2, t + 0.15, fin); }
+        return { obra: ob, cx: cx, cy: cy, esc: k * 100, w: w, h: h, rot: -1.5, oval: false };
     }
     function subtitulos() {
         var L = D.subs, Y = D.yBarra;

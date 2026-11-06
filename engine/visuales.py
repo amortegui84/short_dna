@@ -30,7 +30,7 @@ for stem, prompt in pj.get("visuales", {}).items():
     if out.exists():
         continue
     png = O / f"_{stem}.png"
-    full = f"{prompt}. {brand.get('estetica', '')} Cinematic, grainy, no text, no logos, vertical."
+    full = f"{prompt}. {brand.get('estetica_visual') or brand.get('estetica', '')} Cinematic, grainy, no text, no logos, vertical."   # solo el look (estetica_visual), no los objetos de la marca
     subprocess.run([sys.executable, str(Path(__file__).parent / "zimage_gen.py"), "-p", full, "-o", str(png), "--size", "1088x1920", "--seed", "7"], check=True)
     from PIL import Image
     Image.open(png).convert("RGB").save(out, quality=92); png.unlink()
