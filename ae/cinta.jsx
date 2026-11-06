@@ -41,9 +41,9 @@ var CINTA = (function () {
     // anchor at the text's left edge, vertical centre (left texts) or at its centre (centred texts)
     function anclar(L, centro) { var r = L.sourceRectAtTime(0, false); A(L).setValue([centro ? r.left + r.width / 2 : r.left, r.top + r.height / 2]); return r; }
     // typed on: characters appear from a to a+dur
-    function teclear(L, a, dur) {
+    function teclear(L, a, dur, base) {
         var an = L.property("ADBE Text Properties").property("ADBE Text Animators").addProperty("ADBE Text Animator");
-        an.property("ADBE Text Animator Properties").addProperty("ADBE Text Opacity").setValue(0);
+        an.property("ADBE Text Animator Properties").addProperty("ADBE Text Opacity").setValue(base || 0);
         an.property("ADBE Text Selectors").addProperty("ADBE Text Selector").property("ADBE Text Percent Start").expression = "linear(time," + a.toFixed(3) + "," + (a + dur).toFixed(3) + ",0,100);";
     }
     // given words (0-based) turn red
@@ -151,12 +151,12 @@ var CINTA = (function () {
         var t0 = sec.ini, t1 = sec.fin;
         vida(caja("case black", W / 2, H / 2, W, H, BG, 100), t0, t1);
         var bgI = imp(sec.img);
-        if (bgI) { var B = c.layers.add(bgI); B.name = "case doc faint"; var k = Math.max(W / bgI.width, H / bgI.height) * 100; S(B).setValueAtTime(t0, [k, k]); S(B).setValueAtTime(t1, [k * 1.06, k * 1.06]); P(B).setValue([W / 2, H / 2]); O(B).setValue(10); try { fx(B, "ADBE Gaussian Blur 2").property(1).setValue(6); } catch (e) {} vida(B, t0, t1); }
+        if (bgI) { var B = c.layers.add(bgI); B.name = "case doc faint"; var k = Math.max(W / bgI.width, H / bgI.height) * 100; S(B).setValueAtTime(t0, [k, k]); S(B).setValueAtTime(t1, [k * 1.06, k * 1.06]); P(B).setValue([W / 2, H / 2]); O(B).setValue(24); try { fx(B, "ADBE Gaussian Blur 2").property(1).setValue(6); } catch (e) {} vida(B, t0, t1); }
         var x = 110, y = 520;
         var dot = caja("case dot", x + 14, y, 28, 28, RED, 100); vida(dot, t0, t1); O(dot).expression = "posterizeTime(4); Math.floor(time*2)%2?100:0;";
         var cf = texto("CASE FILE " + D.numero, F_MONO, 40, RED, null, 120); anclar(cf, false); P(cf).setValue([x + 50, y]); teclear(cf, t0 + 0.05, 0.3); vida(cf, t0, t1);
         var lineas = partir(String(D.artista).toUpperCase(), 13), yy = y + 140;
-        for (var i = 0; i < lineas.length; i++) { var L = texto(lineas[i], F_TIT, 104, PH); anclar(L, false); ajustar(L, 860); P(L).setValue([x, yy]); teclear(L, t0 + 0.25 + i * 0.25, 0.45); vida(L, t0, t1); yy += 118; }
+        for (var i = 0; i < lineas.length; i++) { var L = texto(lineas[i], F_TIT, 104, PH); anclar(L, false); ajustar(L, 860); P(L).setValue([x, yy]); teclear(L, t0 + 0.1 + i * 0.25, 0.45, 18); vida(L, t0, t1); yy += 118; }
         var ru = shp("case rule"), gr = grp(ru, "r"); linea(gr, [[0, 0], [860, 0]]); stroke(gr, PH, 3); var tr = trim(gr); tr.property("ADBE Vector Trim End").setValueAtTime(t0 + 0.5, 0); tr.property("ADBE Vector Trim End").setValueAtTime(t0 + 0.9, 100);
         P(ru).setValue([x, yy - 20]); vida(ru, t0, t1);
         var fe = texto(String(D.fechas), F_MONO, 40, DIM); anclar(fe, false); ajustar(fe, 860); P(fe).setValue([x, yy + 40]); teclear(fe, t0 + 0.7, 0.4); vida(fe, t0, t1);
