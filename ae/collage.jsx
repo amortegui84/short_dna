@@ -389,7 +389,7 @@ var COLLAGE = (function () {
         var se = imp("componentes_ae/mates_png/semitono_parejo_4K_alfa.png", true); if (se) { var hs = c.layers.add(se); S(hs).setValue([32, 32]); tab(hs, cx, cy + 300, s, 1); mult(hs, 55); dentro(hs); vida(hs, t + 0.5, v[1]); }
         var herr = ["tubo_1", "pincel_1", "tubo_2", "frasco", "carboncillos", "tubo_3", "pincel_2", "espatula", "paleta", "compas", "regla", "bote_pinceles"];
         for (var i = 0; i < 18; i++) {   // se amontonan de abajo arriba
-            var pi = imp(G + "alfa3/" + herr[i % herr.length] + ".png", true); if (!pi) continue; var Lp = c.layers.add(pi), kp = (110 + (i * 23) % 70) / Math.max(pi.width, pi.height) * 100; S(Lp).setValue([kp, kp]); R(Lp).setValue((i * 47) % 70 - 35); foto(Lp, 30); mult(Lp, 92);
+            var pi = D.relleno && D.relleno.length ? imp(D.relleno[i % D.relleno.length], true) : imp(G + "alfa3/" + herr[i % herr.length] + ".png", true);   // relleno: piezas del kit de la marca if (!pi) continue; var Lp = c.layers.add(pi), kp = (110 + (i * 23) % 70) / Math.max(pi.width, pi.height) * 100; S(Lp).setValue([kp, kp]); R(Lp).setValue((i * 47) % 70 - 35); foto(Lp, 30); mult(Lp, 92);
             var x = cx - ancho * 0.42 + (i * 131) % Math.round(ancho * 0.84), y = cy + 520 - Math.floor(i / 6) * 85 - (i * 31) % 36, t0 = t + 0.6 + i * 0.05;
             P(Lp).expression = exprTab(s, 1, "[" + x + "," + y + "-Math.max(0,1-(time-" + t0 + ")/0.22)*300]"); dentro(Lp); vida(Lp, t0, v[1]);
         }
@@ -503,7 +503,7 @@ var COLLAGE = (function () {
     }
     function ficha(s, q) {
         hoja(s, 540, 760, 940, 1100, "#BFCBC6", 30, -2, MG);
-        etiqueta(s, 540, 215, "Artist file  No. " + D.numero, q.ini + 0.1, -3, 52);
+        etiqueta(s, 540, 215, ((D.estilo && D.estilo.ficha_label) || "Artist file  No. ") + D.numero, q.ini + 0.1, -3, 52);
         siluetaArtista(s, q);   // v6: el retrato del artista como silueta que se llena con sus obras y sus piezas
         // cartela grande: nombre en Impact a la medida, fechas en mono y lema en serif; nada tacha el texto
         var nul = nulo("ficha cartela"); tab(nul, 540, 1250, s, 1);   // v10c: un poco mas abajo (revision 2026-11-05)

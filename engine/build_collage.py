@@ -403,13 +403,16 @@ marcos = {m: abertura(Path(G) / "alfa3" / f"{m}.png") for m in MARCOS}
 RETRATO = (carpeta / "retrato_recorte.png").as_posix()
 ESTILO = json.loads(buscar("styles", pj.get("estilo", "collage_v10c"), pj.get("marca")).read_text(encoding="utf-8"))   # colores, glitch, sonidos
 _est = marca_dir(pj.get("marca")) / "kit" / "fondo_estatica.png"
-ESTATICA = _est.as_posix() if _est.exists() else ""   # el retrato del artista recortado (etapa "retrato")
+ESTATICA = _est.as_posix() if _est.exists() else ""
+# relleno de la ficha: piezas con alfa del kit de la marca (si el estilo lo pide); si no, las herramientas de pintor del kit del repo
+_kit = marca_dir(pj.get("marca")) / "kit"
+RELLENO = [(_kit / f"{n}.png").as_posix() for n in ESTILO.get("relleno_ficha", []) if (_kit / f"{n}.png").exists()]   # el retrato del artista recortado (etapa "retrato")
 OBRAS_ARTISTA = [(carpeta / "obras" / f).as_posix() for f in sorted(os.listdir(carpeta / "obras")) if f.endswith(".jpg") and not f.startswith("00_")
                  and aspecto(carpeta / "obras" / f) >= 0.8]   # sin obras muy altas: dentro de la silueta suben hasta la cara
 DATA = {"retrato": RETRATO, "obrasArtista": OBRAS_ARTISTA, "piezasRelleno": piezas(ENJAMBRE, 18) + piezas(CORRIENTE, 8), "comp": COMP, "total": total, "secciones": secciones, "subs": subs, "yBarra": Y_BARRA, "marcos": marcos, "numero": f"{pj['numero']:02d}",
         "artista": pj["artista"], "fechas": pj["fechas"], "lema": pj["lema"], "barrido": fz0, "musica": MUSICA,
         "voces": [{"id": s["id"], "wav": Path(s["wav"]).as_posix(), "start": s["start"]} for s in segs], "desaturar": 0, "kit": KIT,
-        "estilo": ESTILO, "estatica": ESTATICA, "autodestruccion": (pj.get("autodestruccion") or {}).get("tipo")}
+        "estilo": ESTILO, "estatica": ESTATICA, "relleno": RELLENO, "autodestruccion": (pj.get("autodestruccion") or {}).get("tipo")}
 (carpeta / "datos_ae.json").write_text(json.dumps(DATA, indent=1), encoding="utf-8")
 print(COMP, "|", len(secciones), "secciones |", len(subs), "subtitulos | total", total)
 print("subtitulos:", " / ".join(" ".join(w["w"] for w in s["words"]) for s in subs))

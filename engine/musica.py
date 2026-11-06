@@ -9,7 +9,7 @@ import argparse, json, shutil, subprocess, sys, time, urllib.request
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
-from comun import CFG, LIB, proyecto  # noqa: E402
+from comun import CFG, LIB, buscar, proyecto  # noqa: E402
 
 URL = CFG["comfy_h3"]["url"]
 DUR = 80.0
@@ -49,7 +49,7 @@ a = ap.parse_args(); DUR = a.dur
 carpeta = Path(a.carpeta).resolve(); pj = proyecto(carpeta)
 dest = carpeta / "musica"; dest.mkdir(exist_ok=True)
 if not a.elegir:
-    m = pj.get("musica") or json.loads((LIB / "styles" / f"{pj.get('estilo', 'collage_v10c')}.json").read_text(encoding="utf-8"))["musica"]
+    m = pj.get("musica") or json.loads(buscar("styles", pj.get("estilo", "collage_v10c"), pj.get("marca")).read_text(encoding="utf-8"))["musica"]   # estilo de la marca primero
     root = Path(CFG["comfy_h3"]["comfy_dir"])
     for k, seed in enumerate((101, 202)):
         h = pedir(wf(m["tags"], m.get("bpm", 88), m.get("key", "D minor"), seed, f"audio/{pj['slug']}_musica_{k + 1}"))
