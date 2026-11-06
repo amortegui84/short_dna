@@ -628,7 +628,7 @@ var COLLAGE = (function () {
         var cq = imp(G + "texturas3/craquelado.png", false); MC = c.layers.add(cq); MC.name = "MATE craquelado"; S(MC).setValue([W * 1.6 / cq.width * 100, W * 1.6 / cq.width * 100]); P(MC).setValue([W / 2, H / 2]); fx(MC, "ADBE Threshold2").property(1).setValue(0.46); MC.enabled = false;
         var gr = imp("imagenes/texturas/concrete_layers_02_2k.jpg", false); MG = c.layers.add(gr); MG.name = "MATE erosion"; S(MG).setValue([115, 115]); P(MG).setValue([W / 2, H / 2]); fx(MG, "ADBE Threshold2").property(1).setValue(0.445); MG.enabled = false;
         // fondo
-        var base = c.layers.addSolid(rgb(PAPEL), "papel", W, H, 1, DUR); base.moveToEnd();
+        var base = c.layers.addSolid(rgb(tk.fondo || PAPEL), "papel", W, H, 1, DUR); base.moveToEnd();   // fondo del estilo (Cult Pixel: casi negro)
         var pp = c.layers.add(imp("imagenes/texturas/Paper001_2k.jpg", false)); S(pp).setValue([H * 1.05 / pp.source.height * 100, H * 1.05 / pp.source.height * 100]); P(pp).setValue([W / 2, H / 2]); mult(pp, 22);
         var li = imp(G + "texturas3/lienzo.png", false); if (li) { var ll = c.layers.add(li); S(ll).setValue([W * 1.9 / li.width * 100, W * 1.9 / li.width * 100]); P(ll).setValue([W / 2, H / 2]); mult(ll, 14); }
         // secciones
@@ -684,6 +684,7 @@ var COLLAGE = (function () {
         for (i = 0; i < D.insertos.length; i++) { franjas(D.insertos[i][1] + 0.12); franjas(D.insertos[i][2] + 0.1); }   // entrada y salida del inserto   // v9: el corte de la cabeza a la obra, tapado por franjas
         subtitulos();
         var tp = c.layers.add(imp("imagenes/texturas/Paper002_2k.jpg", false)); S(tp).setValue([H * 1.05 / tp.source.height * 100, H * 1.05 / tp.source.height * 100]); P(tp).setValue([W / 2, H / 2]); mult(tp, 8);
+        if (D.estilo && D.estilo.vhs) vhs();
         var gn = c.layers.addSolid([0, 0, 0], "grano", W, H, 1, DUR); gn.adjustmentLayer = true; fx(gn, "ADBE Noise").property(1).setValue(6);
         for (i = 0; i < D.voces.length; i++) { var V = c.layers.add(imp(D.voces[i].wav, false)); V.name = D.voces[i].id + " voz"; V.startTime = D.voces[i].start; }
         if (D.musica) { var mu = c.layers.add(imp(D.musica, false)); mu.name = "Musica"; mu.outPoint = DUR; var nv = D.musica.indexOf("elegida") >= 0 ? 0 : -13.2, al = mu.property("Audio").property("Audio Levels"); al.setValueAtTime(0, [nv, nv]); al.setValueAtTime(Math.max(0, DUR - 1.8), [nv, nv]); al.setValueAtTime(DUR, [-48, -48]); }   // v10c: musica propia ya normalizada; se apaga al final
@@ -718,6 +719,31 @@ var COLLAGE = (function () {
             var st = c.layers.add(imp(D.estatica, false)); st.name = "estatica final"; S(st).setValue([W / st.source.width * 105, H / st.source.height * 105]); P(st).setValue([W / 2, H / 2]);
             st.blendingMode = BlendingMode.SCREEN; O(st).setValueAtTime(t0 + 0.4, 0); O(st).setValueAtTime(t1, 85); O(st).setValueAtTime(DUR, 100); vida(st, t0 + 0.4, DUR);
         }
+    }
+    // look VHS (estilo con "vhs": true): sangrado de color, lineas de escaneo, banda de tracking, PLAY + contador, vineta, color lavado
+    function vhs() {
+        var v = D.estilo.vhs === true ? {} : D.estilo.vhs, tc = v.texto || "PLAY \u25B6";
+        var cb = c.layers.addSolid([0, 0, 0], "VHS color", W, H, 1, DUR); cb.adjustmentLayer = true;
+        try { var ch = fx(cb, "ADBE Channel Blur"); ch.property(1).setValue(7); ch.property(3).setValue(5); ch.property(5).setValue(2); } catch (e) {}   // rojo y azul sangran (eje horizontal)
+        sat(cb, -18);
+        try { fx(cb, "ADBE Fast Box Blur").property(1).setValue(0.8); } catch (e) {}
+        var ex = fx(cb, "ADBE Brightness & Contrast 2"); ex.property(1).setValue(-6); ex.property(2).setValue(12);
+        // lineas de escaneo: un patron de franjas finas en Multiply
+        var sl = shp("VHS scanlines"); for (var i = 0; i < 64; i++) { var g = grp(sl, "l" + i); rect(g, W, 2, 0); fill(g, "#000000"); vec(g).property(2); g.property("ADBE Vector Transform Group").property("ADBE Vector Position").setValue([0, -H / 2 + i * 30 + 15]); }
+        P(sl).setValue([W / 2, H / 2]); P(sl).expression = "value+[0, (time*90)%30];"; O(sl).setValue(16); sl.blendingMode = BlendingMode.MULTIPLY;
+        // banda de tracking: una franja de ruido que baja cada pocos segundos
+        var tb = c.layers.addSolid([0.5, 0.5, 0.5], "VHS tracking", W, 70, 1, DUR); var fn = fx(tb, "ADBE Fractal Noise");
+        fn.property("Contrast").setValue(260); fn.property("Uniform Scaling").setValue(0); fn.property("Scale Width").setValue(900); fn.property("Scale Height").setValue(12); fn.property("Evolution").expression = "time*1400;";
+        tb.blendingMode = BlendingMode.SCREEN; P(tb).expression = "var p=(time%7.3)/1.6; [540, p<1? -60+p*(1920+120) : -200];"; O(tb).expression = "posterizeTime(12); 22+random(18);";
+        // vineta
+        var vg = c.layers.addSolid([0, 0, 0], "VHS vineta", W, H, 1, DUR); var mk = vg.property("ADBE Mask Parade").addProperty("ADBE Mask Atom"), sh = new Shape(), K = 0.5523, hw = W * 0.62, hh = H * 0.6;
+        sh.vertices = [[540, 960 - hh], [540 + hw, 960], [540, 960 + hh], [540 - hw, 960]]; sh.inTangents = [[-hw * K, 0], [0, -hh * K], [hw * K, 0], [0, hh * K]]; sh.outTangents = [[hw * K, 0], [0, hh * K], [-hw * K, 0], [0, -hh * K]]; sh.closed = true;
+        mk.property("ADBE Mask Shape").setValue(sh); mk.inverted = true; mk.property("ADBE Mask Feather").setValue([380, 380]); O(vg).setValue(55);
+        // PLAY + contador (Courier), arriba a la izquierda, dentro de la zona segura
+        var t1 = texto(tc, "CourierNewPS-BoldMT", 28, "#F7F8F4", ParagraphJustification.LEFT_JUSTIFY); t1.name = "VHS play"; P(t1).setValue([60, 118]);   // arriba de las etiquetas (decorativo) O(t1).expression = "posterizeTime(2); time%2<1.6?85:0;";
+        var t2 = texto("SP 0:00:00", "CourierNewPS-BoldMT", 26, "#F7F8F4", ParagraphJustification.LEFT_JUSTIFY); t2.name = "VHS contador"; P(t2).setValue([60, 150]); O(t2).setValue(80);
+        t2.property("ADBE Text Properties").property("ADBE Text Document").expression = "var s=Math.floor(time); 'SP 0:'+('0'+Math.floor(s/60)).slice(-2)+':'+('0'+(s%60)).slice(-2);";
+        var e1 = fx(t1, "ADBE Glo2"); try { e1.property(3).setValue(0.4); } catch (e) {}
     }
     function subtitulos() {
         var L = D.subs, Y = D.yBarra;

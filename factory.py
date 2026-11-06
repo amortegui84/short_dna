@@ -14,6 +14,7 @@ skill (.claude/skills/shorts-factory/SKILL.md) and the user; the factory checks 
 GPU stages run one at a time; if config "comfy_switch" is set, the factory switches ComfyUI (Klein for images, H3 for video
 and music) before them."""
 import argparse, json, subprocess, sys, time
+sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 from pathlib import Path
 
 REPO = Path(__file__).parent

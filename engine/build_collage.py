@@ -7,6 +7,7 @@ cues and render. Everything specific to a video comes from proyecto.json (see do
 Usage: python build_collage.py <project> [--solo-datos] [--render]
 History of the format (v4 -> v10c) and every rule behind it: docs/STYLE_COLLAGE.md and docs/LEARNINGS.md."""
 import json, os, re, subprocess, sys
+sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 from pathlib import Path
 
 import numpy as np
