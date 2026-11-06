@@ -10,8 +10,29 @@ PostWire can also post to YouTube, Instagram, Facebook, LinkedIn, X, Bluesky and
 month, 2 networks per post) it is kept for TikTok. Zapier covers YouTube and Instagram.
 
 The app's **Publish** view follows this guide. Part A is done once per brand (accounts and links). Part B is done for every
-episode. It was first run on 2026-11-06 for Cult Pixel Tapes 01–03; the links and copy are in
-`brands/cult_pixel/posts.md`.
+episode.
+
+**Proven on 2026-11-06:** Cult Pixel Tapes 01–03 went live on all three networks this way: YouTube Shorts on
+@cult_pixel, Instagram Reels on Cult_Pixel and TikTok on @cult_pixel, each with the AI label. The links and the copy are in
+`brands/cult_pixel/posts.md` (local), and each episode's `publicado.json` holds its ids.
+
+## Quick reference: one episode on the three networks
+| # | What | Tool / call | Who | Cost |
+|---|---|---|---|---|
+| 1 | Check the final cut (QC, props popping in or out of hands) | `qc.json`, a contact sheet | Claude | — |
+| 2 | Publish copy, ~50 MB | `python engine/publicar.py <project>` | Claude or the app | — |
+| 3 | Title, captions (long for YouTube and Instagram, short for TikTok), hashtags, tags | brand's `posts.md` | Claude writes, the person reads | — |
+| 4 | Direct download link | `python tools/publish_release.py --repo <brand>_media <file>` | the person (first time) | — |
+| 5 | YouTube private + AI label | Zapier `upload_video`, then `PUT videos?part=status` with `containsSyntheticMedia` | Claude | 4 Zapier tasks |
+| 6 | Review | YouTube Studio → Content → Shorts (brand channel selected) | the person | — |
+| 7 | YouTube public | the same `PUT` with `privacyStatus: public` | Claude, after the OK | 2 tasks |
+| 8 | Instagram Reel | Graph API: `POST /media` → wait ~4 min for `FINISHED` → `POST /media_publish` | Claude, after the OK | 6 tasks |
+| 9 | TikTok | PostWire `post_to_social` with `PUBLIC_TO_EVERYONE`, `ai_generated: true` and an idempotency key; TikTok reviews it before it shows | Claude, after the OK | 1 of 10 PostWire posts |
+| 10 | Record | `publicado.json` (+ the links in `posts.md`) | Claude | — |
+
+On the free plans that is about 12 Zapier tasks (out of ~100 a month) and 1 PostWire post (out of 10) per episode. The
+limit is PostWire: about 10 episodes a month on TikTok. A private TikTok test costs one more post, so skip it once the
+route is trusted.
 
 Rules that hold throughout:
 - People create their own accounts and type their own logins. Claude never types passwords, codes or personal data into a site.
