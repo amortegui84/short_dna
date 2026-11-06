@@ -256,8 +256,20 @@ var CINTA = (function () {
         cue(t0, "glitch", -4, "self-destruct"); cue(t0 + 0.5, "sub", -6, "self-destruct");
     }
 
+    // the generated ending (engine/final.py, H3 from his last frame): cut to it behind a glitch, its own sound, then END OF TAPE
+    function finalGenerado(it, ts) {
+        var L = c.layers.add(it); L.name = "SELF-DESTRUCT (H3)"; L.startTime = ts;
+        var k = Math.max(W / it.width, H / it.height) * 100 * 1.02; S(L).setValueAtTime(ts, [k, k]); S(L).setValueAtTime(ts + it.duration, [k * 1.05, k * 1.05]); P(L).setValue([W / 2, H / 2]);
+        vida(L, ts, Math.min(DUR, ts + it.duration));
+        var te = ts + it.duration - 0.1, st = imp(D.estatica);
+        if (st) { var S2 = c.layers.add(st); S2.name = "end static"; S(S2).setValue([W / st.width * 105, H / st.height * 105]); P(S2).setValue([W / 2, H / 2]); S2.blendingMode = BlendingMode.SCREEN; O(S2).expression = "posterizeTime(15); 30+random(30);"; vida(S2, te, DUR); }
+        var et = texto("END OF TAPE", F_TIT, 64, PH, ParagraphJustification.CENTER_JUSTIFY, 80); anclar(et, true); P(et).setValue([W / 2, 900]); teclear(et, te + 0.05, 0.3); vida(et, te, DUR);
+        cue(te, "glitch", -6, "end of tape");
+    }
     function build(datos) {
         D = datos; DUR = D.total; CUES = []; nEv = 0;
+        var FIN = D.final_clip ? new File(D.final_clip) : null, finDur = FIN && FIN.exists ? (D.final_dur || 5.17) : 0;
+        if (finDur) DUR = D.total + finDur + 0.9;
         var tk = (D.estilo && D.estilo.tokens) || {}; BG = tk.fondo || BG; PH = tk.fosforo || PH; DIM = tk.fosforo_tenue || DIM; RED = tk.rojo || RED;
         var ty = (D.estilo && D.estilo.tipografia) || {}; F_TIT = ty.titulares || F_TIT; F_MONO = ty.mono || F_MONO; F_FINO = ty.mono_fino || F_FINO;
         for (var i = app.project.numItems; i >= 1; i--) { var it0 = app.project.item(i); if ((it0 instanceof CompItem && it0.name.indexOf(D.comp) === 0) || (it0 instanceof FolderItem && it0.name === D.comp + " media") || (it0 instanceof FootageItem && it0.file && it0.file.fsName.indexOf(D.comp) >= 0 && it0.file.fsName.indexOf("_mdna_sound") >= 0)) it0.remove(); }
@@ -281,14 +293,15 @@ var CINTA = (function () {
             else if (s.tipo === "cita") teletexto(s);
             else if (s.img) evidencia(s.img, s.ini, s.fin, s.stem, true);
         }
-        if (D.autodestruccion && ultimo) autodestruir(ultimo, D.autodestruccion);
+        if (finDur) { var fi = imp(D.final_clip); if (fi) { finalGenerado(fi, D.total - 0.05); GL.push([D.total - 0.05, "self-destruct"]); } }
+        else if (D.autodestruccion && ultimo) autodestruir(ultimo, D.autodestruccion);
         subtitulos();
         hud();
         vhs();
         // glitches last: an adjustment layer only touches what is below it
         for (i = 0; i < GL.length; i++) glitch(GL[i][0], GL[i][1]);
         for (i = 0; i < D.voces.length; i++) { var V = c.layers.add(imp(D.voces[i].wav)); V.name = D.voces[i].id + " voice"; V.startTime = D.voces[i].start; }
-        if (D.musica) { var mu = c.layers.add(imp(D.musica)); mu.name = "Music"; mu.outPoint = DUR; var nv = D.musica.indexOf("elegida") >= 0 ? 0 : -13.2, al = mu.property("Audio").property("Audio Levels"); al.setValueAtTime(0, [nv, nv]); al.setValueAtTime(Math.max(0, DUR - 1.8), [nv, nv]); al.setValueAtTime(DUR, [-48, -48]); }
+        if (D.musica) { var mu = c.layers.add(imp(D.musica)); mu.name = "Music"; mu.outPoint = DUR; var nv = D.musica.indexOf("elegida") >= 0 ? 0 : -13.2, al = mu.property("Audio").property("Audio Levels"); al.setValueAtTime(0, [nv, nv]); al.setValueAtTime(Math.max(0, D.total - 0.3), [nv, nv]); if (finDur) al.setValueAtTime(D.total + 0.4, [nv - 10, nv - 10]); al.setValueAtTime(DUR, [-48, -48]); }
         return "ok " + c.numLayers + " layers\n" + CUES.join("\n");
     }
     return { build: build };

@@ -437,6 +437,10 @@ if ESTILO.get("builder") == "cinta":   # "Night Transmission" (ae/cinta.jsx): it
     _brand = json.loads((_mk / "brand.json").read_text(encoding="utf-8")) if _mk and (_mk / "brand.json").exists() else {}
     DATA.update({"claves": [k[1] for k in pj.get("palabras_clave", []) if len(k) > 1], "titulos": pj.get("titulos", {}), "handle": _brand.get("handle", ""),
                  "fx_humo": _fx("humo_volutas"), "fx_estatica": _fx("estatica_rafaga")})
+    _fin = carpeta / "final" / "autodestruccion.mp4"   # the generated self-destruct (engine/final.py)
+    if _fin.exists():
+        _d = float(subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", str(_fin)], capture_output=True, text=True).stdout.strip() or 5.17)
+        DATA.update({"final_clip": _fin.as_posix(), "final_dur": round(_d, 3)})
     for sec in DATA["secciones"]:
         if sec.get("mate"):
             sec["clip"] = str(sec["mate"]).replace("/mates/", "/clips/").rsplit(".", 1)[0] + ".mp4"

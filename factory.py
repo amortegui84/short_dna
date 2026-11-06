@@ -37,6 +37,7 @@ STAGES = [
     ("sts", "api:voice", "H3 speech -> the video's voice with ElevenLabs speech-to-speech (exact lipsync)", ["sts.py"]),
     ("montaje", "cpu", "timeline: voice pace, holds, subtitles timing", ["montaje.py"]),
     ("mates", "gpu:h3", "cut-out of the presenter + face boxes", ["mates.py"]),
+    ("final", "gpu:h3", "the signature ending: the narrator self-destructs (H3 from his last frame, tied to the story)", ["final.py"]),
     ("musica", "gpu:h3", "music (ACE-Step locally; or the music provider)", ["musica.py"]),
     ("ae", "ae", "build the comp in After Effects with Motion DNA (sound, layout QA)", ["build_collage.py"]),
     ("render", "ae", "aerender + encode + QA (black frames, LUFS, motion)", ["render_ae.py"]),
