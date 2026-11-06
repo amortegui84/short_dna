@@ -105,6 +105,10 @@ def run(args):
             if name == "design" or check(name, carpeta, pj):
                 mark.write_text(time.strftime("%Y-%m-%d %H:%M:%S")); print(f"{name}: ok"); continue
             print(f"STOP at {name}: {what}. Do it with the skill, then run again."); return 1
+        if name == "sts":   # a character without a mouth: no lipsync to match, the voice-over is the designed voice itself
+            c = json.loads((buscar("characters", pj["personaje"], pj.get("marca")) / "character.json").read_text(encoding="utf-8"))
+            if c.get("sin_boca"):
+                mark.write_text("skipped: sin_boca"); print("sts: skipped (character has no mouth)"); continue
         gpu(kind, log)
         t0 = time.time(); log.write(f"\n== {name} {time.strftime('%H:%M:%S')}\n"); log.flush()
         r = subprocess.run([sys.executable, "-u", str(E / cmd[0]), str(carpeta), *cmd[1:]], stdout=log, stderr=subprocess.STDOUT,
