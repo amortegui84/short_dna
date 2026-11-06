@@ -93,7 +93,7 @@ var CINTA = (function () {
     var SX = 540, SY = 690, SW = 900, SH = 1020, nEv = 0;
     function evidencia(img, t0, t1, stem, conFondo) {
         var it = imp(img); if (!it) return null; nEv++;
-        if (conFondo) vida(caja("CRT fondo", W / 2, H / 2, W, H, BG, 100), t0, t1);
+        if (conFondo) { vida(caja("CRT fondo", W / 2, H / 2, W, H, BG, 100), t0, t1); paralaje(t0, t1, 3 + nEv); }
         var hum = caja("CRT glow", SX, SY, SW + 60, SH + 60, PH, 6); vida(hum, t0, t1);
         try { fx(hum, "ADBE Gaussian Blur 2").property(1).setValue(40); } catch (e) {}
         var bk = caja("CRT negro", SX, SY, SW, SH, "#000000", 100); vida(bk, t0, t1);
@@ -147,9 +147,45 @@ var CINTA = (function () {
         }
         return L;
     }
+    // parallax textures over a black plate: three depths drifting up at different speeds (fog far, CRT grid mid,
+    // tape dust near and soft) plus one shared sway scaled by depth, so the black reads as a deep room, not a flat card.
+    // k varies the seed and sway phase per section.
+    function paralaje(t0, t1, k) {
+        var ph = (k * 1.7).toFixed(2);
+        // far: slow phosphor fog
+        var f = c.layers.addSolid([0, 0, 0], "parallax fog", W, H, 1, DUR); vida(f, t0, t1);
+        try {
+            var fn = fx(f, "ADBE Fractal Noise"); fn.property("Contrast").setValue(160); fn.property("Brightness").setValue(-42);
+            fn.property("Uniform Scaling").setValue(0); fn.property("Scale Width").setValue(900); fn.property("Scale Height").setValue(520); fn.property("Complexity").setValue(4);
+            fn.property("Offset Turbulence").expression = "[540+Math.sin(time*0.5+" + ph + ")*30, 960+time*22+" + (k * 300) + "];";
+            fn.property("Evolution").expression = "time*18;";
+            var tn = fx(f, "ADBE Tint"); tn.property(1).setValue(rgb(BG)); tn.property(2).setValue(rgb(DIM));
+        } catch (e) {}
+        f.blendingMode = BlendingMode.SCREEN; O(f).setValue(k === 1 ? 12 : 20);
+        // mid: CRT measuring grid with + marks, wraps every cell
+        var cell = 135, gd = shp("parallax grid"), gg = grp(gd, "g");
+        for (var x = -W / 2; x <= W / 2; x += cell) linea(gg, [[x, -H / 2 - cell], [x, H / 2 + cell]]);
+        for (var y = -H / 2 - cell; y <= H / 2 + cell; y += cell) linea(gg, [[-W / 2, y], [W / 2, y]]);
+        stroke(gg, DIM, 1);
+        var gp = grp(gd, "p");
+        for (x = -W / 2 + cell; x < W / 2; x += cell * 2) for (y = -H / 2 - cell; y <= H / 2 + cell; y += cell * 2) { linea(gp, [[x - 9, y], [x + 9, y]]); linea(gp, [[x, y - 9], [x, y + 9]]); }
+        stroke(gp, PH, 2);
+        P(gd).setValue([W / 2, H / 2]); P(gd).expression = "[540+Math.sin(time*0.5+" + ph + ")*14, 960-(time*45)%" + cell + "];"; O(gd).setValue(6); gd.blendingMode = BlendingMode.ADD; vida(gd, t0, t1);
+        // near: tape dust, two stacked copies so the drift wraps seamlessly, slightly out of focus
+        var du = shp("parallax dust"), dg = grp(du, "d"), s = 7919 + k * 104729;
+        function rnd() { s = (s * 16807) % 2147483647; return s / 2147483647; }
+        for (var i = 0; i < 46; i++) {
+            var px = (rnd() - 0.5) * W, py = (rnd() - 0.5) * H, sz = 2 + rnd() * 5;
+            for (var cp = 0; cp < 2; cp++) { var e = dg.addProperty("ADBE Vector Shape - Ellipse"); e.property("ADBE Vector Ellipse Size").setValue([sz, sz]); e.property("ADBE Vector Ellipse Position").setValue([px, py + cp * H]); }
+        }
+        fill(dg, PH, 100);
+        P(du).setValue([W / 2, H / 2]); P(du).expression = "[540+Math.sin(time*0.5+" + ph + ")*40, 960-(time*120+" + (k * 400) + ")%" + H + "];";
+        O(du).expression = "posterizeTime(12); 22+random(10);"; du.blendingMode = BlendingMode.ADD; vida(du, t0, t1);
+        try { fx(du, "ADBE Box Blur2").property(1).setValue(2); } catch (e2) {}
+    }
     function casoTitulo(sec) {
         var t0 = sec.ini, t1 = sec.fin;
-        vida(caja("case black", W / 2, H / 2, W, H, BG, 100), t0, t1);
+        vida(caja("case black", W / 2, H / 2, W, H, BG, 100), t0, t1); paralaje(t0, t1, 1);
         var bgI = imp(sec.img);
         if (bgI) { var B = c.layers.add(bgI); B.name = "case doc faint"; var k = Math.max(W / bgI.width, H / bgI.height) * 100; S(B).setValueAtTime(t0, [k, k]); S(B).setValueAtTime(t1, [k * 1.06, k * 1.06]); P(B).setValue([W / 2, H / 2]); O(B).setValue(24); try { fx(B, "ADBE Gaussian Blur 2").property(1).setValue(6); } catch (e) {} vida(B, t0, t1); }
         var x = 110, y = 520;
@@ -166,7 +202,7 @@ var CINTA = (function () {
     }
     function teletexto(sec) {
         var t0 = sec.ini, t1 = sec.fin;
-        vida(caja("quote black", W / 2, H / 2, W, H, BG, 100), t0, t1);
+        vida(caja("quote black", W / 2, H / 2, W, H, BG, 100), t0, t1); paralaje(t0, t1, 2);
         var st = imp(D.estatica);
         if (st) { var Sx = c.layers.add(st); S(Sx).setValue([W / st.width * 104, H / st.height * 104]); P(Sx).setValue([W / 2, H / 2]); Sx.blendingMode = BlendingMode.SCREEN; O(Sx).expression = "posterizeTime(12); 8+random(6);"; vida(Sx, t0, t1); }
         var ws = sec.cita.join(" ").replace(/[“”"]/g, "").split(/\s+/), pw = sec.palabras || [], TW = [];
