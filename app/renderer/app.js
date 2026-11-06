@@ -227,12 +227,24 @@ V.platforms = async () => {
 V.projects = async () => {
   const ps = await window.api.projects(BRAND);
   const names = ["research", "script", "design", "obras", "retrato", "look", "inicios", "voz", "clips", "sts", "montaje", "mates", "musica", "ae", "render", "qc", "collect"];
-  return [h("h1", {}, "Projects"), h("p", { class: "lead" }, "Every video is a folder in work_dir. Run the next stages (cost estimate first), ask Claude, open the folder or play the render."),
-    ps.length ? h("table", {}, h("tr", {}, ...["Project", "Character / look / style", "Stages", ""].map((x) => h("th", {}, x))), ps.map((p) => h("tr", {},
-      h("td", {}, h("b", {}, p.slug), h("br"), p.tema || ""), h("td", {}, `${p.personaje || ""} · ${p.look || ""} · ${p.estilo || ""}`),
-      h("td", {}, h("div", { class: "chips" }, names.map((n) => h("span", { class: p.done.includes(n) ? "on" : "" }, n)))),
-      h("td", {}, h("div", { class: "row" }, h("button", { onclick: () => runFactory(p.slug) }, "Run next"), h("button", { class: "ghost", onclick: () => askClaude(PROMPTS.run({ slug: p.slug })) }, "With Claude"),
-        h("button", { class: "ghost", onclick: () => window.api.open(p.dir) }, "Folder"), p.video ? h("button", { class: "ghost", onclick: () => window.api.open(p.video) }, "Play") : ""))))) : h("p", { class: "lead" }, "No projects yet: start with Topic → Short.")];
+  const url = (p) => "file:///" + encodeURI(p.split("\\").join("/"));
+  const day = (ms) => new Date(ms).toLocaleDateString(undefined, { day: "numeric", month: "short" });
+  const card = (p) => {
+    const n = names.filter((x) => p.done.includes(x)).length;
+    const thumb = p.video
+      ? h("video", { src: url(p.video) + "#t=3", preload: "metadata", playsinline: "", onmouseenter: (e) => { e.target.muted = true; e.target.play(); }, onmouseleave: (e) => e.target.pause(), onclick: () => window.api.open(p.video) })
+      : h("div", { class: "empty" }, "No video yet");
+    return h("div", { class: "vid" }, thumb,
+      h("div", { class: "meta" }, h("b", {}, p.slug), h("span", { class: "tag" + (p.final ? " on" : "") }, p.video ? (p.final ? "Final" : "Draft") : `${n}/${names.length} stages`)),
+      h("p", {}, p.tema || ""),
+      h("p", { class: "sub" }, [p.estilo, p.video ? `${p.mb} MB` : "", day(p.when)].filter(Boolean).join(" · ")),
+      h("details", {}, h("summary", {}, `Stages ${n}/${names.length}`), h("div", { class: "chips" }, names.map((x) => h("span", { class: p.done.includes(x) ? "on" : "" }, x)))),
+      h("div", { class: "row" }, p.video ? h("button", { onclick: () => window.api.open(p.video) }, "Play") : h("button", { onclick: () => runFactory(p.slug) }, "Run next"),
+        h("button", { class: "ghost", onclick: () => window.api.open(p.dir) }, "Folder"),
+        h("button", { class: "ghost", onclick: () => askClaude(PROMPTS.run({ slug: p.slug })) }, "With Claude")));
+  };
+  return [h("h1", {}, "Projects"), h("p", { class: "lead" }, "Every video of this brand, newest first. Hover to preview, click to play the finished cut; each one is a folder in work_dir with everything that made it."),
+    ps.length ? h("div", { class: "gallery" }, ps.map(card)) : h("p", { class: "lead" }, "No projects yet: start with Topic → Short.")];
 };
 
 V.library = async () => [h("h1", {}, "Library"), h("p", { class: "lead" }, "What the system knows: styles, techniques and templates (library/), model notes (docs/models/), every lesson (docs/LEARNINGS.md)."),

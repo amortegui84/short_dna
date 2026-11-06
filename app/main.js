@@ -84,9 +84,13 @@ ipcMain.handle("projects", (e, brand) => {
   return listDirs(W).filter((d) => fs.existsSync(path.join(W, d, "proyecto.json"))).map((d) => {
     const pj = readJSON(path.join(W, d, "proyecto.json"), {});
     const done = fs.readdirSync(path.join(W, d)).filter((f) => f.startsWith(".done_")).map((f) => f.slice(6));
-    const mp4 = path.join(W, d, `${pj.slug}.mp4`);
-    return { slug: d, tema: pj.tema || pj.artista, personaje: pj.personaje, look: pj.look, estilo: pj.estilo, plataformas: pj.plataformas || [], done, video: fs.existsSync(mp4) ? mp4 : null, dir: path.join(W, d) };
-  });
+    // the finished cut is the After Effects render; the plain mp4 is the draft before it
+    const base = pj.slug || d;
+    const cut = [`${base}_AE.mp4`, `${base}.mp4`].map((f) => path.join(W, d, f)).find((f) => fs.existsSync(f)) || null;
+    const st = cut ? fs.statSync(cut) : fs.statSync(path.join(W, d, "proyecto.json"));
+    return { slug: d, tema: pj.tema || pj.artista, personaje: pj.personaje, look: pj.look, estilo: pj.estilo, plataformas: pj.plataformas || [], done,
+      video: cut, final: !!cut && cut.endsWith("_AE.mp4"), mb: cut ? +(st.size / 1048576).toFixed(1) : 0, when: st.mtimeMs, dir: path.join(W, d) };
+  }).sort((a, b) => b.when - a.when);
 });
 
 ipcMain.handle("brands", () => listDirs(BRANDS).filter((b) => fs.existsSync(path.join(BRANDS, b, "brand.json"))).map((b) => ({ ...readJSON(path.join(BRANDS, b, "brand.json"), {}), dir: path.join(BRANDS, b) })));
