@@ -2,7 +2,7 @@
 Una linea por llamada -> vo/<id>.mp3. QC con Whisper contra el guion; hasta 3 tomas y se queda la MEJOR (los nombres propios
 como "Hilma af Klint" Whisper los oye mal aunque esten bien dichos, asi que nunca se borra todo). La clave no se imprime.
 Uso: python tts.py <carpeta>"""
-import base64, json, sys, urllib.request
+import base64, json, re, sys, urllib.request
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
@@ -21,7 +21,15 @@ for ln in pj["lineas"]:
     tomas = []
     for intento in range(3):
         toma = vo / f"{ln['id']}_t{intento}.mp3"
-        body = {"text": ln.get("tts", ln["texto"]), "model_id": "eleven_v3", "voice_settings": {"stability": 0.5}}
+        modelo = VOZ.get("modelo", "eleven_v3")
+        texto = ln.get("tts", ln["texto"])
+        if modelo != "eleven_v3":   # solo v3 entiende [etiquetas]; en v2 se quitan (si no, las lee)
+            texto = re.sub(r"\s*\[[^\]]+\]\s*", " ", texto).strip()
+        ajustes = {"stability": VOZ.get("stability", 0.5)}
+        for k in ("speed", "similarity_boost", "style"):
+            if k in VOZ:
+                ajustes[k] = VOZ[k]
+        body = {"text": texto, "model_id": modelo, "voice_settings": ajustes}
         r = json.load(urllib.request.urlopen(urllib.request.Request(
             f"https://api.elevenlabs.io/v1/text-to-speech/{pj['voz']}/with-timestamps?output_format=mp3_44100_128",
             data=json.dumps(body).encode(), headers=H), timeout=120))
@@ -34,7 +42,7 @@ for ln in pj["lineas"]:
             break
     mejor = max(tomas)[1]
     mejor.replace(mp3)
-    if VOZ.get("procesado") in ("ultratumba", "claro"):   # voz procesada en local (voz_ultratumba.py): "claro" = entendible, "ultratumba" = cripta
+    if VOZ.get("procesado") in ("ultratumba", "claro", "limpio"):   # voz procesada en local (voz_ultratumba.py): "claro" = entendible, "ultratumba" = cripta
         from voz_ultratumba import procesar
         crudo = mp3.with_name(mp3.stem + "_crudo.mp3"); mp3.replace(crudo); procesar(crudo, mp3, VOZ.get("semitonos", 2.0), VOZ["procesado"])
     for _, t in tomas:

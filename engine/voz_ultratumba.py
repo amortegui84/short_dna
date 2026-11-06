@@ -27,8 +27,14 @@ def cadena_clara():
             "acompressor=threshold=-28dB:ratio=3.5:attack=5:release=120:makeup=2,loudnorm=I=-20:TP=-2:LRA=8")   # susurros arriba, picos contenidos
 
 
+def cadena_limpia():
+    """La voz tal cual, solo clara y pareja (sin sala ni eco): revision 2026-11-05 "menos ultratumba"."""
+    return ("highpass=f=70,equalizer=f=3000:t=q:w=1.2:g=3,equalizer=f=6500:t=q:w=1:g=1.5,"
+            "acompressor=threshold=-26dB:ratio=3:attack=5:release=120:makeup=2,loudnorm=I=-20:TP=-2:LRA=8")
+
+
 def procesar(src, dst, semitonos=2.0, modo="ultratumba"):
-    af = cadena_clara() if modo == "claro" else cadena(semitonos)
+    af = cadena_limpia() if modo == "limpio" else cadena_clara() if modo == "claro" else cadena(semitonos)
     subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", str(src), "-af", af, "-ar", "44100", str(dst)], check=True)
     return dst
 
