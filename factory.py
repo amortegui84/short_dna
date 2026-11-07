@@ -40,6 +40,7 @@ STAGES = [
     ("final", "gpu:h3", "the signature ending: the narrator self-destructs (H3 from his last frame, tied to the story)", ["final.py"]),
     ("musica", "gpu:h3", "music (ACE-Step locally; or the music provider)", ["musica.py"]),
     ("ae", "ae", "build the comp in After Effects with Motion DNA (sound, layout QA)", ["build_collage.py"]),
+    ("continuar", "gpu:h3", "new narrator footage where a section outlasts his clip (never a ping-pong loop), then matte + comp again", ["continuar.py"]),
     ("render", "ae", "aerender + encode + QA (black frames, LUFS, motion)", ["render_ae.py"]),
     ("qc", "cpu", "transcript match, loudness, contact sheet", ["qc.py"]),
     ("collect", "ae", "light collect of the project + zip", ["collect.py"]),

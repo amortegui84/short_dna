@@ -56,7 +56,11 @@ var CINTA = (function () {
     }
     function limpia(w) { return w.toLowerCase().replace(/[^a-z0-9']/g, ""); }
     function esClave(w) { var k = D.claves || [], x = limpia(w); for (var i = 0; i < k.length; i++) if (x && x === limpia(k[i])) return true; return false; }
-    function ping(L) { L.timeRemapEnabled = true; L.property("ADBE Time Remapping").expression = "var d=source.duration-0.05, t=Math.max(0,time-thisLayer.startTime), n=Math.floor(t/d), r=t%d; (n%2)? d-r : r;"; return L; }
+    // never ping-pong (review 2026-11-06: the narrator rewinding looked broken): engine/continuar.py generates new footage for a long
+    // section; if a clip is still short, it holds on its last frame
+    function ping(L) { L.timeRemapEnabled = true; L.property("ADBE Time Remapping").expression = "Math.min(Math.max(0, time - thisLayer.startTime), source.duration - 0.05);"; return L; }
+    // ambient layers (the faint smoke) loop forward, never backward
+    function bucle(L) { L.timeRemapEnabled = true; L.property("ADBE Time Remapping").expression = "Math.max(0, time - thisLayer.startTime) % (source.duration - 0.05);"; return L; }
     function partir(s, n) {
         var ws = s.split(/\s+/), out = [], cur = "";
         for (var i = 0; i < ws.length; i++) { if (cur && (cur + " " + ws[i]).length > n) { out.push(cur); cur = ws[i]; } else cur = cur ? cur + " " + ws[i] : ws[i]; }
@@ -86,7 +90,7 @@ var CINTA = (function () {
         vida(L, sec.ini, sec.fin);
         // smoke drifting in the room (MiniMax fx clip on black, Screen)
         var hu = imp(D.fx_humo);
-        if (hu) { var Hm = c.layers.add(hu); Hm.name = "smoke " + sec.id; Hm.audioEnabled = false; Hm.startTime = sec.ini; ping(Hm); var kh = Math.max(W / hu.width, H / hu.height) * 100; S(Hm).setValue([kh, kh]); P(Hm).setValue([W / 2, H / 2]); Hm.blendingMode = BlendingMode.SCREEN; O(Hm).setValue(22); vida(Hm, sec.ini, sec.fin); }
+        if (hu) { var Hm = c.layers.add(hu); Hm.name = "smoke " + sec.id; Hm.audioEnabled = false; Hm.startTime = sec.ini; bucle(Hm); var kh = Math.max(W / hu.width, H / hu.height) * 100; S(Hm).setValue([kh, kh]); P(Hm).setValue([W / 2, H / 2]); Hm.blendingMode = BlendingMode.SCREEN; O(Hm).setValue(22); vida(Hm, sec.ini, sec.fin); }
         return L;
     }
     // evidence on the CRT inset

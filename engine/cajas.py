@@ -17,6 +17,6 @@ for c in sys.argv[1:]:
             ys, xs = np.nonzero(a > 40)
             caja = [int(xs.min() * 4), int(ys.min() * 4), int((xs.max() + 1) * 4), int((ys.max() + 1) * 4)] if len(xs) else None
             lst.append({"t": round(i * 0.2, 1), "caja": caja})
-        out[m.stem] = lst
+        out[m.stem.replace("_full", "")] = lst   # Lxx_full (clip + new footage) replaces Lxx
     (d / "cajas_cabeza.json").write_text(json.dumps(out), encoding="utf-8")
     print(c, {k: len(v) for k, v in out.items()})

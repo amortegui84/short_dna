@@ -99,7 +99,9 @@ HEAD_B = {"x": 860, "y": 1110, "s": 30}
 SLOTS_OBRA = [(255, 500), (255, 1000)]
 CAND_ETQ = [(300, 250), (720, 250), (300, 420), (720, 420), (540, 330), (540, 500), (300, 580), (720, 580)]   # sobre la obra de arriba, lejos de la cara
 secciones, ult_mate, n_rec, n_loop = [], None, 0, 0
-mate_de = {s["id"]: (carpeta / "mates" / f"{s['id']}.mov").as_posix() for s in segs if s["tipo"] == "A"}
+# the matte of the clip + its new footage (engine/continuar.py) wins when it exists
+mate_de = {s["id"]: next(m for m in (carpeta / "mates" / f"{s['id']}_full.mov", carpeta / "mates" / f"{s['id']}.mov") if m.exists() or m.name.endswith(f"{s['id']}.mov")).as_posix()
+           for s in segs if s["tipo"] == "A"}
 
 
 def rec(k=0):
@@ -444,6 +446,9 @@ if ESTILO.get("builder") == "cinta":   # "Night Transmission" (ae/cinta.jsx): it
     for sec in DATA["secciones"]:
         if sec.get("mate"):
             sec["clip"] = str(sec["mate"]).replace("/mates/", "/clips/").rsplit(".", 1)[0] + ".mp4"
+            _full = Path(sec["clip"][:-4] + "_full.mp4")   # the talking clip + its new footage (engine/continuar.py)
+            if _full.exists():
+                sec["clip"] = _full.as_posix()
     (carpeta / "datos_ae.json").write_text(json.dumps(DATA, indent=1), encoding="utf-8")
     r = M.run_jsx((HERE.parent / "ae" / "cinta.jsx").read_text(encoding="utf-8") + chr(10) + f"var r = CINTA.build({json.dumps(DATA)}); app.project.save(); return r;", timeout=1800, includes=())
     print(r.splitlines()[0])

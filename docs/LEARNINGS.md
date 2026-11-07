@@ -21,6 +21,17 @@ section the moment a review note arrives.
   keep H3's speech (perfect lips) and change its timbre with ElevenLabs speech-to-speech (`sts.py`): 0 ms offset, correlation 0.92-0.95.
 - **Intonation wobbles** → ElevenLabs v3 "Creative" (stability 0) → "Natural" (0.5). Three takes per line, keep the best by Whisper.
 - **Whisper mis-hears proper names ("Hilma af Klint")** → never discard every take; keep the best ratio.
+- **The narrator "rewinds": his clip plays forward, backward, forward** (review 2026-11-06, Cult Pixel ep04) → a narrator section
+  of the edit (his line plus the B lines read over him) lasted 13-14 s while his talking clip lasted 5 s, and `ae/cinta.jsx`
+  filled it with a ping-pong time-remap → stage `continuar` (`engine/continuar.py`, after `ae`): new H3 footage from the clip's
+  last frame, the narrator silently acting out what the voice says, joined to the clip; then matte and comp again. A section
+  still short holds its last frame. Never reuse footage backward; ambient layers (smoke) loop forward only.
+- **The narrator looks the same in every episode** → candles and the same poses each time → per episode a new look (pose + prop),
+  `proyecto.json` › `mesa` (props on the table instead of candles, in start frames, clips and ending: `comun.con_mesa`) and
+  `inicios_variantes` (the episode's own poses).
+- **A book appears in the narrator's hands** (ep04 L08 continuation) → the move said he "mimes holding an open book"; H3 draws
+  whatever object a prompt names, mimed or not → describe only hand motions and say the hands stay empty (no book, paper, object);
+  look at a contact sheet of every `_full` clip before the edit goes out.
 - **After Effects: "add ... null" importing the voice** → `montaje.py` run with a relative folder wrote relative wav paths → always pass absolute folders (the factory does).
 
 ## After Effects build (collage style)

@@ -115,6 +115,14 @@ Zapier works in the cloud, so it needs a **direct download link** to each video,
   ```
   python tools/publish_release.py --repo cult_pixel_media brands/cult_pixel/proyectos/ep01_gateway/ep01_gateway_pub.mp4
   ```
+- **Claude runs it (proven 2026-11-06):** when Windows keeps several GitHub accounts, Git Credential Manager opens a
+  picker window that a non-interactive terminal cannot answer; name the account: `--user <github user>` (Cult Pixel:
+  `amortegui84`). The script never prints the token.
+- **Unattended (Claude runs it every episode):** git's login lives in the person's own session, so Claude's terminal
+  cannot read it. Create a GitHub fine-grained token (github.com › Settings › Developer settings › Fine-grained tokens):
+  only the repository `<brand>_media`, permissions *Contents* and *Administration* read/write, an expiry date. Paste it
+  yourself as `GITHUB_TOKEN=...` in the `.env` named by `config/local.json` › `env_file`. The script prefers it and never
+  prints it.
 - **Alternative: Google Drive.** Shared as "Anyone with the link". For large files Drive can answer with a "can't scan
   for viruses" page instead of the video, and then the upload fails. Test with a private YouTube upload first.
 

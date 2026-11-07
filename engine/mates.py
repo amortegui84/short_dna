@@ -11,10 +11,13 @@ from comun import MOTION_DNA, PY_PORTABLE, proyecto  # noqa: E402
 carpeta = Path(sys.argv[1]).resolve(); pj = proyecto(carpeta)
 (carpeta / "mates").mkdir(exist_ok=True)
 for ln in [l for l in pj["lineas"] if l["tipo"] == "A"]:
-    out = carpeta / "mates" / f"{ln['id']}.mov"
+    full = (carpeta / "clips" / f"{ln['id']}_full.mp4").exists()   # the clip + its new footage (engine/continuar.py)
+    out = carpeta / "mates" / f"{ln['id']}{'_full' if full else ''}.mov"
     if out.exists():
         continue
-    subprocess.run([PY_PORTABLE, str(MOTION_DNA / "tools" / "video_matte.py"), str(carpeta / "clips" / f"{ln['id']}.mp4"), str(out),
+    clip = carpeta / "clips" / f"{ln['id']}_full.mp4"   # the clip + its new footage (engine/continuar.py), if any
+    clip = clip if clip.exists() else carpeta / "clips" / f"{ln['id']}.mp4"
+    subprocess.run([PY_PORTABLE, str(MOTION_DNA / "tools" / "video_matte.py"), str(clip), str(out),
                     "--size", "1080x1920", "--fps", "24"], check=True)
     print(ln["id"], "mate ok", flush=True)
 subprocess.run([sys.executable, str(Path(__file__).parent / "cajas.py"), str(carpeta)], check=True)

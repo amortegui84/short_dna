@@ -8,7 +8,7 @@ import os, subprocess, sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
-from comun import H3, PY_PORTABLE, personaje, proyecto, run  # noqa: E402
+from comun import H3, PY_PORTABLE, con_mesa, personaje, proyecto, run  # noqa: E402
 
 carpeta = Path(sys.argv[1]).resolve(); pj = proyecto(carpeta)
 ad = pj.get("autodestruccion") or {}
@@ -41,6 +41,7 @@ overall_soundscape:
 non_diegetic_music:
 N/A
 """
+prompt = con_mesa(prompt, pj)   # the episode's own props on the table instead of the candles
 (F / "prompt.txt").write_text(prompt, encoding="utf-8")
 PIKA = ["--turbo", "pika_h3_flex_ref2va_v1_bf16.safetensors", "--steps", "6", "--no-shift", "--size", "768x1344",
         "--lora", "minidv_lora_h3_v1.safetensors:0.9"]

@@ -35,6 +35,12 @@ Follow the template's section grammar (`template.json` › `estructura`) and `do
 - `tts` text with ElevenLabs v3 tags; `texto` clean; no "..." in A lines (H3 invents words).
 - `momentos_a`: what enters on which spoken word in each A line (`obra`, `etq`, `cta`); `obras_b`: the artwork of each B line on
   the word that names it; `titulos`; `cita` (+ `clave`); `juntas` (names a subtitle line must not split); `obras_descarga`.
+- **Never reuse footage** (no loops, no reverse, no repeated clip): every second of the presenter is generated for that moment.
+  Write each `accion` from what the words are about, chained to the previous and next move (start and end pose), with no move
+  twice in an episode, and a `continuacion` for every A line whose section runs on under B lines (`docs/templates/script.md` ›
+  Movement). The stage `continuar` generates that footage.
+- **The presenter never looks the same twice**: a new look per episode (pose + prop), `mesa` (props on the table) and
+  `inicios_variantes` (the episode's poses).
 - Show the script to the user before generating anything paid or long.
 
 ## 3. Design (optional)

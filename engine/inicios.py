@@ -8,16 +8,19 @@ import argparse, json, subprocess, sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
-from comun import escena_de, personaje, proyecto  # noqa: E402
+from comun import con_mesa, escena_de, personaje, proyecto  # noqa: E402
 
 ap = argparse.ArgumentParser(); ap.add_argument("carpeta"); ap.add_argument("--seed-base", type=int, default=42000)
 a = ap.parse_args()
 carpeta = Path(a.carpeta).resolve(); pj = proyecto(carpeta); c = personaje(pj)
 out = carpeta / "inicios"; out.mkdir(exist_ok=True)
 look = str(escena_de(pj, carpeta))
-var = c["inicios_variantes"]
+# the narrator never looks the same twice: an episode may bring its own poses (proyecto.json "inicios_variantes") and its
+# own props on the table ("mesa", which replaces the candles everywhere: start frames, clips, ending)
+var = pj.get("inicios_variantes") or c["inicios_variantes"]
+fijo = con_mesa(c["inicios_fijo"], pj)
 items = [{"name": f"i{i + 1:02d}", "refs": [look, str(c["_dir"] / c["maestro"])], "seed": a.seed_base + 10 * i, "size": "768x1344",
-          "prompt": f"{p} {c['inicios_mirada']} {c['inicios_fijo']}"} for i, p in enumerate(var)]
+          "prompt": f"{con_mesa(p, pj)} {c['inicios_mirada']} {fijo}"} for i, p in enumerate(var)]
 spec = out / "spec.json"
 spec.write_text(json.dumps({"out_dir": str(out), "items": items}, indent=2), encoding="utf-8")
 subprocess.run([sys.executable, str(Path(__file__).parent / "klein_gen.py"), "--spec", str(spec)], check=True)

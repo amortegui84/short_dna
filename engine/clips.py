@@ -6,7 +6,7 @@ import difflib, json, os, re, subprocess, sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
-from comun import H3, PY_PORTABLE, duracion, escena_de, palabras, personaje, proyecto, run  # noqa: E402
+from comun import H3, PY_PORTABLE, con_mesa, duracion, escena_de, palabras, personaje, proyecto, run  # noqa: E402
 
 carpeta = Path(sys.argv[1])
 pj = proyecto(carpeta)
@@ -44,6 +44,7 @@ for ln in [l for l in pj["lineas"] if l["id"] in ids]:
         vd = duracion(carpeta / "vo" / f"{lid}.mp3") + 0.3
         seg = next((s for s in REJILLA if s >= vd), REJILLA[-1])
     prompt = PJE["prompt_clip"].format(artista=pj.get("artista", pj.get("tema", "")), accion=ln["accion"], dialogo=dialogo)
+    prompt = con_mesa(prompt, pj)   # the episode's own props on the table instead of the candles
     pf = carpeta / "prompts" / f"{lid}.txt"
     pf.write_text(prompt, encoding="utf-8")
     esperado = re.sub(r"[^a-z ]", "", ln["texto"].lower()).split()

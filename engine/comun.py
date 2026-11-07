@@ -47,6 +47,17 @@ def clave(nombre):
     raise KeyError(f"{nombre} no esta en {ENV_KEY} ni en el entorno")
 
 
+def con_mesa(texto, pj):
+    """The episode's own props on the table (proyecto.json "mesa") in place of the candles of the character's prompts, so the
+    narrator's room changes between episodes (e.g. glowing crystal spheres instead of candles)."""
+    m = pj.get("mesa")
+    if not m:
+        return texto
+    for v in ("a few melted candles", "melted candles", "a lit candle", "candles", "candle"):
+        texto = re.sub(r"\b" + re.escape(v) + r"\b", m, texto)
+    return texto
+
+
 def escena_de(pj, carpeta):
     """Imagen de partida del video: proyecto "escena" (ruta del proyecto) > el look del personaje ("look") > su escena base."""
     c = personaje(pj)

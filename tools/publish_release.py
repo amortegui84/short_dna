@@ -1,21 +1,35 @@
 """Upload publish copies of episodes to a GitHub release so posting services (Zapier) can fetch them by a direct URL.
 Creates the public repo <your GitHub user>/<repo> and the release 'tapes' if missing; re-uploading a file replaces it.
-Uses the GitHub login git already has (git credential fill); the token is never printed. See docs/PUBLISHING.md (A5).
-Usage: python tools/publish_release.py [--repo cult_pixel_media] <file.mp4> [<file.mp4> ...]"""
+Token: GITHUB_TOKEN from the environment or the .env (engine/comun.clave; a fine-grained token with Contents + Administration
+write on this one repo lets Claude publish unattended), else the GitHub login git already has (git credential fill). Never printed. See docs/PUBLISHING.md (A5).
+Usage: python tools/publish_release.py [--repo cult_pixel_media] [--user <github user>] <file.mp4> [<file.mp4> ...]"""
 import json, subprocess, sys, urllib.error, urllib.request
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "engine"))
 
 args = sys.argv[1:]
 REPO, TAG = "cult_pixel_media", "tapes"
 if "--repo" in args:
     i = args.index("--repo"); REPO = args[i + 1]; del args[i:i + 2]
+USER = None   # which saved GitHub account to use when Windows keeps several (else Git Credential Manager asks in a window)
+if "--user" in args:
+    i = args.index("--user"); USER = args[i + 1]; del args[i:i + 2]
 if not args:
     sys.exit(__doc__)
-out = subprocess.run(["git", "credential", "fill"], input="protocol=https\nhost=github.com\n\n",
-                     capture_output=True, text=True).stdout
-tok = dict(l.split("=", 1) for l in out.splitlines() if "=" in l).get("password")
+try:
+    from comun import clave
+    tok = clave("GITHUB_TOKEN")
+except Exception:
+    tok = None
+import os
+out = "" if tok else subprocess.run(["git", "credential", "fill"],
+                                    input="protocol=https\nhost=github.com\n" + (f"username={USER}\n" if USER else "") + "\n",
+                                    capture_output=True, text=True,
+                                    env=dict(os.environ, GCM_INTERACTIVE="never", GIT_TERMINAL_PROMPT="0")).stdout
+tok = tok or dict(l.split("=", 1) for l in out.splitlines() if "=" in l).get("password")
 if not tok:
-    sys.exit("git has no GitHub login on this machine: push once to any GitHub repo (or install Git Credential Manager) and retry")
+    sys.exit("No GitHub login: put GITHUB_TOKEN in the .env (docs/PUBLISHING.md A5) or push once to any GitHub repo, and retry")
 H = {"Authorization": f"Bearer {tok}", "Accept": "application/vnd.github+json", "User-Agent": "shorts-factory-publisher"}
 
 
