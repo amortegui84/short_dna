@@ -7,6 +7,10 @@ description: Make a vertical Short end to end with a generated presenter (resear
 
 The user says **who** (character + look), **how** (style) and **what** (topic). You run the rest with `factory.py` and the
 libraries, and stop at the checkpoints. Read `docs/LEARNINGS.md` before working: every rule in it came from a review.
+A brand with a series bible (`brands/<brand>/BIBLE.md`, e.g. Cult Pixel) is read before its script: it says what never changes,
+which knobs change with the topic (place, props, look, ending, survives) and how past episodes chose them. Every review note
+on an episode becomes a rule in that bible.
+For several episodes at once, follow docs/RECIPE_SERIES.md (the line, times, limits, batch steps, known gaps).
 
 ## Paths (the app's views; the same from chat)
 - **Topic → Short**: below, steps 0-7. Pick the hook with `library/hooks.json` and the rules of each platform in

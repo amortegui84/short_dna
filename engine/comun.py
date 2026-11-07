@@ -49,7 +49,20 @@ def clave(nombre):
 
 def con_mesa(texto, pj):
     """The episode's own props on the table (proyecto.json "mesa") in place of the candles of the character's prompts, so the
-    narrator's room changes between episodes (e.g. glowing crystal spheres instead of candles)."""
+    narrator's room changes between episodes (e.g. glowing crystal spheres instead of candles). With proyecto.json
+    "escenario" ({"lugar": "<where he sits, its light>", "sonido": "<ambient sound>"}) the whole room changes too: every
+    description of the character's ritual room and its CRT hum is replaced by the episode's place (e.g. a jungle at night)."""
+    e = pj.get("escenario")
+    if e:
+        lugar, sonido = e["lugar"], e.get("sonido", "night ambience")
+        texto = texto.replace("the dark ritual room with CRT televisions, plastic sheeting and candles, the red and blue light",
+                              "the place: " + lugar)
+        texto = re.sub(r"(?:sits )?(?:in )?(?:a |his )?dark ritual room[^.]*?glow from the other", "sits " + lugar, texto)
+        texto = re.sub(r"same room: [^.]*?glow from the other", "same place: " + lugar, texto)
+        texto = re.sub(r"in a room of CRT TVs, plastic sheets and candles", "in " + lugar, texto)
+        texto = texto.replace("Low room tone, faint CRT hum, a candle crackle.", sonido + ".")
+        texto = texto.replace("Low room tone and a faint CRT hum only.", sonido + " only.")
+        texto = texto.replace("Low room tone and CRT hum", sonido)
     m = pj.get("mesa")
     if not m:
         return texto
@@ -130,3 +143,30 @@ norm_palabras = lambda s: re.sub(r"[^a-z0-9 ]", "", s.lower().replace("-", " "))
 def parecido(a, b):
     import difflib
     return difflib.SequenceMatcher(None, norm_palabras(a), norm_palabras(b)).ratio()
+
+
+def clip_roto(path, n=12):
+    """None if a generated clip holds up, else the reason. H3 sometimes collapses mid-clip (ep05 L10_cont1: the picture went
+    dark and smeared and every QC passed it). Measured at a quarter of the resolution so the VHS grain does not count:
+    sharpness of the later frames against the first (broken clips fell to 0.49-0.60, good ones never below 0.90) and
+    brightness (a collapse darkens). Not for endings where he is meant to dissolve."""
+    import cv2
+    cap = cv2.VideoCapture(str(path)); total = int(cap.get(cv2.CAP_PROP_FRAME_COUNT)); fs = []
+    for i in np.linspace(0, max(total - 1, 0), n).astype(int):
+        cap.set(cv2.CAP_PROP_POS_FRAMES, int(i)); ok, f = cap.read()
+        if ok:
+            fs.append(cv2.cvtColor(f, cv2.COLOR_BGR2GRAY).astype(np.float32))
+    cap.release()
+    if len(fs) < 3:
+        return "unreadable"
+    def nitidez(g):
+        s = cv2.resize(g, (g.shape[1] // 4, g.shape[0] // 4), interpolation=cv2.INTER_AREA)
+        return float(cv2.Laplacian(s, cv2.CV_32F).var())
+    s0, l0 = nitidez(fs[0]) or 1e-6, float(fs[0].mean()) or 1e-6
+    sharp = float(np.median([nitidez(f) / s0 for f in fs[1:]]))
+    luma = min(float(f.mean()) / l0 for f in fs[1:])
+    if sharp < 0.75:
+        return f"smeared (sharpness {sharp:.2f} of the first frame)"
+    if luma < 0.7:
+        return f"went dark (brightness {luma:.2f} of the first frame)"
+    return None

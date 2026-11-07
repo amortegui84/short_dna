@@ -85,8 +85,17 @@ var CINTA = (function () {
         if (!it) return null;
         var L = c.layers.add(it); L.name = "NARRADOR " + sec.id; L.audioEnabled = false; L.startTime = sec.ini; ping(L);
         var k = Math.max(W / it.width, H / it.height) * 100 * 1.02;
-        S(L).setValueAtTime(sec.ini, [k, k]); S(L).setValueAtTime(sec.fin, [k * 1.08, k * 1.08]);
-        P(L).setValue([W / 2, H / 2]); P(L).expression = "value + [wiggle(0.6,7)[0]-value[0], wiggle(0.5,5)[1]-value[1]];";
+        var sl = sec.saltos || [[sec.ini, 1.0]], hx = sec.cabeza_xy ? sec.cabeza_xy[0] : W / 2, hy = sec.cabeza_xy ? sec.cabeza_xy[1] : H * 0.4;
+        // zoom jumps: each shot holds one framing (with a slow push), the cut jumps to the next one, punching in toward his head
+        var lx = it.width / 2 + (hx - W / 2) / (k / 100), ly = it.height / 2 + (hy - H / 2) / (k / 100);
+        A(L).setValue([lx, ly]);
+        for (var q = 0; q < sl.length; q++) {
+            var a = sl[q][0], b = q + 1 < sl.length ? sl[q + 1][0] - 1 / FPS : sec.fin, m = sl[q][1], s0 = k * m, s1 = k * m * 1.035;
+            var px = m > 1.01 ? W / 2 : hx, py = m > 1.01 ? H * 0.38 : hy, sc = s1 / 100;
+            px = Math.min(lx * sc, Math.max(W - (it.width - lx) * sc, px)); py = Math.min(ly * sc, Math.max(H - (it.height - ly) * sc, py));
+            S(L).setValueAtTime(a, [s0, s0]); S(L).setValueAtTime(b, [s1, s1]); P(L).setValueAtTime(a, [px, py]); P(L).setValueAtTime(b, [px, py]);
+        }
+        P(L).expression = "value + [wiggle(0.6,7)[0]-value[0], wiggle(0.5,5)[1]-value[1]];";
         vida(L, sec.ini, sec.fin);
         // smoke drifting in the room (MiniMax fx clip on black, Screen)
         var hu = imp(D.fx_humo);

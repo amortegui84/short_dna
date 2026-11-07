@@ -6,7 +6,7 @@ import difflib, json, os, re, subprocess, sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
-from comun import H3, PY_PORTABLE, con_mesa, duracion, escena_de, palabras, personaje, proyecto, run  # noqa: E402
+from comun import H3, PY_PORTABLE, clip_roto, con_mesa, duracion, escena_de, palabras, personaje, proyecto, run  # noqa: E402
 
 carpeta = Path(sys.argv[1])
 pj = proyecto(carpeta)
@@ -39,7 +39,7 @@ for ln in [l for l in pj["lineas"] if l["id"] in ids]:
     escena = carpeta / pj["inicios"][lid] if lid in pj.get("inicios", {}) else ESCENA
     # sin puntos suspensivos (H3 inventa palabras en la pausa) y sin frases fuera de <d> (H3 las dice en voz alta)
     dialogo = ln["texto"].replace("...", ",").replace(",,", ",")
-    seg = next(s for s in REJILLA if s >= len(dialogo.split()) / 2.7 + 0.8)
+    seg = next((s for s in REJILLA if s >= len(dialogo.split()) / 2.7 + 0.8), REJILLA[-1])   # long line: longest clip, continuar extends it
     if PJE.get("sin_boca") and (carpeta / "vo" / f"{lid}.mp3").exists():   # sin boca: el clip dura lo que la voz dramatica (pausas incluidas)
         vd = duracion(carpeta / "vo" / f"{lid}.mp3") + 0.3
         seg = next((s for s in REJILLA if s >= vd), REJILLA[-1])
@@ -55,7 +55,10 @@ for ln in [l for l in pj["lineas"] if l["id"] in ids]:
                         "--seconds", str(seg), *PIKA, "--gen-audio", "--seeds", str(seed), "-o", str(tmp)], check=True, env=ENV)
         oido = [re.sub(r"[^a-z]", "", w.lower()) for w, _, _ in palabras(tmp)]   # QC: Whisper sobre el audio que genero H3
         ratio = difflib.SequenceMatcher(None, esperado, [w for w in oido if w]).ratio()
-        print(f"[{lid}] seed {seed}: ratio={ratio:.2f} oido={' '.join(oido)}", flush=True)
+        roto = clip_roto(tmp)   # a take that collapses mid-clip (dark, smeared) loses to any sound take
+        if roto:
+            ratio -= 1
+        print(f"[{lid}] seed {seed}: ratio={ratio:.2f} oido={' '.join(oido)}" + (f" BROKEN: {roto}" if roto else ""), flush=True)
         if ratio > mejor[0]:
             mejor = (ratio, tmp)
         if ratio >= 0.85:

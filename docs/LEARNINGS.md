@@ -34,6 +34,14 @@ section the moment a review note arrives.
   look at a contact sheet of every `_full` clip before the edit goes out.
 - **After Effects: "add ... null" importing the voice** → `montaje.py` run with a relative folder wrote relative wav paths → always pass absolute folders (the factory does).
 
+- **A generated clip collapses mid-take and QC passes it** (ep05 L10_cont1, 2026-11-07): the picture went dark and smeared
+  halfway; transcript, loudness and black-frame checks all passed. Cause: H3 drift; nothing measured the picture itself.
+  Fix: `comun.clip_roto` (sharpness at 1/4 resolution so VHS grain does not count, plus brightness, both against the first
+  frame; broken 0.49-0.60, good never below 0.90); `clips`, `continuar` and survivor endings re-seed a broken take.
+- **The ending starts from the wrong pose** (ep05 v3): stage `final` runs before `continuar`, so when the last section was
+  extended the ending began from the short clip's end. Fix: `continuar` compares the extended clip's last frame with
+  `final/inicio.png` and remakes the ending when they differ.
+
 ## After Effects build (collage style)
 - **~5 frames of empty green before an artwork** → the presenter's colour background lived until cut + 0.4 s above the artwork → end it at cut + 0.02.
 - **"The same painting split by a transition"** → a voice-over line was its own section with a camera move and stripes, although the

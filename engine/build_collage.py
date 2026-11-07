@@ -449,6 +449,21 @@ if ESTILO.get("builder") == "cinta":   # "Night Transmission" (ae/cinta.jsx): it
             _full = Path(sec["clip"][:-4] + "_full.mp4")   # the talking clip + its new footage (engine/continuar.py)
             if _full.exists():
                 sec["clip"] = _full.as_posix()
+        # zoom jumps (ep05 v2 review: "reframes, the jumps we used"): while he is on screen the edit cuts between framings at
+        # sentence ends (at least SALTO_MIN s apart), punching in toward his head (median head box of his talking clip)
+        if sec.get("tipo") in ("gancho", "cabeza"):
+            SALTO_MIN, NIV = 2.4, [1.0, 1.3, 1.12, 1.4]
+            fins = sorted(w["e"] for g in tl["segmentos"] for i, w in enumerate(g["words"])
+                          if w["w"][-1:] in ".?!:" and i < len(g["words"]) - 1 or (i == len(g["words"]) - 1))
+            cortes, ult = [], sec["ini"]
+            for e in fins:
+                if sec["ini"] + 1.5 < e < sec["fin"] - 1.6 and e - ult >= SALTO_MIN:
+                    cortes.append(round(e + 0.05, 3)); ult = e
+            sec["saltos"] = [[sec["ini"], NIV[0]]] + [[t, NIV[(i + 1) % len(NIV)]] for i, t in enumerate(cortes)]
+            cj = sorted(CAJAS.get(sec.get("id"), []), key=lambda c: c["caja"][1])
+            if cj:
+                x0, y0, x1, y1 = cj[len(cj) // 2]["caja"]
+                sec["cabeza_xy"] = [round((x0 + x1) / 2), round(y0 + (y1 - y0) * 0.14)]
     (carpeta / "datos_ae.json").write_text(json.dumps(DATA, indent=1), encoding="utf-8")
     r = M.run_jsx((HERE.parent / "ae" / "cinta.jsx").read_text(encoding="utf-8") + chr(10) + f"var r = CINTA.build({json.dumps(DATA)}); app.project.save(); return r;", timeout=1800, includes=())
     print(r.splitlines()[0])

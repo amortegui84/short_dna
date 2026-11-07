@@ -1,5 +1,7 @@
 # Writing the script (template artist_short)
 
+A brand with `brands/<brand>/BIBLE.md` (Cult Pixel): read it first; it sets the constants and the topic knobs.
+
 - 10 lines following `template.json` › `estructura`; ~140-160 words in total → 55-65 s with holds.
 - **A lines** (presenter): conversational, one idea, ≤ 20 words; an `accion` for hands and face that fits the words (an open hand
   toward one side for each option in the closing question: the detail cards follow that side); no "..." (H3 invents words).
@@ -30,3 +32,12 @@ presenter on screen is generated for that moment.
 6. **Never write "mimes holding a book" (or any object):** the video model draws the object (ep04 L08 got a real book).
    Describe only what the hands do (trace a line in the air, lay a palm flat) and end with "his hands stay empty: no book,
    no paper, no object of any kind".
+7. **He faces the lens.** Never write him turning his head over his shoulder or looking behind him (ep05 review: "he looks
+   back too much"); looking back is saved for the ending, where it pays off. End each action with "He keeps his face toward
+   the lens".
+8. **Calm hands, no pointing.** He is explaining, not miming: most of the time his hands rest or quietly handle
+   something the place gives him (a leaf, a stick in the fire, a small animal: in ep05's jungle a poison dart frog). Move the
+   hands a little only on the line that needs it, and never point at the lens (ep05 v2 review: "unnecessary hand movements").
+   An episode with a prop says so in its start frames (`inicios_variantes`) and drops "hands stay empty" for those lines.
+9. **Reframe.** Not every line in the same medium shot: mix close portraits (chest up) and medium shots in the start frames,
+   and the edit punches in at sentence ends (zoom jumps) while he is on screen.
