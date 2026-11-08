@@ -1,0 +1,57 @@
+{
+ "motor": "seedance 2.5 (fal)",
+ "clips": [
+  {
+   "clip": "seedance_A",
+   "lineas": [
+    "L01",
+    "L03",
+    "L05"
+   ],
+   "pedido_s": 23,
+   "resolucion": "480p",
+   "w": 480,
+   "h": 854,
+   "duracion_s": 23.08,
+   "usd": 4.729,
+   "usd_si_720p": 10.632,
+   "usd_si_1080p": 23.921,
+   "seed": 1976581992,
+   "generacion_s": 264.3,
+   "hora": "2026-11-07T20:51:00"
+  },
+  {
+   "clip": "seedance_B",
+   "lineas": [
+    "L08",
+    "L10"
+   ],
+   "pedido_s": 15,
+   "resolucion": "480p",
+   "w": 480,
+   "h": 854,
+   "duracion_s": 15.09,
+   "usd": 3.084,
+   "usd_si_720p": 6.934,
+   "usd_si_1080p": 15.601,
+   "seed": 1686188281,
+   "generacion_s": 264.5,
+   "hora": "2026-11-07T20:55:24"
+  }
+ ],
+ "total_usd": 7.813,
+ "total_si_720p": 17.566,
+ "total_si_1080p": 39.522,
+ "elevenlabs": {
+  "tts_caracteres": 537,
+  "sts_segundos": 63.2,
+  "creditos_aprox": 1590
+ },
+ "tiempos": {
+  "pedido": "2026-11-07 20:34:42",
+  "clips_seedance": "20:46:35-20:55:33 (2 clips, 264 s each, one after the other)",
+  "entregado": "21:12:04",
+  "total_min": 37.4,
+  "nota": "includes ~10 min fixing two pipeline gaps (montaje expected TTS for host lines; missing gancho) and an After Effects restart"
+ }
+}

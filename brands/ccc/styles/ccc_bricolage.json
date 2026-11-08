@@ -1,0 +1,121 @@
+{
+ "slug": "ccc_bricolage",
+ "nombre": "Cool Culture Club: Bricolage Pop",
+ "builder": "ccc",
+ "descripcion": "A sarcastic floating art-toy head over a moving wall of COOL CULTURE CLUB type, cut hard against the artist's paintings (drifting, magnified, revealed), a modern bricolage portrait and a torn-strip quote card. Fast, warm, coral-to-teal.",
+ "formato": {
+  "w": 1080,
+  "h": 1920,
+  "fps": 30,
+  "duracion_ref_s": 56,
+  "seguro": [
+   60,
+   150,
+   1020,
+   1500
+  ],
+  "y_subtitulos": 1460
+ },
+ "tokens": {
+  "fondo": "gradient ramp #FC604C at y 291 to #132019 at y 1362",
+  "texto": "#F6E8D7",
+  "acento": "#E3C971",
+  "cinta_nombre": "#CB2479",
+  "papel": "#F0E8DD",
+  "negro": "#1E1714"
+ },
+ "ritmo": {
+  "palabras_por_segundo": 2.6,
+  "plano_medio_s": 3.3,
+  "cortes_en_56s": 16,
+  "avatar_en_pantalla": "about 45% of the time, 5 blocks (L01, L03, L05, L08, L10)",
+  "pausa_max_s": 1.2,
+  "subtitulo_grupo_s": 1.0
+ },
+ "curvas": {
+  "salto_avatar": {
+   "que": "every avatar cut lands slightly big and settles",
+   "claves": "scale 109% -> 102% in 0.13 s (4 frames)",
+   "ease": "out 30% / in 90% (snappy start, soft landing)"
+  },
+  "punch_in": {
+   "que": "a beat inside an avatar line punches in close",
+   "claves": "scale 144% -> 134% in 0.13 s",
+   "ease": "out 30% / in 90%"
+  },
+  "deriva_obra": {
+   "que": "Ken Burns on every artwork",
+   "claves": "scale +3% to +10% over 2-3 s, or a 70 -> 78% drift on wide panels",
+   "ease": "linear (16.7/16.7)"
+  },
+  "empuje_detalle": {
+   "que": "push to a detail on the anchor",
+   "claves": "scale 200% -> 240% over 3.4 s",
+   "ease": "out 75% / in 95% (very soft both ends)"
+  },
+  "revelado": {
+   "que": "zoom out from a detail to the whole panel",
+   "claves": "scale 200% -> 61% over 6.2 s with the anchor travelling",
+   "ease": "out 75% / in 95%"
+  },
+  "boton_cta": {
+   "que": "pill button reveal",
+   "claves": "reveal 0 -> 100 in 0.7 s; label offset -35 -> 100",
+   "ease": "70/70; label out 50 / in 85"
+  },
+  "jitter": {
+   "que": "stop-motion hold once a bricolage piece lands",
+   "expresion": "prompts/stop_motion_jitter.expr.txt",
+   "amplitud": "0.3 deg subject, 0.4-0.6 paper and tape, 1-2 stickers and marks; a strip and its text share the seed"
+  }
+ },
+ "transiciones": [
+  "Hard cuts between shots, on the end of a phrase; layers overlap 0.1-0.3 s so nothing flashes.",
+  "No wipes or dissolves between shots: the energy comes from the avatar's settle and the artwork's motion.",
+  "Inside modules pieces enter with Scale Pop, Slide Land, Wipe Reveal (angle 270 for left to right, 0 for drips), Rotate Settle, Drop Bounce, Spin Pop, Stretch Slide, Words Fade Up."
+ ],
+ "modulos": {
+  "avatar_plate": "Seedance clip with an Object Matte roto of the head; behind it the kinetic type wall (graded to black on coral) and the coral-to-teal gradient. 1-3 punch-ins per line.",
+  "kinetic_type_wall": "Rows of COOL CULTURE CLUB in Bahnschrift 240 px, row pitch 194, slant -14, narrow width 78% / tracking -19; the weight sweeps light -> bold condensed and back (cycle 6 s, sweep 2.8 s, row stagger 0.3 s, ease power 2.5). kit/loops/kinetic_type_wall.mp4",
+  "bricolage_portrait": "6 s: background pieces 0.10-0.55 s (paper circle, riso, halftone, torn papers, black square, tapes, spiral); cutout Drop Bounce at 0.70 s (impact 1.03, settle 1.57); halo, tabs, clip, price tag, pin 1.05-1.40; pink tape, drip, NAME LABEL 1.45-1.60; stickers, sparkle, number, X 1.75-2.15; then stop-motion jitter. Caption: name, place, year.",
+  "artwork": "full painting or panel, Ken Burns drift; title cards optional (SuisseIntlMono 40, white).",
+  "detail_zoom": "the painting behind (push-in 4%), then 1-2 cards magnifying a detail (card 780x1040 rot -1.5 at x2.2; card 600x760 rot 2 at x6.5) with tape on top and a 45% shadow, entering on their word.",
+  "quote_card": "each line on its own torn cream strip (text width +120, height +70) wiping left to right at 0.60/0.95/1.30/1.65 s, words fade up 0.15 s after; Instrument Serif Italic 112, warm black; attribution in Bahnschrift on black tape at 2.15 s; big cream quote mark.",
+  "cta_button": "cream/amber pill 'Comment below' under the captions on the last line (Motion DNA element button).",
+  "captions": "Poppins SemiBold 66, cream #F6E8D7, the word being spoken in amber #E3C971 (expression selector per word), 2-4 words per group, no box, soft drop shadow, at y ~1460.",
+  "alternativos": "Art Carousel, Art Slider, Art Strip, Art Scroll, Ken Burns Details, Kinetic Type: built in the template, not used in the Bosch cut; options for listing several works."
+ },
+ "sonidos": {
+  "swish": "swish",
+  "pop": "pop",
+  "hit": "hit",
+  "tick": "tick",
+  "click": "click"
+ },
+ "musica": {
+  "tags": "playful upbeat indie hip-hop beat, bright plucks, light drums, 95-110 BPM, no vocals",
+  "nota": "guide only: the real song goes in the app"
+ },
+ "builder_nota": "ae/ccc.jsx (engine/build_collage.py, branch ccc). The Bosch AE template in references/bosch_template stays as the hand-built reference.",
+ "tipografia": {
+  "subtitulos": "Poppins-SemiBold 66 (stand-in on machines without Poppins: InterTight-SemiBold)",
+  "cita": "InstrumentSerif-Italic",
+  "marca": "Bahnschrift",
+  "cta": "InterTight-Bold",
+  "etiqueta": "InterTight-ExtraBold"
+ },
+ "cabeza": {
+  "medido": "Seedance clips of the Bosch cut, matte (InSPyReNet) + head box per frame (references/head/*.json)",
+  "alto_cabeza": "cap top to chin = 57-66% of the frame height; cap top at 11-14% from the top, chin at 71-77%; the hair falls to the bottom edge",
+  "ancho": "ears reach 94-100% of the width in the close clip, ~70% in the wider one",
+  "movimiento": "locked horizontally (centre moves 2-12 px), bobs and leans vertically 25-67 px; no camera move inside the clip",
+  "en_edicion": "cut-in 109% -> 102% in 4 frames; punch-in 144% -> 134% at sentence ends, anchored at the eyes (the cap and ears crop on the punch)",
+  "h3": "H3 renders the head smaller (about half the width): the edit's cover scale + punch-ins bring it back to the reference size"
+ },
+ "cola_final_s": 1.6,
+ "retrato_cabeza_y": [
+  280,
+  850
+ ],
+ "_notas": {}
+}

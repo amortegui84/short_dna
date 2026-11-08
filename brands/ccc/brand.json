@@ -1,0 +1,108 @@
+{
+ "slug": "ccc",
+ "nombre": "Cool Culture Club",
+ "handle": "TBD (creator account)",
+ "plataformas": [
+  "instagram_reels",
+  "tiktok",
+  "youtube_shorts"
+ ],
+ "tipo_cuenta": "creator (Instagram Creator, TikTok Personal, any YouTube channel): keeps access to in-app music libraries",
+ "idioma": "English",
+ "audiencia": "Scrollers 16-34 who like art, music and pop culture told like gossip: curious, irreverent, allergic to lectures.",
+ "tono": "A sarcastic, confident art-toy host spilling the tea on an artist: fast, cheeky, funny first, then one real surprising fact. Never a museum voice.",
+ "mensaje": "Art is weirder and more alive than school made it look. Every episode ends with a two-option question and a joke.",
+ "concepto": "Each episode celebrates one artist (classic painters first, music artists later). A floating 3D art-toy presenter tells the story to camera, intercut with the artist's work, a bricolage portrait of the artist and a quote card.",
+ "colores": {
+  "coral": "#FA5639",
+  "amber": "#E39336",
+  "magenta": "#CB2479",
+  "plum": "#651F77",
+  "teal": "#326055",
+  "deep_teal": "#26483F",
+  "salmon": "#D7746E",
+  "cream": "#F0E8DD",
+  "warm_black": "#1E1714",
+  "caption_cream": "#F6E8D7",
+  "caption_highlight": "#E3C971",
+  "cta_box": "#E8C66A",
+  "fondo_arriba": "#FC604C",
+  "fondo_abajo": "#132019"
+ },
+ "fuentes": {
+  "marca": "Bahnschrift-Light (kinetic type wall, labels; ships with Windows)",
+  "subtitulos": "Poppins-SemiBold 66",
+  "cita": "InstrumentSerif-Italic (Adobe Fonts: activate it)",
+  "titulos_obra": "SuisseIntlMono-Regular",
+  "cta": "InterTight-Bold"
+ },
+ "personajes": [
+  "ccc_girl",
+  "ccc_guy"
+ ],
+ "personaje": "ccc_girl",
+ "estilo": "ccc_bricolage",
+ "plantilla": "ccc_artist_short",
+ "voz": {
+  "estado": "CHOSEN 2026-11-07 (samples + QA in references/voice/samples/qa.json)",
+  "chica": {
+   "voice_id": "6u6JbqKdaQy89ENzLSju",
+   "nombre": "Brielle - Podcast girl (already in the ElevenLabs account)",
+   "modelo_tts": "eleven_v3",
+   "modelo_sts": "eleven_multilingual_sts_v2",
+   "ajustes": {
+    "stability": 0.5,
+    "similarity_boost": 0.8,
+    "style": 0.35
+   },
+   "qa": "similarity to the Bosch series voice 0.90-0.94 (TTS) and 0.94 (STS from the Seedance voice, timing kept 10.00 -> 9.98 s); f0 ~225 Hz vs 215",
+   "notas": [
+    "STS output comes out ~-27 LUFS: level it with the TTS lines (~-17) before the mix",
+    "TTS runs ~2.0-2.8 words/s: speed the voice-over 1.1x in montaje to reach the reference 2.6"
+   ]
+  },
+  "chico": {
+   "voice_id": "6OzrBCQf8cjERkYgzSg8",
+   "nombre": "Young Jamal (shared library; usable by id)",
+   "modelo_tts": "eleven_v3",
+   "qa": "f0 ~88 Hz, 2.35 words/s, Whisper match 0.91; no reference recording of the guy exists, chosen by description (young Black American, casual, social media)",
+   "respaldo": "VlUmeC1Uzj3NnwiVR9K9 Julius"
+  },
+  "flujo": "host clips: the clip's own generated voice drives the lips, then ElevenLabs speech-to-speech to the series voice (engine/sts.py); voice-over lines: ElevenLabs v3 straight (engine/tts.py)",
+  "ritmo": "about 2.6 words a second, pauses under a second, [laughs] allowed"
+ },
+ "musica": {
+  "en_exportacion": "none: the export carries voice-over + code-made sound effects only",
+  "en_app": "the song is added inside each app at the chosen start point (creator account libraries); edit against a muted guide track",
+  "guia": "playful upbeat indie / hip-hop beat, 95-110 BPM, bright plucks and light drums, no vocals under the voice",
+  "sonidos": "code-made pops, swishes, a hit on the cutout's first impact, ticks (Motion DNA add_sound)",
+  "derechos": "in-app music does not cover boosting, sponsored posts or re-uploads; no AI likenesses of real musicians; press-kit images with credit or the artist's permission"
+ },
+ "estetica": "Modern bricolage, not vintage collage: black-and-white photocopy cutout of the artist, fluorescent gaffer tape graded to the palette, Sharpie marks, vinyl stickers, acetate, office hardware, torn paper strips. All color comes from the craft materials; the subject stays black and white. No sepia, aged paper, newspaper clippings or typewriter text.",
+ "reglas": [
+  "Everything on screen and in the voice is in English.",
+  "The presenter is a floating art-toy head with no hands: every gesture is a face or head move.",
+  "Funny hook first (the strangest true detail), then who/where/when on the bricolage portrait.",
+  "The artwork is the star of every B line: slow drifts, magnifier cards on details, a zoom-out reveal; never a static still.",
+  "Facts are checked against a source before publishing (the source scripts still need it).",
+  "Captions on every second: Poppins SemiBold, 2-4 words per group, the spoken word in amber.",
+  "Close with a two-option question, 'tell me in the comments' with the CTA pill, and a last joke.",
+  "Music is added in the app, not in the export.",
+  "No brand logo in the video; no AI likeness of real musicians.",
+  "Never publish ccc through the Cult Pixel connections; ccc has its own accounts (not connected yet)."
+ ],
+ "notas": [
+  "2026-11-07: brand set up from the Bosch template (AE project, final video, handoff). Nothing generated yet."
+ ],
+ "figma": {
+  "url": "https://www.figma.com/design/wtJ4aT1vMnifzVnsA9Bkqz/test",
+  "file_key": "wtJ4aT1vMnifzVnsA9Bkqz",
+  "pagina": "CCC · Cool Culture Club"
+ },
+ "referencia": "references/bosch_final_v1.mp4 (Bosch, 56 s) + references/bosch_template/ (AE project, handoff, dump)",
+ "publicar": {
+  "estado": "NOT PUBLISHED: separate account and project. The publishing connections in this setup (Zapier YouTube/Instagram, PostWire TikTok) belong to Cult Pixel and must never be used for ccc.",
+  "cuentas": null
+ },
+ "voz_id": "6u6JbqKdaQy89ENzLSju"
+}

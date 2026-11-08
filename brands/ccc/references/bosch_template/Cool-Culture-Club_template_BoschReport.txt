@@ -1,0 +1,142 @@
+Report created: 
+	11/6/2026	6:01:29 PM
+
+Project name: Cool-Culture-Club_template_Bosch.aep
+
+Source files collected to: 
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\Cool-Culture-Club_template_Bosch folder
+
+Source files collected: All
+
+Collected comps:  
+	CCC Avatar Plate
+	Hieronymus Bosch (9x16) · MASTER
+	CCC Avatar Plate B
+	Slide 01 · THE GARDEN OF EARTHLY DELIGHTS
+	Slide 02 · HELL  ·  RIGHT WING
+	Slide 03 · THE HAYWAIN TRIPTYCH
+	Slide 04 · THE TEMPTATION OF ST ANTHONY
+	Slide 05 · THE SHIP OF FOOLS
+	Art Carousel (9x16)
+	Art Slider (9x16)
+	Detail Zoom (9x16)
+	Bosch · Detail Zoom · L03 (Avatar_3D)
+	Art Strip (9x16)
+	Art Scroll (9x16)
+	CCC · Kinetic Type (9x16)
+	CCC · Kinetic Type Wall (9x16)
+	Bosch · Bricolage Portrait (9x16)
+	Bosch · Quote · L06 (Avatar_3D)
+	Ken Burns Details (9x16)
+	Hieronymus Bosch (9x16) · MASTER SUBS
+	
+Number of collected files:  62
+
+Size of collected files:  120 MB
+
+Collected source files: 
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\03_Footage\AI Gen\CCC Avatar Test_Seedance 2.mp4
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\03_Footage\AI Gen\CCC Avatar Test_Seedance 2_B.mp4
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\03_Footage\bosch_bricolage\layers_ccc\A_bosch_cutout.png
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\03_Footage\bosch_bricolage\layers_ccc\C_name_label.png
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\03_Footage\bricolage_kit\layers_ccc\B_tape_black.png
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\03_Footage\bricolage_kit\layers_ccc\B_tape_orange_creased.png
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\03_Footage\bricolage_kit\layers_ccc\B_tape_pink_long.png
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\03_Footage\bricolage_kit\layers_ccc\B_tape_yellow.png
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\03_Footage\bricolage_kit\layers_ccc\D_mark_halo.png
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\03_Footage\bricolage_kit\layers_ccc\D_mark_num1.png
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\03_Footage\bricolage_kit\layers_ccc\D_mark_x_pink.png
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\03_Footage\bricolage_kit\layers_ccc\F_price_tag.png
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\03_Footage\bricolage_kit\layers_ccc\G_tape_tabs_01.png
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\03_Footage\bricolage_kit\layers_ccc\G_tape_tabs_02.png
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\03_Footage\bricolage_kit\layers_ccc\G_tape_tabs_07.png
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\03_Footage\bricolage_kit\layers_ccc\H_marker_scribbles_05.png
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\03_Footage\bricolage_kit\layers_ccc\H_marker_scribbles_12.png
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\03_Footage\bricolage_kit\layers_ccc\I_paint_marks_08.png
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\03_Footage\bricolage_kit\layers_ccc\J_paper_shapes_01.png
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\03_Footage\bricolage_kit\layers_ccc\J_paper_shapes_07.png
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\03_Footage\bricolage_kit\layers_ccc\K_torn_paper_03.png
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\03_Footage\bricolage_kit\layers_ccc\K_torn_paper_05.png
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\03_Footage\bricolage_kit\layers_ccc\K_torn_paper_06.png
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\03_Footage\bricolage_kit\layers_ccc\L_stickers_02.png
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\03_Footage\bricolage_kit\layers_ccc\L_stickers_06.png
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\03_Footage\bricolage_kit\layers_ccc\L_stickers_09.png
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\03_Footage\bricolage_kit\layers_ccc\L_stickers_14.png
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\03_Footage\bricolage_kit\layers_ccc\L_stickers_16.png
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\03_Footage\bricolage_kit\layers_ccc\M_hardware_01.png
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\03_Footage\bricolage_kit\layers_ccc\M_hardware_05.png
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\03_Footage\bricolage_kit\layers_ccc\N_print_textures_01.png
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\03_Footage\bricolage_kit\layers_ccc\N_print_textures_03.png
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\03_Footage\bricolage_kit\layers_ccc\N_print_textures_07.png
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\05_AE\sound\03 Hieronymus Bosch (9x16) · Avatar_3D_mdna_sound.wav
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\05_AE\sound\Bosch · Art Scroll (9x16)_mdna_sound.wav
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\05_AE\sound\Bosch · Art Slider (9x16)_mdna_sound.wav
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\05_AE\sound\Bosch · Art Strip (9x16)_mdna_sound.wav
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\05_AE\sound\Bosch · Bricolage Portrait (9x16)_mdna_sound.wav
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\05_AE\sound\Bosch · Detail Zoom (9x16)_mdna_sound.wav
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\05_AE\sound\Bosch · Ken Burns Details (9x16)_mdna_sound.wav
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\05_AE\sound\Bosch · Quote · L06 (Avatar_3D)_mdna_sound.wav
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\05_AE\sound\CCC · Kinetic Type (9x16)_mdna_sound.wav
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\05_AE\sound\CCC · Kinetic Type Wall (9x16)_mdna_sound.wav
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\06_Renders\CCC · Kinetic Type Wall (9x16).mp4
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\COLLECT_shorts_arte (1)\COLLECT_shorts_arte\Footage\03 Hieronymus Bosch (9x16) media\00_retrato_arras.jpg
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\COLLECT_shorts_arte (1)\COLLECT_shorts_arte\Footage\03 Hieronymus Bosch (9x16) media\01_garden_full.jpg
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\COLLECT_shorts_arte (1)\COLLECT_shorts_arte\Footage\03 Hieronymus Bosch (9x16) media\02_garden_paradise.jpg
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\COLLECT_shorts_arte (1)\COLLECT_shorts_arte\Footage\03 Hieronymus Bosch (9x16) media\03_hell_panel.jpg
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\COLLECT_shorts_arte (1)\COLLECT_shorts_arte\Footage\03 Hieronymus Bosch (9x16) media\04_hell_detail.jpg
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\COLLECT_shorts_arte (1)\COLLECT_shorts_arte\Footage\03 Hieronymus Bosch (9x16) media\05_temptation.jpg
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\COLLECT_shorts_arte (1)\COLLECT_shorts_arte\Footage\03 Hieronymus Bosch (9x16) media\06_haywain.jpg
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\COLLECT_shorts_arte (1)\COLLECT_shorts_arte\Footage\03 Hieronymus Bosch (9x16) media\07_ship_of_fools.jpg
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\COLLECT_shorts_arte (1)\COLLECT_shorts_arte\Footage\03 Hieronymus Bosch (9x16) media\L01.wav
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\COLLECT_shorts_arte (1)\COLLECT_shorts_arte\Footage\03 Hieronymus Bosch (9x16) media\L02.wav
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\COLLECT_shorts_arte (1)\COLLECT_shorts_arte\Footage\03 Hieronymus Bosch (9x16) media\L03.wav
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\COLLECT_shorts_arte (1)\COLLECT_shorts_arte\Footage\03 Hieronymus Bosch (9x16) media\L04.wav
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\COLLECT_shorts_arte (1)\COLLECT_shorts_arte\Footage\03 Hieronymus Bosch (9x16) media\L06.wav
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\COLLECT_shorts_arte (1)\COLLECT_shorts_arte\Footage\03 Hieronymus Bosch (9x16) media\L07.wav
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\COLLECT_shorts_arte (1)\COLLECT_shorts_arte\Footage\03 Hieronymus Bosch (9x16) media\L08.wav
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\COLLECT_shorts_arte (1)\COLLECT_shorts_arte\Footage\03 Hieronymus Bosch (9x16) media\L09.wav
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\COLLECT_shorts_arte (1)\COLLECT_shorts_arte\Footage\03 Hieronymus Bosch (9x16) media\L10.wav
+	C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club\COLLECT_shorts_arte (1)\COLLECT_shorts_arte\Footage\03 Hieronymus Bosch (9x16) media\quote_card.png
+	
+Rendering plug-ins:
+	Classic 3D
+	
+Effects used:  14
+
+Effect:  Brightness & Contrast
+	
+Effect:  Checkbox Control
+	
+Effect:  Color Control
+	
+Effect:  Drop Shadow
+	
+Effect:  Dropdown Menu Control
+	
+Effect:  Fill
+	
+Effect:  Fractal Noise
+	
+Effect:  Gaussian Blur
+	
+Effect:  Gradient Ramp
+	
+Effect:  Linear Wipe
+	
+Effect:  Lumetri Color
+	
+Effect:  Point Control
+	
+Effect:  Roto Brush & Refine Edge
+	
+Effect:  Slider Control
+	
+
+Layer:  Text Layer
+	External dependencies:  
+		Font family: “Bahnschrift”, Font style: “Light”
+		Font family: “Instrument Serif”, Font style: “Italic”
+		Font family: “Inter Tight”, Font style: “Bold”
+		Font family: “Poppins”, Font style: “SemiBold”
+		Font family: “Suisse Int'l Mono”, Font style: “Regular”
+

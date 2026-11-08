@@ -1,0 +1,258 @@
+{
+ "slug": "ep05_durer",
+ "marca": "ccc",
+ "plantilla": "ccc_artist_short",
+ "estilo": "ccc_bricolage",
+ "personaje": "ccc_girl",
+ "numero": 5,
+ "artista": "Albrecht Dürer",
+ "fechas": "Nuremberg, Germany · around 1500",
+ "lema": "the man who drew a rhino he never saw",
+ "tema": "Albrecht Dürer: the rhino he never saw, his AD logo and the first fight over a copied logo",
+ "voz": "6u6JbqKdaQy89ENzLSju",
+ "ia_disclosure": true,
+ "musica": null,
+ "duracion_objetivo_s": 56,
+ "retrato": "autorretrato",
+ "ritmo_b": 1.1,
+ "pausa_b": 0.25,
+ "pausa_max": 0.4,
+ "inicios": {
+  "L01": "../../characters/ccc_girl/master.png",
+  "L03": "../../characters/ccc_girl/master.png",
+  "L05": "../../characters/ccc_girl/master.png",
+  "L08": "../../characters/ccc_girl/master.png",
+  "L10": "../../characters/ccc_girl/master.png"
+ },
+ "sustituir": {
+  "Durer": "Dürer",
+  "Durer's": "Dürer's"
+ },
+ "lineas": [
+  {
+   "id": "L01",
+   "tipo": "A",
+   "texto": "The most famous rhino in art history was drawn by a guy who never saw a rhino.",
+   "tts": "The most famous rhino in art history... was drawn by a guy who never saw a rhino. [laughs]",
+   "accion": "she leans in with a scandalised grin, eyes dart left and right as if sharing gossip, then eyebrows shoot up and she snorts a laugh on 'never saw a rhino'. She keeps her face toward the lens for the punchline. No hands, no body."
+  },
+  {
+   "id": "L02",
+   "tipo": "B",
+   "texto": "Albrecht Dürer. Nuremberg, Germany, around 1500. Yes, that's his selfie.",
+   "tts": "[playful] Albrecht Dürer. Nuremberg, Germany, around 1500. [giggles] Yes... that's his selfie.",
+   "obras": []
+  },
+  {
+   "id": "L03",
+   "tipo": "A",
+   "texto": "Look closely at the rhino. Armor plates, scaly legs, and a tiny extra horn on its back.",
+   "tts": "Look closely at the rhino. Armor plates, scaly legs... and a tiny extra horn on its back.",
+   "accion": "she squints one eye and pushes toward the lens as if through a magnifying glass on 'look closely', eyes snap wide on 'armor plates', then a slow smirk on 'extra horn'. She keeps her face toward the lens for the punchline. No hands, no body."
+  },
+  {
+   "id": "L04",
+   "tipo": "B",
+   "texto": "In 1515 a real rhino reached Lisbon. Dürer only got a letter and a sketch. His version stayed in school books for four hundred years.",
+   "tts": "[excited] In 1515 a real rhino reached Lisbon. [sarcastic] Dürer only got a letter... and a sketch. [impressed] His version stayed in school books for four hundred years.",
+   "obras": []
+  },
+  {
+   "id": "L05",
+   "tipo": "A",
+   "texto": "And here's the thing: he was a total brand. He signed everything with his AD logo.",
+   "tts": "And here's the thing: he was a total brand. He signed everything with his A, D logo.",
+   "accion": "one eyebrow up and a slight lean in on 'here's the thing', an exaggerated proud nod on 'total brand', a wink on 'logo'. She keeps her face toward the lens for the punchline. No hands, no body."
+  },
+  {
+   "id": "L06",
+   "tipo": "B",
+   "texto": "Art is hidden in nature. Whoever can tear it out, has it.",
+   "tts": "[dramatic] Art is hidden in nature. [whispers] Whoever can tear it out... has it.",
+   "obras": [
+    "__cita__"
+   ]
+  },
+  {
+   "id": "L07",
+   "tipo": "B",
+   "texto": "When a printer in Venice copied his prints, logo and all, Dürer went to the government. They protected the logo.",
+   "tts": "[gossipy] When a printer in Venice copied his prints, logo and all... [dramatic] Dürer went to the government. [smug] They protected the logo.",
+   "obras": []
+  },
+  {
+   "id": "L08",
+   "tipo": "A",
+   "texto": "So scholars still argue. Was he a scientist, or the first artist influencer?",
+   "tts": "So scholars still argue. Was he a scientist... or the first artist influencer?",
+   "accion": "her head tilts to one side on 'scientist', then swings to the other side with a mocking pout on 'influencer'. She keeps her face toward the lens for the punchline. No hands, no body."
+  },
+  {
+   "id": "L09",
+   "tipo": "B",
+   "texto": "He painted a hare so real you can count the hairs, and a rhino he made up.",
+   "tts": "[amazed] He painted a hare so real you can count the hairs... [laughs] and a rhino he made up.",
+   "obras": []
+  },
+  {
+   "id": "L10",
+   "tipo": "A",
+   "texto": "Genius or hype man? Tell me in the comments. I'm off to draw a rhino from memory.",
+   "tts": "Genius... or hype man? Tell me in the comments. [laughs] I'm off to draw a rhino from memory.",
+   "accion": "eyes roll up thinking on 'genius', a sly side glance on 'hype man', back to the lens on 'tell me in the comments', and a wink with a laugh at the end. She keeps her face toward the lens for the punchline. No hands, no body."
+  }
+ ],
+ "cita": {
+  "lineas": [
+   "Art is hidden",
+   "in nature. Whoever",
+   "can tear it out,",
+   "has it."
+  ],
+  "autor": "— Albrecht Dürer, 1528",
+  "clave": "nature"
+ },
+ "momentos_a": {
+  "L01": [
+   [
+    "obra",
+    "rinoceronte",
+    "rhino"
+   ]
+  ],
+  "L03": [
+   [
+    "obra",
+    "rinoceronte",
+    "rhino"
+   ]
+  ],
+  "L05": [
+   [
+    "obra",
+    "autorretrato",
+    "logo"
+   ]
+  ]
+ },
+ "obras_b": {
+  "L02": [
+   [
+    "autorretrato",
+    "selfie"
+   ]
+  ],
+  "L04": [
+   [
+    "rinoceronte",
+    "lisbon"
+   ]
+  ],
+  "L07": [
+   [
+    "melencolia",
+    "venice"
+   ],
+   [
+    "manos",
+    "protected"
+   ]
+  ],
+  "L09": [
+   [
+    "liebre",
+    "hare"
+   ],
+   [
+    "rinoceronte",
+    "rhino"
+   ]
+  ]
+ },
+ "titulos": {
+  "autorretrato": [
+   "Self-Portrait",
+   "1500"
+  ],
+  "rinoceronte": [
+   "The Rhinoceros",
+   "woodcut, 1515"
+  ],
+  "liebre": [
+   "Young Hare",
+   "watercolour, 1502"
+  ],
+  "manos": [
+   "Praying Hands",
+   "1508"
+  ],
+  "melencolia": [
+   "Melencolia I",
+   "engraving, 1514"
+  ]
+ },
+ "detalles": {
+  "rinoceronte": [
+   {
+    "palabra": "plates",
+    "foco": [
+     0.33,
+     0.42
+    ],
+    "x": 2.2
+   },
+   {
+    "palabra": "horn",
+    "foco": [
+     0.655,
+     0.24
+    ],
+    "x": 6.5
+   }
+  ]
+ },
+ "palabras_clave": [
+  [
+   "L01",
+   "rhino",
+   "never saw a rhino"
+  ],
+  [
+   "L05",
+   "brand",
+   "total brand"
+  ],
+  [
+   "L10",
+   "comments",
+   "tell me in the comments"
+  ]
+ ],
+ "juntas": [
+  [
+   "albrecht",
+   "dürer"
+  ],
+  [
+   "a",
+   "d"
+  ],
+  [
+   "hype",
+   "man"
+  ],
+  [
+   "ad",
+   "logo"
+  ]
+ ],
+ "etiqueta_nombre": "ALBRECHT DÜRER",
+ "fuentes": [
+  "https://en.wikipedia.org/wiki/D%C3%BCrer%27s_Rhinoceros",
+  "https://en.wikipedia.org/wiki/Marcantonio_Raimondi"
+ ],
+ "gancho": "He never saw a rhino",
+ "continuacion": {
+  "L10": "she keeps the closed-mouth smug smile toward the lens, gives a tiny proud head tilt, then a slow playful wink, and settles back to a satisfied smile looking straight at the camera"
+ }
+}

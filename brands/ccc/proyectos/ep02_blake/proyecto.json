@@ -1,0 +1,236 @@
+{
+ "slug": "ep02_blake",
+ "marca": "ccc",
+ "plantilla": "ccc_artist_short",
+ "estilo": "ccc_bricolage",
+ "personaje": "ccc_girl",
+ "motor_clips": "seedance",
+ "numero": 2,
+ "artista": "William Blake",
+ "fechas": "London, England · around 1800",
+ "lema": "the poet who painted the ghost of a flea",
+ "tema": "William Blake: visions, the ghost of a flea, a printing method of his own",
+ "voz": "6u6JbqKdaQy89ENzLSju",
+ "ia_disclosure": true,
+ "musica": null,
+ "duracion_objetivo_s": 56,
+ "retrato": "retrato",
+ "ritmo_b": 1.1,
+ "pausa_b": 0.25,
+ "pausa_max": 0.4,
+ "inicios": {
+  "L01": "../../characters/ccc_girl/master.png",
+  "L03": "../../characters/ccc_girl/master.png",
+  "L05": "../../characters/ccc_girl/master.png",
+  "L08": "../../characters/ccc_girl/master.png",
+  "L10": "../../characters/ccc_girl/master.png"
+ },
+ "lineas": [
+  {
+   "id": "L01",
+   "tipo": "A",
+   "texto": "This painting is the ghost of a flea. And the artist swears he saw it in person.",
+   "accion": "she leans in with a scandalised grin on 'ghost of a flea', eyes dart left and right, then eyebrows shoot up on 'saw it in person'. She keeps her face toward the lens for the punchline. No hands, no body."
+  },
+  {
+   "id": "L02",
+   "tipo": "B",
+   "texto": "William Blake. London, around 1800. Poet, painter, printmaker... and full-time seer of things.",
+   "tts": "[playful] William Blake. London, around 1800. Poet, painter, printmaker... [giggles] and full-time seer of things.",
+   "obras": []
+  },
+  {
+   "id": "L03",
+   "tipo": "A",
+   "texto": "Look closely. Glaring eyes, a bowl of blood, and a tongue that just won't stop.",
+   "accion": "she squints one eye and pushes toward the lens as if through a magnifying glass on 'look closely', eyes snap wide in mock horror on 'bowl of blood', then a grossed-out smirk on 'tongue'. She keeps her face toward the lens for the punchline. No hands, no body."
+  },
+  {
+   "id": "L04",
+   "tipo": "B",
+   "texto": "In 1819 a friend asked him to draw a flea's spirit. Blake said it was standing right there, and drew its mouth separately.",
+   "tts": "[gossipy] In 1819 a friend asked him to draw a flea's spirit. [excited] Blake said it was standing right there... [sarcastic] and drew its mouth separately.",
+   "obras": []
+  },
+  {
+   "id": "L05",
+   "tipo": "A",
+   "texto": "And here's the thing: as a kid he said he saw angels in the haystacks. He never stopped seeing them.",
+   "accion": "one eyebrow up and a slight lean in on 'here's the thing', a dreamy look up on 'angels in the haystacks', then a knowing nod on 'never stopped'. She keeps her face toward the lens for the punchline. No hands, no body."
+  },
+  {
+   "id": "L06",
+   "tipo": "B",
+   "texto": "If the doors of perception were cleansed, everything would appear as it is: infinite.",
+   "tts": "[dramatic] If the doors of perception were cleansed... [whispers] everything would appear as it is: infinite.",
+   "obras": [
+    "__cita__"
+   ]
+  },
+  {
+   "id": "L07",
+   "tipo": "B",
+   "texto": "He invented his own printing method, colored the books by hand with his wife Catherine, and sold fewer than thirty copies of his famous Songs.",
+   "tts": "[impressed] He invented his own printing method, colored the books by hand with his wife Catherine... [sarcastic] and sold fewer than thirty copies of his famous Songs.",
+   "obras": []
+  },
+  {
+   "id": "L08",
+   "tipo": "A",
+   "texto": "So people still argue. Was he a genius, or just a little bit mad?",
+   "accion": "her head tilts to one side on 'genius', then swings to the other side with a mocking pout on 'a little bit mad'. She keeps her face toward the lens for the punchline. No hands, no body."
+  },
+  {
+   "id": "L09",
+   "tipo": "B",
+   "texto": "He was buried in an unmarked grave in 1827. The spot was only marked in 2018.",
+   "tts": "[sad] He was buried in an unmarked grave in 1827. [surprised] The spot was only marked in 2018.",
+   "obras": []
+  },
+  {
+   "id": "L10",
+   "tipo": "A",
+   "texto": "Visionary or mad? Tell me in the comments. I'm off to check the haystacks for angels.",
+   "accion": "eyes roll up thinking on 'visionary', a sly side glance on 'mad', back to the lens on 'tell me in the comments', and a wink with a laugh at the end. She keeps her face toward the lens for the punchline. No hands, no body."
+  }
+ ],
+ "cita": {
+  "lineas": [
+   "If the doors",
+   "of perception were",
+   "cleansed, everything",
+   "would appear infinite."
+  ],
+  "autor": "— William Blake, 1790",
+  "clave": "infinite"
+ },
+ "momentos_a": {
+  "L01": [
+   [
+    "obra",
+    "pulga",
+    "flea"
+   ]
+  ],
+  "L03": [
+   [
+    "obra",
+    "pulga",
+    "closely"
+   ]
+  ],
+  "L05": [
+   [
+    "obra",
+    "anciano",
+    "angels"
+   ]
+  ]
+ },
+ "obras_b": {
+  "L04": [
+   [
+    "pulga",
+    "spirit"
+   ]
+  ],
+  "L07": [
+   [
+    "tigre",
+    "printing"
+   ],
+   [
+    "newton",
+    "songs"
+   ]
+  ],
+  "L09": [
+   [
+    "dragon",
+    "unmarked"
+   ],
+   [
+    "anciano",
+    "marked"
+   ]
+  ]
+ },
+ "titulos": {
+  "retrato": [
+   "Portrait by Thomas Phillips",
+   "1807"
+  ],
+  "pulga": [
+   "The Ghost of a Flea",
+   "c. 1819-20"
+  ],
+  "anciano": [
+   "The Ancient of Days",
+   "1794"
+  ],
+  "newton": [
+   "Newton",
+   "1795"
+  ],
+  "dragon": [
+   "The Great Red Dragon",
+   "c. 1805"
+  ],
+  "tigre": [
+   "The Tyger",
+   "Songs of Experience, 1794"
+  ]
+ },
+ "detalles": {
+  "pulga": [
+   {
+    "palabra": "eyes",
+    "foco": [
+     0.56,
+     0.2
+    ],
+    "x": 2.2
+   },
+   {
+    "palabra": "blood",
+    "foco": [
+     0.24,
+     0.42
+    ],
+    "x": 6.5
+   }
+  ]
+ },
+ "palabras_clave": [
+  [
+   "L01",
+   "flea",
+   "ghost of a flea"
+  ],
+  [
+   "L05",
+   "angels",
+   "angels in the haystacks"
+  ],
+  [
+   "L10",
+   "comments",
+   "tell me in the comments"
+  ]
+ ],
+ "juntas": [
+  [
+   "william",
+   "blake"
+  ]
+ ],
+ "etiqueta_nombre": "WILLIAM BLAKE",
+ "continuacion": {
+  "L10": "she keeps the closed-mouth smug smile toward the lens, a tiny head tilt, a slow playful wink, and settles back to a satisfied smile looking straight at the camera"
+ },
+ "fuentes": [
+  "https://en.wikipedia.org/wiki/William_Blake",
+  "https://en.wikipedia.org/wiki/The_Ghost_of_a_Flea"
+ ],
+ "gancho": "He saw a flea ghost"
+}

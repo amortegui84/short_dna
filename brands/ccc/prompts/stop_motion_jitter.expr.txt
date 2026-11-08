@@ -1,0 +1,2 @@
+// stop-motion jitter once the piece has landed
+if (time < inPoint + 0.9) value; else { posterizeTime(6); seedRandom(index, true); value + (wiggle(1, 1.2) - value); }

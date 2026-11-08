@@ -1,0 +1,104 @@
+{
+ "slug": "ccc_artist_short",
+ "nombre": "Cool Culture Club: artist short",
+ "duracion_s": 56,
+ "campo_tema": "artista",
+ "estructura": [
+  {
+   "seccion": "gancho",
+   "linea": "L01",
+   "tipo": "A",
+   "modulo": "avatar_plate",
+   "regla": "the strangest true detail about the artist in one cheeky sentence (Bosch: 'Someone painted sheet music on a man's butt... 500 years ago.'); one punch-in on the punchline"
+  },
+  {
+   "seccion": "ficha",
+   "linea": "L02",
+   "tipo": "B",
+   "modulo": "bricolage_portrait + artwork",
+   "regla": "name, country, year on the bricolage portrait, then the most famous work drifting"
+  },
+  {
+   "seccion": "mira",
+   "linea": "L03",
+   "tipo": "A",
+   "modulo": "avatar_plate -> detail_zoom",
+   "regla": "'look closely at...': the presenter sends us into the painting; the magnifier cards land on the details named"
+  },
+  {
+   "seccion": "dato",
+   "linea": "L04",
+   "tipo": "B",
+   "modulo": "artwork details + reveal",
+   "regla": "the modern twist (Bosch: a student recorded the butt song in 2014); push-ins on details, then zoom out to the whole panel"
+  },
+  {
+   "seccion": "giro",
+   "linea": "L05",
+   "tipo": "A",
+   "modulo": "avatar_plate",
+   "regla": "'and here's the thing': what we don't know or nobody expects"
+  },
+  {
+   "seccion": "cita",
+   "linea": "L06",
+   "tipo": "B",
+   "modulo": "quote_card",
+   "regla": "one real quote from or about the artist, with source"
+  },
+  {
+   "seccion": "historia",
+   "linea": "L07",
+   "tipo": "B",
+   "modulo": "artwork x2",
+   "regla": "a patron, a scandal or a fan (Bosch: Philip II collected him); two works, one per sentence"
+  },
+  {
+   "seccion": "debate",
+   "linea": "L08",
+   "tipo": "A",
+   "modulo": "avatar_plate -> artworks",
+   "regla": "the open question scholars argue about, as two options shown on two works"
+  },
+  {
+   "seccion": "respiro",
+   "linea": "L09",
+   "tipo": "B",
+   "modulo": "artworks",
+   "regla": "'nobody knows, and maybe that's the point'"
+  },
+  {
+   "seccion": "cierre",
+   "linea": "L10",
+   "tipo": "A",
+   "modulo": "avatar_plate + cta_button",
+   "regla": "two-option question ('Saint? Secret rebel?'), 'tell me in the comments' with the pill, a last joke that calls back the hook"
+  }
+ ],
+ "reglas": [
+  "About 140 words, 55-60 s.",
+  "A lines are written for a head with no hands: describe face and head moves.",
+  "Names the model may mispronounce carry a guide in brackets.",
+  "Each B line names the artwork it shows with a clear word so the cut lands on it."
+ ],
+ "proyecto_base": {
+  "artista": "",
+  "presentador": "ccc_girl",
+  "lineas": [],
+  "obras": {},
+  "cita": {
+   "lineas": [],
+   "autor": ""
+  },
+  "retrato_recorte": "",
+  "etiqueta_nombre": "",
+  "fuentes": []
+ },
+ "episodios_previstos": [
+  "01 Hilma af Klint",
+  "02 William Blake",
+  "03 Hieronymus Bosch (reference cut done)",
+  "04 Odilon Redon",
+  "05 Albrecht Durer"
+ ]
+}

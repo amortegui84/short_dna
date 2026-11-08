@@ -1,0 +1,475 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Cool Culture Club Handoff</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a single reading column with a sticky contents rail on wide screens; each section is one part of the pipeline, in the order the work happens. */
+:root {
+  --bg: #F6F7F5;
+  --surface: #FFFFFF;
+  --ink: #1B2421;
+  --muted: #5B6662;
+  --line: #DCE1DE;
+  --coral: #E5482F;
+  --teal: #2C6B5E;
+  --magenta: #B81F6E;
+  --code-bg: #EEF1EF;
+  --warn-bg: #FCEDEA;
+  --display: "Bricolage Grotesque", "Arial Narrow", system-ui, sans-serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121816; --surface: #1A2220; --ink: #E7ECE9; --muted: #9AA6A1; --line: #2C3633;
+    --coral: #FF7A62; --teal: #5FB3A0; --magenta: #F06AAE; --code-bg: #0E1412; --warn-bg: #3A201B;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121816; --surface: #1A2220; --ink: #E7ECE9; --muted: #9AA6A1; --line: #2C3633;
+  --coral: #FF7A62; --teal: #5FB3A0; --magenta: #F06AAE; --code-bg: #0E1412; --warn-bg: #3A201B;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15.5px; line-height: 1.6; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-block: 40px 80px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 48px; }
+nav { position: sticky; top: calc(24px + env(safe-area-inset-top, 0px)); align-self: start; font-size: 13.5px; }
+nav p { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; }
+nav ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+nav a { color: var(--muted); text-decoration: none; display: block; padding: 3px 0 3px 10px; border-left: 2px solid var(--line); }
+nav a:hover, nav a:focus-visible { color: var(--ink); border-left-color: var(--coral); outline: none; }
+main { min-width: 0; max-width: 800px; }
+header { padding-bottom: 28px; border-bottom: 1px solid var(--line); margin-bottom: 8px; }
+.eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--teal); margin: 0 0 10px; }
+h1 { font-family: var(--display); font-weight: 700; font-size: clamp(34px, 5vw, 50px); line-height: 1.05; margin: 0 0 14px; text-wrap: balance; letter-spacing: -.01em; }
+h1 span { color: var(--coral); }
+.lede { font-size: 17px; color: var(--muted); margin: 0; max-width: 62ch; }
+.meta { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 18px; font-family: var(--mono); font-size: 12.5px; color: var(--muted); }
+section { padding-top: 40px; scroll-margin-top: 20px; }
+h2 { font-family: var(--display); font-weight: 700; font-size: 26px; line-height: 1.15; margin: 0 0 12px; text-wrap: balance; }
+h3 { font-family: var(--body); font-weight: 600; font-size: 16px; margin: 26px 0 8px; }
+p, li { max-width: 68ch; }
+ul, ol.steps { padding-left: 20px; margin: 8px 0; }
+li { margin: 4px 0; }
+a { color: var(--teal); }
+code { font-family: var(--mono); font-size: .88em; background: var(--code-bg); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+.table { overflow-x: auto; margin: 12px 0; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; vertical-align: top; padding: 9px 12px; border-bottom: 1px solid var(--line); }
+th { font-family: var(--mono); font-size: 11.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 500; background: var(--code-bg); }
+tr:last-child td { border-bottom: 0; }
+td code { white-space: nowrap; }
+.swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin: 12px 0; }
+.sw { border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--surface); font-size: 13px; }
+.sw i { display: block; height: 44px; }
+.sw div { padding: 6px 10px; }
+.sw b { display: block; font-weight: 600; }
+.sw span { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+details.prompt { border: 1px solid var(--line); border-radius: 8px; background: var(--surface); margin: 10px 0; }
+details.prompt summary { cursor: pointer; padding: 10px 14px; font-weight: 600; font-size: 14.5px; display: flex; justify-content: space-between; gap: 12px; align-items: center; list-style: none; }
+details.prompt summary::-webkit-details-marker { display: none; }
+details.prompt summary::after { content: "Show"; font-family: var(--mono); font-size: 12px; color: var(--teal); font-weight: 500; }
+details.prompt[open] summary::after { content: "Hide"; }
+details.prompt summary:focus-visible { outline: 2px solid var(--teal); outline-offset: -2px; border-radius: 8px; }
+.pbody { position: relative; border-top: 1px solid var(--line); }
+pre { margin: 0; padding: 14px 16px; font-family: var(--mono); font-size: 12.5px; line-height: 1.55; white-space: pre-wrap; overflow-wrap: anywhere; background: var(--code-bg); border-radius: 0 0 8px 8px; }
+.copy { position: absolute; top: 8px; right: 8px; font-family: var(--mono); font-size: 12px; padding: 4px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); color: var(--ink); cursor: pointer; }
+.copy:hover, .copy:focus-visible { border-color: var(--teal); outline: none; }
+.issue { border-left: 3px solid var(--coral); background: var(--surface); border-radius: 0 8px 8px 0; padding: 10px 14px; margin: 10px 0; border-top: 1px solid var(--line); border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.issue b { display: block; margin-bottom: 2px; }
+.issue p { margin: 4px 0; font-size: 14.5px; }
+.todo { list-style: none; padding: 0; display: grid; gap: 8px; }
+.todo li { display: grid; grid-template-columns: 22px 1fr; gap: 8px; max-width: none; }
+.todo li::before { content: ""; width: 14px; height: 14px; border: 2px solid var(--teal); border-radius: 3px; margin-top: 5px; }
+.note { font-size: 14px; color: var(--muted); }
+.num { font-variant-numeric: tabular-nums; }
+@media (max-width: 860px) {
+  .wrap { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  nav { position: static; }
+  nav ol { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+}
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+
+<div class="wrap">
+<nav aria-label="Contents">
+  <p>Contents</p>
+  <ol>
+    <li><a href="#overview">Overview</a></li>
+    <li><a href="#files">Where things live</a></li>
+    <li><a href="#presenters">Presenter avatars</a></li>
+    <li><a href="#video">Avatar video (Seedance)</a></li>
+    <li><a href="#scripts">Scripts</a></li>
+    <li><a href="#kit">Bricolage kit</a></li>
+    <li><a href="#color">Color system</a></li>
+    <li><a href="#ae">Portrait and quote in AE</a></li>
+    <li><a href="#gotchas">Problems and fixes</a></li>
+    <li><a href="#costs">Weave and costs</a></li>
+    <li><a href="#music">Music on Shorts</a></li>
+    <li><a href="#next">Open items</a></li>
+  </ol>
+</nav>
+
+<main>
+<header>
+  <p class="eyebrow">Handoff · Cool Culture Club · Nov 2026</p>
+  <h1>Cool Culture Club: <span>where the project stands</span></h1>
+  <p class="lede">Everything decided and built so far for the Cool Culture Club shorts: the two presenter avatars, the Bosch episode assets, a reusable bricolage kit for artist portraits, the color system that ties them together, and the After Effects builds.</p>
+  <div class="meta"><span>Project root: <code>C:\Documentos\Trabajos Clientes\FL\Cool Culture Club\cool-culture-club</code></span><span>Prepared by Gian Orsi with Claude</span></div>
+</header>
+
+<section id="overview">
+  <h2>Overview</h2>
+  <p>Cool Culture Club is a creator account that celebrates artists and creators: classic painters like Hieronymus Bosch, and later music artists. Each episode is a vertical short (1080×1920, 30 fps) where a synthetic 3D presenter tells the story, intercut with the artist's work, a bricolage portrait of the artist and a quote card.</p>
+  <h3>What exists today</h3>
+  <ul>
+    <li><b>Two presenters</b>: a girl with a backwards orange-to-fuchsia cap on a green or coral background, and a guy with dreadlocks on a magenta-red background. Image and video prompts are below.</li>
+    <li><b>Bosch episode</b>: script, presenter clips, a <b>bricolage portrait</b> (<code>CCC_Bosch_Bricolage_Portrait_V1.mp4</code>) and a <b>quote card</b> (<code>CCC_Bosch_Quote_V1.mp4</code>), each 6 s with sound.</li>
+    <li><b>Bricolage kit</b>: 125 transparent PNG elements (gaffer tape, marker, paint, paper, stickers, hardware, print textures, frames) for building portraits of any artist.</li>
+    <li><b>Color system</b>: the kit is graded to the presenters' palette, with a .cube LUT for After Effects.</li>
+  </ul>
+  <h3>The creative direction</h3>
+  <p>Modern bricolage, not vintage collage: a black-and-white photocopy cutout of the artist, surrounded by fluorescent gaffer tape, Sharpie marks, vinyl stickers, acetate and office hardware. No sepia, aged paper, newspaper clippings or typewriter text. All color comes from the craft materials, and the subject stays black and white.</p>
+</section>
+
+<section id="files">
+  <h2>Where things live</h2>
+  <p>All paths are relative to the project root. The Motion DNA library itself lives in <code>C:/Documentos/Trabajos Clientes/Superside/R+D/Motion Library Claude</code>. Nothing project-specific goes into that repo.</p>
+  <div class="table"><table>
+    <thead><tr><th>Path</th><th>What it is</th></tr></thead>
+    <tbody>
+      <tr><td><code>05_AE/cool-culture-club.aep</code></td><td>Main AE project. Comps <i>Bosch · Bricolage Portrait (9x16)</i> and <i>Bosch · Quote (9x16)</i>. <b>Not saved since they were built</b> (see Open items).</td></tr>
+      <tr><td><code>03_Footage/bricolage_kit/layers/</code></td><td>125 kit PNGs, original neon colors</td></tr>
+      <tr><td><code>03_Footage/bricolage_kit/layers_ccc/</code></td><td>The same 125, graded to the presenter palette. <b>Use these.</b></td></tr>
+      <tr><td><code>03_Footage/bricolage_kit/_sheets/</code></td><td>Raw generated sheets (one per group), before splitting</td></tr>
+      <tr><td><code>03_Footage/bricolage_kit/CCC_presenter_palette.cube</code></td><td>The palette grade as a 33-point 3D LUT</td></tr>
+      <tr><td><code>03_Footage/bricolage_kit/bricolage_kit_overview.jpg</code></td><td>Contact sheet of every kit element with its file name</td></tr>
+      <tr><td><code>03_Footage/bosch_bricolage/layers_ccc/</code></td><td>Bosch-only layers: <code>A_bosch_cutout</code>, <code>C_name_label</code></td></tr>
+      <tr><td><code>03_Footage/bosch_bricolage/bosch_bricolage_layout_ccc.json</code></td><td>Portrait layout: each layer's file, position, scale and rotation, back to front</td></tr>
+      <tr><td><code>03_Footage/bosch_bricolage/_rejected/</code></td><td>Bosch creature stickers, rejected as not generic</td></tr>
+      <tr><td><code>06_Renders/CCC_Bosch_Bricolage_Portrait_V1.mp4</code></td><td>Animated portrait, 6 s</td></tr>
+      <tr><td><code>06_Renders/CCC_Bosch_Quote_V1.mp4</code></td><td>Animated quote card, 6 s</td></tr>
+      <tr><td><code>05_AE/sound/</code></td><td>Code-made sound effect WAVs for each comp</td></tr>
+      <tr><td><code>COLLECT_shorts_arte/Herramientas/serie_proyectos/</code></td><td>Episode scripts and config as JSON (Hilma, Blake, Bosch, Redon, Dürer)</td></tr>
+      <tr><td><code>Claude/</code></td><td>Prompts, plans and scripts from these sessions (listed below)</td></tr>
+    </tbody>
+  </table></div>
+  <h3>In the Claude folder</h3>
+  <div class="table"><table>
+    <thead><tr><th>File</th><th>Use</th></tr></thead>
+    <tbody>
+      <tr><td><code>art_shorts_avatar_scripts.md</code></td><td>All five episode scripts in readable form, with avatar lines and actions</td></tr>
+      <tr><td><code>bosch_avatar_seedance_prompts.md</code></td><td>Seedance prompts for the Bosch avatar lines (two long clips, plus one per line as fallback)</td></tr>
+      <tr><td><code>bricolage_kit_plan.md</code></td><td>Prompt for every kit sheet, plus the reusable subject-cutout prompt</td></tr>
+      <tr><td><code>split_sheets.py</code></td><td>Splits a transparent sheet into one PNG per element</td></tr>
+      <tr><td><code>ccc_grade.py</code></td><td>Grades layers to the presenter palette and writes the .cube LUT</td></tr>
+      <tr><td><code>compose.py</code></td><td>Builds the portrait PNG and layout JSON from a layer list</td></tr>
+      <tr><td><code>ccc_color_guide.md</code></td><td>Palette and AE color-correction steps</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="presenters">
+  <h2>Presenter avatars</h2>
+  <p>Both presenters are floating 3D art-toy heads with no body or neck. These are the final image prompts that produced the approved looks. Keep the identity lines unchanged when generating new poses.</p>
+  <h3>What we learned writing them</h3>
+  <ul>
+    <li><b>Framing</b>: spell out that the top of the cap, both ears, the chin and the ends of the hair sit inside the frame, and that the head fills about 60% of the frame height. Portrait aspect (4:5 or 2:3) helps long hair fit.</li>
+    <li><b>A backwards cap needs explaining</b>: "strap and back panels facing forward over the forehead, brim pointing behind the head". Saying "backwards" alone gets ignored.</li>
+    <li><b>Gradients on fabric</b>: describe a dyed ombré, with direction ("lower left to upper right"), so it doesn't look like a flat digital overlay.</li>
+    <li><b>Clean skin</b>: list every unwanted mark (scars, stains, moles, freckles, redness, face paint, extra tattoos) and say the one tattoo is "the only mark anywhere on his skin".</li>
+    <li><b>Which side is "his left"</b>: models confuse the subject's left with the viewer's left. Say "on the right side of the image" if it lands on the wrong side.</li>
+  </ul>
+
+  <details class="prompt"><summary>Girl presenter · image prompt</summary><div class="pbody"><button class="copy" type="button">Copy</button><pre>A grotesque, hyperrealistic 3D character head floating in space, underground art-toy aesthetic.
+Levitating head of a young woman, no body, no neck. Strongly caricatured facial proportions with extreme material realism.
+Full head and full hair completely visible inside the frame, nothing cropped: the cap, both ears, the chin and the ends of the hair all sit well within the image borders.
+Centered composition, head occupying about 60% of the frame height, generous empty space on all four sides, straight-on front view at eye level, slightly zoomed out.
+Very large dominant eyes, icy blue/gray, visible sclera veins, wet glossy reflections.
+Small compact nose with a slightly upturned tip, thick sculptural lips, defined cheekbones, oversized slightly protruding ears.
+Facial proportions pushed beyond realism but still clearly human.
+Sarcastic, confident expression: asymmetrical mocking smile, cold eyes that do not smile.
+Unimpressed, superior attitude.
+Dark eyeshadow and heavy eyeliner, slightly messy and worn-in makeup, subtle skin shine visible.
+Dark espresso-brown hair, long and straight, falling loosely and floating slightly below the head, slightly messy with flyaways, individual strands visible, the full length of the hair shown.
+5-panel cap worn backwards, the adjustable strap and back panels facing forward over the forehead, brim pointing behind the head and not visible from the front. The cap fabric is dyed in a smooth diagonal ombré gradient running corner to corner across the cap, from vivid orange at the lower left side to magenta-fuchsia at the upper right side, the colors blending softly at an angle across the panels, nylon or cotton twill fabric texture, visible panel seams and light wear.
+Silver septum ring, a thin circular bull ring hanging from the center of the nose just above the upper lip, realistic polished metal reflections, sitting naturally against the nostrils.
+One tiny silver stud in one earlobe, subtle and minimal, realistic metal reflection.
+Ultra-hyperrealistic skin: visible pores, freckles, micro-wrinkles, peach fuzz, uneven tone, subtle redness and oiliness. Skin feels alive and tactile, no cracks or stylization.
+Green gradient background (deep forest green to light mint), clean and seamless.
+Hard studio lighting, high contrast, sharp focus emphasizing exaggerated anatomy.
+Ultra-high resolution, physically based rendering, strong subsurface scattering.
+Raw, macarra, confrontational.</pre></div></details>
+
+  <details class="prompt"><summary>Guy presenter · image prompt</summary><div class="pbody"><button class="copy" type="button">Copy</button><pre>A grotesque, hyperrealistic 3D character head floating in space, underground art-toy aesthetic.
+Levitating head of a young Black African American man, no body, no neck, no hat. Strongly caricatured facial proportions with extreme material realism.
+Full head and full hair completely visible inside the frame, nothing cropped: the top of the head, both ears, the chin and the ends of the dreadlocks all sit well within the image borders.
+Centered composition, head occupying about 60% of the frame height, generous empty space on all four sides, straight-on front view at eye level, slightly zoomed out.
+Very large dominant eyes, deep dark brown irises almost black, clean bright whites, wet glossy reflections.
+Broad nose with a rounded tip, thick sculptural lips, strong defined cheekbones, firm jawline, oversized slightly protruding ears.
+Facial proportions pushed beyond realism but still clearly human.
+Sarcastic, confident expression: asymmetrical mocking smile, cold eyes that do not smile.
+Unimpressed, superior attitude.
+Heavy-lidded eyes, thick natural eyebrows, light stubble along the jaw and upper lip, subtle skin shine visible.
+Medium-deep brown skin with warm golden undertones, rich but not the darkest tone.
+Long thick dreadlocks growing from the scalp and fully visible on top of the head, dense and textured, falling loosely and floating slightly below the head, individual locs visible with frizz and natural fibers, the full length of the locs shown.
+One big circular silver hoop through the earlobe, thick and bold, realistic polished metal reflections.
+Small tattoo under his left eye: a thin-line outlined triangle, dark ink, sitting on the upper cheekbone. This single triangle is the only tattoo and the only mark anywhere on his skin.
+Ultra-hyperrealistic clean skin: visible pores, fine hair, micro-texture and natural oiliness, smooth even complexion. Completely unmarked skin apart from the triangle: no other tattoos, no face paint, no scarification, no scars, no stains, no spots, no moles, no freckles, no blemishes, no redness, no discoloration, no dirt. Skin feels alive and tactile, no cracks or stylization.
+Magenta-red gradient background, darker at the top (deep crimson-magenta) fading to lighter at the bottom (soft pinkish red), clean and seamless.
+Hard studio lighting, high contrast, sharp focus emphasizing exaggerated anatomy.
+Ultra-high resolution, physically based rendering, strong subsurface scattering.
+Raw, macarra, confrontational.
+
+Negative: scars, scarification, stains, spots, moles, freckles, blemishes, redness, face paint, extra tattoos, tribal markings, dirt, discoloration, hat, cap</pre></div></details>
+  <p class="note">The approved guy render came out more stylized (closer to a Pixar look) than this prompt describes, with hoops in both ears. His video prompt describes the render as it is, not the prompt.</p>
+</section>
+
+<section id="video">
+  <h2>Avatar video (Seedance 2.5)</h2>
+  <p>Image-to-video in Seedance 2.5, with the avatar still as the start frame. Seedance 2.5 generates up to 30 s per clip.</p>
+  <h3>How the clips are split</h3>
+  <ul>
+    <li>Each script has 5 avatar lines (A lines). Together they need about 29 s of speech, too tight for one 30 s clip with pauses, so they go into <b>two clips</b>: Clip A (L01 + L03 + L05, <span class="num">20 s</span>) and Clip B (L08 + L10, <span class="num">16 s</span>).</li>
+    <li>Between lines the avatar settles to a neutral face for under a second and blinks. Those pauses are the cut points where the artwork shots (B lines) go in.</li>
+    <li>One clip per line remains a fallback when a long clip drifts in identity or lip sync.</li>
+  </ul>
+  <h3>Performance rules that worked</h3>
+  <ul>
+    <li>More expressive than a real person: big eyebrow moves, cheeks squashing, wide mouth shapes.</li>
+    <li>Head turns only when the line calls for one (a side glance, a doubtful aside, a dreamy drift), then back to the lens for every punchline.</li>
+    <li>Natural blinks every 2 to 4 s, quick blinks on emphasis.</li>
+    <li>Timestamped beats such as <code>[2.5-4s]</code> tie each expression to a word.</li>
+    <li>The negative prompt goes at the end as an <b>Avoid:</b> line. If hands or a body appear, move it to the top.</li>
+    <li>Hand gestures from the original script actions are rewritten as face or head moves, because the presenters have no hands.</li>
+  </ul>
+  <h3>Voice workflow (from the earlier episodes)</h3>
+  <p>The voice Seedance generates gives the exact lip sync. ElevenLabs Speech-to-Speech then swaps its timbre to the series voice, keeping rhythm and pauses. The B lines use direct ElevenLabs voiceover, so the voice matches across the whole video.</p>
+  <p>For any name the model may mispronounce, put a guide in brackets next to it, for example "Hieronymus Bosch [heer-ON-ih-mus Bosh]".</p>
+
+  <details class="prompt"><summary>Guy presenter · Bosch Clip A (20 s)</summary><div class="pbody"><button class="copy" type="button">Copy</button><pre>Image-to-video. Animate this exact character: a stylized 3D art-toy floating head, no body, no neck, no hands. Keep his identity exactly as in the image for the whole clip: warm brown skin, long thick dreadlocks with braided rows on top hanging well below the chin, dark brown eyes, thick eyebrows, light goatee stubble, big silver hoop earrings in both ears, and the small thin-line triangle tattoo under his left eye. No hat. Static magenta-red gradient background, darker at the top and lighter at the bottom. Locked-off camera, head centered and fully in frame, dreadlocks fully visible.
+He speaks to camera in English, young African American male voice, smooth, natural, gossipy and playful, the same voice throughout, with precise lip sync. Three separate lines, each followed by a short pause:
+
+Line 1: "Someone painted sheet music on a man's butt... five hundred years ago."
+
+Line 2: "Look closely at the hell panel. Monsters, giant instruments... and a guy with a song on his backside."
+
+Line 3: "And here's the thing: we know almost nothing about Bosh. No letters, no diary. Just these paintings."
+
+Exaggerated, cartoonishly expressive art-toy performance: big eyebrow moves, cheeks squashing, wide clear mouth shapes. He mostly faces the lens with small bobs; turns his head only when the beat calls for it, then returns to the lens for each punchline. Natural blinks every 2-4 s, quick blinks on emphasis. The heavy dreadlocks swing with weight and momentum on every head movement and settle naturally afterwards; the hoop earrings swing slightly. Cheeky, sarcastic attitude.
+[0-1s] He floats slightly toward the lens with a scandalised grin.
+[1-2.5s] Eyes dart left then right as if sharing gossip.
+[2.5-4s] Facing the lens, eyebrows shoot up.
+[4-5s] Short snort of laughter.
+[5-5.8s] Pause: silent, he settles to a neutral face looking into the lens, one blink.
+[5.8-7.5s] He squints one eye and pushes toward the lens as if through a magnifying glass on "look closely at the hell panel".
+[7.5-8.5s] Eyes snap wide in mock horror on "monsters".
+[8.5-10s] Head sways side to side in rhythm on "giant instruments", locs swinging.
+[10-11.5s] Back to the lens, smirk building on "and a guy with a song on his".
+[11.5-12.5s] Bursts out laughing on "backside", head tipping back, locs bouncing.
+[12.5-13.3s] Pause: silent, he settles to a neutral face looking into the lens, one blink.
+[13.3-14.5s] One eyebrow up, slight lean in on "and here's the thing".
+[14.5-16s] Exaggerated facial shrug, eyebrows high, head tilted, lips pulled down on "we know almost nothing about Bosh".
+[16-17.5s] Two sharp little head shakes on "no letters", "no diary", locs swaying.
+[17.5-19s] Head turns slightly to one side then swings back with wide intense eyes on "just these paintings".
+[19-20s] Holds eye contact with a mocking half-smile.
+Avoid: body, neck, shoulders, hands, arms, extra limbs, camera movement, zoom, cropping, head leaving the frame, dreadlocks cut off by the frame, hat, earrings disappearing, tattoo moving or disappearing, extra tattoos, face morphing, identity drift, static frozen face, stiff mouth, subtitles, on-screen text.</pre></div></details>
+  <p class="note">The girl's versions of Clip A and Clip B, and per-line fallbacks, are in <code>Claude/bosch_avatar_seedance_prompts.md</code>. To make the girl's version of any clip, swap the identity line for her look (backwards orange-to-fuchsia cap, dark hair, icy blue eyes, heavy smudged eyeliner, freckles, septum ring, ear stud) and change "his locs" to "her hair".</p>
+</section>
+
+<section id="scripts">
+  <h2>Scripts</h2>
+  <p>Each episode is a JSON file in <code>COLLECT_shorts_arte/Herramientas/serie_proyectos/</code> with 10 lines. <b>A</b> lines are the avatar on camera, with an <code>accion</code> note for hands and face. <b>B</b> lines are voiceover over the artwork or the quote card. The <code>tts</code> field keeps the ElevenLabs v3 tags such as <code>[laughs]</code>.</p>
+  <p>Episodes: 01 Hilma af Klint, 02 William Blake, 03 Hieronymus Bosch, 04 Odilon Redon, 05 Albrecht Dürer. The readable version is in <code>Claude/art_shorts_avatar_scripts.md</code>.</p>
+  <p>The script facts come from well-known biographies and still need checking against a source before publishing.</p>
+</section>
+
+<section id="kit">
+  <h2>Bricolage kit</h2>
+  <p>A generic set of craft elements for building a portrait of any artist. Nothing in it belongs to one artist. Each portrait adds only two project-specific layers: the artist's photocopy cutout and a name label.</p>
+  <div class="table"><table>
+    <thead><tr><th>Prefix</th><th>Group</th><th class="num">Count</th><th>Contents</th></tr></thead>
+    <tbody>
+      <tr><td><code>B_</code></td><td>Gaffer tape strips</td><td class="num">8</td><td>Long strips in fluorescent colors, red and black, plus a folded one and a creased one</td></tr>
+      <tr><td><code>G_</code></td><td>Tape tabs and corners</td><td class="num">12</td><td>Short tabs, triangle photo corners, black tape X, folded tab</td></tr>
+      <tr><td><code>D_ H_</code></td><td>Marker marks</td><td class="num">21</td><td>Halo, arrows, X, underline, numbers 1–3, zigzag, star, check, squiggle, spiral, asterisk, brackets, ! and ?, scribble fill, sparkle burst, rectangle</td></tr>
+      <tr><td><code>I_</code></td><td>Paint</td><td class="num">13</td><td>Swashes, dry brush, splat plus 4 loose droplets, drips, roller stripe, dabs</td></tr>
+      <tr><td><code>J_</code></td><td>Paper cutouts</td><td class="num">12</td><td>Circle, half circle, arch, starburst, blob, rectangle, square, triangle, crescent, zigzag, cloud, flower</td></tr>
+      <tr><td><code>K_</code></td><td>Torn paper</td><td class="num">9</td><td>Neon, blue, black, white, gray and graph-paper scraps</td></tr>
+      <tr><td><code>L_</code></td><td>Stickers</td><td class="num">17</td><td>Dot labels, stars (silver, holographic), scalloped, checkered, striped, arrows</td></tr>
+      <tr><td><code>F_</code></td><td>Plastic</td><td class="num">6</td><td>Acetates, clear sleeve, holographic disc, bubble wrap, price tag</td></tr>
+      <tr><td><code>M_</code></td><td>Hardware</td><td class="num">10</td><td>Binder clip, paper clips, safety pin, push pins, staples, zip ties, rubber band</td></tr>
+      <tr><td><code>N_</code></td><td>Print textures</td><td class="num">11</td><td>Halftone, riso grain, crop and registration marks, color bars, barcode, noise, dotted line</td></tr>
+      <tr><td><code>O_</code></td><td>Empty frames</td><td class="num">6</td><td>Instant photo, torn paper, black window, pink, circle, tape frame, all with transparent centers</td></tr>
+    </tbody>
+  </table></div>
+  <p class="note">Most files have numbers instead of descriptive names (for example <code>J_paper_shapes_07</code>). Use <code>bricolage_kit_overview.jpg</code> to find them.</p>
+  <h3>How it was made</h3>
+  <ol class="steps">
+    <li>One <b>sheet</b> per group, generated with <b>GPT Image 2.6</b> on Weave, <code>background: transparent</code>, high quality, 1536×1024 PNG, about 11 credits per sheet. Every prompt ends with: <i>"Isolated elements on a transparent background, flat top-down view, spread out with clear space between them, none touching, none cut off by the edge, no shadow, no background."</i></li>
+    <li><code>split_sheets.py</code> cuts each sheet into one trimmed PNG per element, using alpha connected components. The merge distance depends on the sheet: small for solid shapes that sit close together (stickers 3, paper 4), large for strokes and dot patterns that must stay one piece (marker 14, paint 18, print 14).</li>
+    <li><code>ccc_grade.py</code> grades every layer to the presenter palette into <code>layers_ccc/</code>.</li>
+  </ol>
+  <h3>Making a new artist's portrait</h3>
+  <ol class="steps">
+    <li>Turn a public-domain or cleared portrait of the artist into the cutout with the prompt below (GPT Image 2.6 edit, transparent background).</li>
+    <li>Make a name label: black gaffer tape with the name in white paint marker. Spell the name out letter by letter in the prompt.</li>
+    <li>Grade both with <code>python ccc_grade.py &lt;src&gt; &lt;dst&gt;</code>.</li>
+    <li>Edit the <code>LAYOUT</code> list in <code>compose.py</code> and run it to get the PNG and the layout JSON, then build the comp in AE (next section).</li>
+  </ol>
+  <details class="prompt"><summary>Subject cutout prompt (any artist)</summary><div class="pbody"><button class="copy" type="button">Copy</button><pre>Turn the person in this image into a modern photocopy cutout: same face, same features, same clothing, head and shoulders only. Crisp high-contrast black and white like a fresh laser photocopy with a fine halftone dot texture, deep blacks and clean whites. Cut out by hand along the silhouette with a thin even white paper border. Isolated on a transparent background, no shadow.</pre></div></details>
+  <h3>What didn't work</h3>
+  <ul>
+    <li><b>Bosch creature stickers</b> (owl, fish with legs, strawberry): rejected because they only work for Bosch. The kit has to be generic.</li>
+    <li><b>Hell-panel crop from the painting</b>: blocked by OpenAI's safety filter because of the nudity, and charged anyway. Crops of real paintings, if ever needed, are better made locally from the file.</li>
+    <li><b>Old-paper look</b>: the brief is modern. Keep "aged paper, sepia, newspaper clippings, typewriter text" in the avoid lists.</li>
+  </ul>
+</section>
+
+<section id="color">
+  <h2>Color system</h2>
+  <p>The kit's neon blues, limes and yellows clashed with the presenters, so everything is graded to the palette sampled from the two avatar clips.</p>
+  <div class="swatches">
+    <div class="sw"><i style="background:#FA5639"></i><div><b>Coral</b><span>#FA5639</span></div></div>
+    <div class="sw"><i style="background:#E39336"></i><div><b>Amber</b><span>#E39336</span></div></div>
+    <div class="sw"><i style="background:#CB2479"></i><div><b>Magenta</b><span>#CB2479</span></div></div>
+    <div class="sw"><i style="background:#651F77"></i><div><b>Plum</b><span>#651F77</span></div></div>
+    <div class="sw"><i style="background:#326055"></i><div><b>Teal</b><span>#326055</span></div></div>
+    <div class="sw"><i style="background:#26483F"></i><div><b>Deep teal</b><span>#26483F</span></div></div>
+    <div class="sw"><i style="background:#D7746E"></i><div><b>Salmon</b><span>#D7746E</span></div></div>
+    <div class="sw"><i style="background:#F0E8DD"></i><div><b>Cream</b><span>#F0E8DD</span></div></div>
+    <div class="sw"><i style="background:#1E1714"></i><div><b>Warm black</b><span>#1E1714</span></div></div>
+  </div>
+  <div class="table"><table>
+    <thead><tr><th>Kit color</th><th>Becomes</th></tr></thead>
+    <tbody>
+      <tr><td>Red, fluorescent orange</td><td>Coral</td></tr>
+      <tr><td>Fluorescent yellow, lime</td><td>Amber</td></tr>
+      <tr><td>Fluorescent green, cyan, electric blue</td><td>Deep teal</td></tr>
+      <tr><td>Violet</td><td>Plum</td></tr>
+      <tr><td>Fluorescent pink</td><td>Magenta</td></tr>
+      <tr><td>White / gray / black</td><td>Cream / warm gray / warm black</td></tr>
+    </tbody>
+  </table></div>
+  <h3>Backgrounds and fonts</h3>
+  <ul>
+    <li><b>Portrait and quote background</b>: a Gradient Ramp from coral <code>#FC604C</code> at y 291 to dark teal <code>#132019</code> at y 1362, the same as the girl presenter's background.</li>
+    <li><b>CCC brand font</b>: <b>Bahnschrift Light</b> (in the Kinetic Type comps). It ships with Windows.</li>
+    <li><b>Quote font</b>: <b>Instrument Serif Italic</b>, which pairs well with Bahnschrift. It comes through Adobe Fonts, so activate it on any machine that opens the project, or AE will substitute another font.</li>
+  </ul>
+  <h3>Color correcting in After Effects</h3>
+  <ul>
+    <li>Default: build from <code>layers_ccc</code>.</li>
+    <li>Or use the neon originals with an adjustment layer: <i>Apply Color LUT</i> loaded with <code>CCC_presenter_palette.cube</code>.</li>
+    <li>To shift one color family everywhere: <i>Hue/Saturation</i> on the adjustment layer, with one channel selected.</li>
+    <li>To recolor one element: <i>Change to Color</i> or <i>Tint</i> on that layer only.</li>
+  </ul>
+</section>
+
+<section id="ae">
+  <h2>Portrait and quote in After Effects</h2>
+  <p>Both comps were built with the <b>Motion DNA</b> MCP tools (<code>run_jsx</code>, <code>apply_preset</code>, <code>add_sound</code>, <code>check_layout</code>, <code>render_comp</code>). Everything is native keyframes and expressions, with no plugins.</p>
+  <h3>Bosch · Bricolage Portrait (9x16) · 6 s</h3>
+  <div class="table"><table>
+    <thead><tr><th>Time</th><th>What enters</th><th>Preset</th></tr></thead>
+    <tbody>
+      <tr><td class="num">0.10–0.55 s</td><td>Paper circle, riso, halftone, torn papers, black square, tapes, spiral</td><td>Scale Pop, Slide Land, Wipe Reveal, Rotate Settle</td></tr>
+      <tr><td class="num">0.70 s</td><td>Bosch cutout (first impact 1.03 s, settles 1.57 s)</td><td>Drop Bounce</td></tr>
+      <tr><td class="num">1.05–1.40 s</td><td>Halo, tape tabs, binder clip, price tag, push pin</td><td>Wipe Reveal, Scale Pop, Drop Bounce, Rotate Settle</td></tr>
+      <tr><td class="num">1.45–1.60 s</td><td>Pink tape, paint drip, name label</td><td>Wipe Reveal</td></tr>
+      <tr><td class="num">1.75–2.15 s</td><td>Stickers, sparkle, number, X, registration mark</td><td>Spin Pop, Scale Pop, Stretch Slide</td></tr>
+    </tbody>
+  </table></div>
+  <h3>Bosch · Quote (9x16) · 6 s</h3>
+  <ul>
+    <li>Each line of the quote sits on its own torn cream strip (<code>K_torn_paper_06</code>), sized to the text: strip width = text width + 120 px, height = text height + 70 px.</li>
+    <li>Strips wipe on left to right at 0.60, 0.95, 1.30 and 1.65 s. Each line fades up word by word (<i>Words Fade Up</i>) 0.15 s after its strip.</li>
+    <li>Attribution in Bahnschrift Light on black tape at 2.15 to 2.30 s, also <i>Words Fade Up</i>. <i>Tracking Settle</i> was tried and spread the text past the frame.</li>
+  </ul>
+  <h3>The hold: stop-motion jitter</h3>
+  <p>Once a piece lands, its rotation gets a small jitter at 6 fps, so the frame looks handmade instead of frozen. A strip and its line of text share one seed so the words never slide on the paper.</p>
+  <details class="prompt"><summary>Rotation expression</summary><div class="pbody"><button class="copy" type="button">Copy</button><pre>// stop-motion jitter once the piece has landed
+if (time &lt; inPoint + 0.9) value; else { posterizeTime(6); seedRandom(index, true); value + (wiggle(1, 1.2) - value); }</pre></div></details>
+  <p class="note">Amplitude: about 0.3° for the subject, 0.4–0.6° for paper and tape, 1–2° for stickers and marks. For a strip and its text, replace <code>index</code> with the same number on both layers.</p>
+  <h3>Sound</h3>
+  <p><code>add_sound</code> makes the sound effects in code (pops, swishes, a hit, ticks), so they're ours to ship. Put the cues on exact landing times: for example, the portrait's hit is at 1.06 s, the cutout's first impact.</p>
+  <h3>Checks</h3>
+  <p>Run <code>check_layout</code> before rendering. It measures text against what's behind the layer, so text sitting on an image card (the cream strips) shows as low contrast when it isn't. Those warnings can stay. Fix the real ones: the magenta quote mark was 1.2:1 on the gradient and became cream.</p>
+</section>
+
+<section id="gotchas">
+  <h2>Problems and fixes</h2>
+  <div class="issue"><b>The Motion DNA bridge stops answering</b><p>Symptom: <code>ae_status</code> times out while AE is open and responding, and jobs pile up in <code>bridge/inbox</code>. The bridge's polling chain has stopped. Re-arm it from a terminal:</p><p><code>AfterFX.exe -s "if ($.global.SS_BRIDGE_ON &amp;&amp; $.global.SS_BRIDGE_TICK) { try { app.cancelTask($.global.SS_BRIDGE_TASK); } catch (e) {} $.global.SS_BRIDGE_TASK = app.scheduleTask($.global.SS_BRIDGE_TICK, 500, false); }"</code></p><p>Don't run <code>ss_bridge.jsx</code> again: running it twice toggles the bridge off.</p></div>
+  <div class="issue"><b>Wipe Reveal reveals right to left</b><p>The preset sets the Linear Wipe angle to 90°, which reveals the right side first. Set <i>SS Wipe › Transition Angle</i> to <b>270°</b> for left to right (text, tape) and <b>0°</b> for top to bottom (drips). The <i>direction</i> option in <code>apply_preset</code> doesn't change it. Worth fixing in Motion DNA itself.</p></div>
+  <div class="issue"><b>add_sound fails with "Permission denied"</b><p>AE holds the old WAV open. Remove the <i>Motion DNA sound</i> layer and its footage item, run <code>app.purge(PurgeTarget.ALL_CACHES)</code>, then run <code>add_sound</code> again.</p></div>
+  <div class="issue"><b>Weave flow has no inputs</b><p>The <i>CCC Avatar Test</i> flow (<code>app.weavy.ai/flow/NT708RqEcXqrk5zcQAQrSX</code>) returns no inputs or outputs over MCP. Publish it as a tool with the image node, the prompt node and the output exposed before it can be driven from Claude. Meanwhile, models run directly with <code>weave_run_model</code>.</p></div>
+  <div class="issue"><b>Merged or broken elements after splitting</b><p>Two stickers sitting close together merged into one, and a sparkle burst broke into 8 dashes. Tune the merge distance per sheet in <code>split_sheets.py</code>, and group small pieces that belong together.</p></div>
+  <div class="issue"><b>Renders land in the Motion DNA repo</b><p><code>render_comp</code> writes to <code>renders/mcp/</code> inside the Motion DNA repo. Move each file to <code>06_Renders</code> right away. Project files never stay in the repo.</p></div>
+</section>
+
+<section id="costs">
+  <h2>Weave and costs</h2>
+  <div class="table"><table>
+    <thead><tr><th>Model</th><th>Use</th><th>Approx. cost</th></tr></thead>
+    <tbody>
+      <tr><td>GPT Image 2.6</td><td>Transparent sheets, cutout edits (<code>background: transparent</code>)</td><td class="num">11 credits (high, 1536×1024)</td></tr>
+      <tr><td>Bria Remove Background</td><td>Cleanup if an asset comes back with a halo</td><td class="num">~0.6 credits</td></tr>
+      <tr><td>Nano Banana 2.1</td><td>Image edits, no transparency</td><td class="num">~7 credits at 1K</td></tr>
+    </tbody>
+  </table></div>
+  <p>Spent in this round: <b class="num">176 Weave credits</b> (16 runs of 11, including one blocked run that was still charged). These are workspace Weave credits, not Figma AI credits.</p>
+  <p>The project rule is to ask before any paid generation. Weave quotes the cost before running, and every run needs an explicit approval.</p>
+</section>
+
+<section id="music">
+  <h2>Music on Shorts</h2>
+  <p>Cool Culture Club is a creator account, not a brand, which gives it access to most of the in-app music libraries.</p>
+  <ul>
+    <li><b>Account types</b>: Instagram <b>Creator</b> (not Business), TikTok <b>Personal</b> (not Business), and any YouTube channel. Business accounts lose most popular songs.</li>
+    <li><b>Add music inside each app</b>, not in the export. Edit to the chosen section of the song with a muted guide track, export with voiceover and sound effects only, then add the song in the app at the same start point.</li>
+    <li><b>In-app music doesn't cover</b>: boosting or paid promotion, sponsored posts, re-uploading the file elsewhere, or songs missing from the library. On YouTube, Shorts with music share revenue with the rights holders.</li>
+    <li><b>Visuals of music artists</b>: album covers and photos are owned by labels and photographers, and in-app music licenses don't cover them. Use press kit images with credit, or ask the artist (and offer a Collab post). Don't make AI likenesses of real musicians.</li>
+    <li><b>Working directly with a band</b>: get written permission from whoever owns the master and the publishing, saying whether it covers organic posts only or ads too. Have the distributor allowlist the accounts in Content ID and Meta Rights Manager. Ask for WAV masters and stems.</li>
+  </ul>
+  <p class="note">Platform rules change often and vary by country. For anything paid, check with a lawyer or the client's legal team.</p>
+</section>
+
+<section id="next">
+  <h2>Open items</h2>
+  <ul class="todo">
+    <li><span><b>Save the AE project.</b> The portrait and quote comps exist only in the open session of <code>05_AE/cool-culture-club.aep</code>.</span></li>
+    <li><span><b>Generate the Bosch avatar clips</b> in Seedance 2.5 for whichever presenter hosts the episode, then run them through the voice workflow.</span></li>
+    <li><span><b>Edit the Bosch short</b>: avatar clips, artwork shots, portrait and quote card, cut at the neutral pauses.</span></li>
+    <li><span><b>Fact-check the scripts</b> before publishing.</span></li>
+    <li><span><b>Rename the kit layers</b> by content (for example <code>J_paper_circle_magenta</code>) so they're easier to find.</span></li>
+    <li><span><b>Fix the Wipe Reveal default</b> in Motion DNA so it reveals left to right.</span></li>
+    <li><span><b>Publish the Weave flow</b> with exposed inputs if it should be driven from Claude.</span></li>
+    <li><span><b>Next artists</b>: Hilma af Klint, Blake, Redon and Dürer portraits and quote cards, built the same way from the kit.</span></li>
+    <li><span><b>Barcode element</b> (<code>N_print_textures_08</code>) still has two crop marks attached.</span></li>
+  </ul>
+</section>
+</main>
+</div>
+
+<script>
+document.querySelectorAll(".copy").forEach(function (btn) {
+  btn.addEventListener("click", function () {
+    var pre = btn.parentNode.querySelector("pre");
+    var done = function () { btn.textContent = "Copied"; setTimeout(function () { btn.textContent = "Copy"; }, 1600); };
+    var fallback = function () {
+      var r = document.createRange(); r.selectNodeContents(pre);
+      var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+      btn.textContent = "Selected";
+      setTimeout(function () { btn.textContent = "Copy"; }, 1600);
+    };
+    try {
+      navigator.clipboard.writeText(pre.textContent).then(done, fallback);
+    } catch (e) { fallback(); }
+  });
+});
+</script>
+
+</body></html>

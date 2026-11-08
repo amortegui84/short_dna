@@ -1,0 +1,27 @@
+Image-to-video. Animate this exact character: a stylized 3D art-toy floating head, no body, no neck, no hands. Keep his identity exactly as in the image for the whole clip: warm brown skin, long thick dreadlocks with braided rows on top hanging well below the chin, dark brown eyes, thick eyebrows, light goatee stubble, big silver hoop earrings in both ears, and the small thin-line triangle tattoo under his left eye. No hat. Static magenta-red gradient background, darker at the top and lighter at the bottom. Locked-off camera, head centered and fully in frame, dreadlocks fully visible.
+He speaks to camera in English, young African American male voice, smooth, natural, gossipy and playful, the same voice throughout, with precise lip sync. Three separate lines, each followed by a short pause:
+
+Line 1: "Someone painted sheet music on a man's butt... five hundred years ago."
+
+Line 2: "Look closely at the hell panel. Monsters, giant instruments... and a guy with a song on his backside."
+
+Line 3: "And here's the thing: we know almost nothing about Bosh. No letters, no diary. Just these paintings."
+
+Exaggerated, cartoonishly expressive art-toy performance: big eyebrow moves, cheeks squashing, wide clear mouth shapes. He mostly faces the lens with small bobs; turns his head only when the beat calls for it, then returns to the lens for each punchline. Natural blinks every 2-4 s, quick blinks on emphasis. The heavy dreadlocks swing with weight and momentum on every head movement and settle naturally afterwards; the hoop earrings swing slightly. Cheeky, sarcastic attitude.
+[0-1s] He floats slightly toward the lens with a scandalised grin.
+[1-2.5s] Eyes dart left then right as if sharing gossip.
+[2.5-4s] Facing the lens, eyebrows shoot up.
+[4-5s] Short snort of laughter.
+[5-5.8s] Pause: silent, he settles to a neutral face looking into the lens, one blink.
+[5.8-7.5s] He squints one eye and pushes toward the lens as if through a magnifying glass on "look closely at the hell panel".
+[7.5-8.5s] Eyes snap wide in mock horror on "monsters".
+[8.5-10s] Head sways side to side in rhythm on "giant instruments", locs swinging.
+[10-11.5s] Back to the lens, smirk building on "and a guy with a song on his".
+[11.5-12.5s] Bursts out laughing on "backside", head tipping back, locs bouncing.
+[12.5-13.3s] Pause: silent, he settles to a neutral face looking into the lens, one blink.
+[13.3-14.5s] One eyebrow up, slight lean in on "and here's the thing".
+[14.5-16s] Exaggerated facial shrug, eyebrows high, head tilted, lips pulled down on "we know almost nothing about Bosh".
+[16-17.5s] Two sharp little head shakes on "no letters", "no diary", locs swaying.
+[17.5-19s] Head turns slightly to one side then swings back with wide intense eyes on "just these paintings".
+[19-20s] Holds eye contact with a mocking half-smile.
+Avoid: body, neck, shoulders, hands, arms, extra limbs, camera movement, zoom, cropping, head leaving the frame, dreadlocks cut off by the frame, hat, earrings disappearing, tattoo moving or disappearing, extra tattoos, face morphing, identity drift, static frozen face, stiff mouth, subtitles, on-screen text.

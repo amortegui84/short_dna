@@ -17,4 +17,18 @@ work/
 node_modules/
 app/node_modules/
 # brand folders (profiles, characters, kits, projects) live outside git
-brands/
+brands/*
+# Cool Culture Club: the brand's rules, style, characters, prompts and kit are in git; never its key, renders or heavy references
+!brands/ccc/
+brands/ccc/.env
+brands/ccc/references/head/
+brands/ccc/references/voice/
+brands/ccc/references/*.mp4
+brands/ccc/references/bosch_template/*.aep
+brands/ccc/characters/*/*.mp4
+brands/ccc/kit/sound/
+brands/ccc/proyectos/*/*
+!brands/ccc/proyectos/*/proyecto.json
+!brands/ccc/proyectos/*/research.md
+!brands/ccc/proyectos/*/COSTOS.md
+!brands/ccc/proyectos/*/costos.json

@@ -1,0 +1,72 @@
+{
+ "slug": "ccc_girl",
+ "nombre": "CCC presenter: the girl",
+ "descripcion": "A floating hyperreal 3D art-toy head of a young woman, no body, no neck, no hands: backwards 5-panel cap dyed orange-to-fuchsia, long dark espresso hair floating below the head, huge icy blue-gray eyes, heavy smudged eyeliner, freckles, silver septum ring, one ear stud; sarcastic, confident, unimpressed. Green gradient background (deep forest green to mint).",
+ "maestro": "master.png",
+ "referencias": [
+  "smile.png",
+  "seedance_clip_a.mp4",
+  "seedance_clip_b.mp4"
+ ],
+ "sin_manos": true,
+ "fondo": {
+  "tipo": "gradient",
+  "de": "#14382F",
+  "a": "#9FD6C3",
+  "nota": "green gradient in the generated clip; in the edit the head is roto-cut and placed over the coral-to-teal gradient with the kinetic type wall between"
+ },
+ "voz": {
+  "proveedor": "elevenlabs",
+  "tipo": "voice_design + speech_to_speech",
+  "estado": "CHOSEN 2026-11-07",
+  "descripcion": "young American woman in her twenties, bright and smooth, gossipy, playful and sarcastic, quick (about 2.6 words a second), close to the mic, conversational, laughs and scoffs come through",
+  "flujo": "Seedance's own voice for lip sync, then ElevenLabs speech-to-speech to the series voice; B lines straight ElevenLabs v3",
+  "voice_id": "6u6JbqKdaQy89ENzLSju",
+  "stability": 0.0,
+  "sts_ajustes": {
+   "stability": 0.35,
+   "similarity_boost": 0.85,
+   "style": 0.6
+  },
+  "notas_vivacidad": "2026-11-07 review 'the voice could sound more alive like the original': VO in v3 Creative (stability 0.0) with attitude tags, STS style 0.6 / stability 0.35 for every line"
+ },
+ "identidad_fija": "Keep her identity exactly as in the image: a floating hyperreal 3D art-toy head of a young woman, no body, no neck, no hands; backwards 5-panel cap (strap and back panels facing forward over the forehead) dyed in a diagonal ombre from vivid orange at the lower left to magenta-fuchsia at the upper right; long straight dark espresso-brown hair floating below the head; very large icy blue-gray eyes; heavy smudged dark eyeliner; freckles; thin silver septum ring; one tiny silver ear stud.",
+ "mirada": "She faces the lens; head turns only when a line calls for it, then back to the lens for each punchline.",
+ "nunca": [
+  "body, neck, shoulders, hands, arms",
+  "camera movement or zoom inside the clip (the edit does the zooms)",
+  "the head or hair cut off by the frame",
+  "the cap facing forward or losing its gradient",
+  "piercings disappearing",
+  "subtitles or on-screen text",
+  "identity drift or face morphing",
+  "a static frozen face or stiff mouth"
+ ],
+ "prompt_imagen": "A grotesque, hyperrealistic 3D character head floating in space, underground art-toy aesthetic.\nLevitating head of a young woman, no body, no neck. Strongly caricatured facial proportions with extreme material realism.\nFull head and full hair completely visible inside the frame, nothing cropped: the cap, both ears, the chin and the ends of the hair all sit well within the image borders.\nCentered composition, head occupying about 60% of the frame height, generous empty space on all four sides, straight-on front view at eye level, slightly zoomed out.\nVery large dominant eyes, icy blue/gray, visible sclera veins, wet glossy reflections.\nSmall compact nose with a slightly upturned tip, thick sculptural lips, defined cheekbones, oversized slightly protruding ears.\nFacial proportions pushed beyond realism but still clearly human.\nSarcastic, confident expression: asymmetrical mocking smile, cold eyes that do not smile.\nUnimpressed, superior attitude.\nDark eyeshadow and heavy eyeliner, slightly messy and worn-in makeup, subtle skin shine visible.\nDark espresso-brown hair, long and straight, falling loosely and floating slightly below the head, slightly messy with flyaways, individual strands visible, the full length of the hair shown.\n5-panel cap worn backwards, the adjustable strap and back panels facing forward over the forehead, brim pointing behind the head and not visible from the front. The cap fabric is dyed in a smooth diagonal ombré gradient running corner to corner across the cap, from vivid orange at the lower left side to magenta-fuchsia at the upper right side, the colors blending softly at an angle across the panels, nylon or cotton twill fabric texture, visible panel seams and light wear.\nSilver septum ring, a thin circular bull ring hanging from the center of the nose just above the upper lip, realistic polished metal reflections, sitting naturally against the nostrils.\nOne tiny silver stud in one earlobe, subtle and minimal, realistic metal reflection.\nUltra-hyperrealistic skin: visible pores, freckles, micro-wrinkles, peach fuzz, uneven tone, subtle redness and oiliness. Skin feels alive and tactile, no cracks or stylization.\nGreen gradient background (deep forest green to light mint), clean and seamless.\nHard studio lighting, high contrast, sharp focus emphasizing exaggerated anatomy.\nUltra-high resolution, physically based rendering, strong subsurface scattering.\nRaw, macarra, confrontational.",
+ "prompt_clip": "subject_definitions:\n<Subject 1> is the floating art-toy head from <Picture 1>; her look matches <Picture 2> exactly: backwards 5-panel cap dyed orange to magenta-fuchsia, long dark hair floating below the head, huge icy blue-gray eyes, heavy smudged eyeliner, freckles, a thin silver septum ring, one ear stud. She is only a head: no body, no neck, no shoulders, no hands. <Audio 1> is her voice.\n\nsummary:\n[reference-to-video generation + audio generation]\nA vertical Shorts clip: a sarcastic 3D art-toy host gossips about the artist {artista} straight to the camera.\n\nretention_analysis:\n<Subject 1>: fully_preserved (cap, hair, eyes, makeup, piercings, green gradient background)\n\ndetailed_description:\nA clean hyperreal 3D render, vertical 9:16, locked-off camera, the head centered and fully in frame exactly as in <Picture 1>, on the same smooth green gradient background. Exaggerated, cartoonishly expressive art-toy performance: big eyebrow moves, cheeks squashing, wide clear mouth shapes, natural blinks every 2-4 seconds. She mostly faces the lens with small bobs and turns her head only when the line calls for it, then back to the lens for the punchline; her hair swings with weight and settles. Cheeky, sarcastic, unimpressed attitude. While speaking {accion}\n<Subject 1> (S1) says in a young American woman's voice, bright, quick, gossipy and sarcastic: <d>[English] {dialogo}</d>\n\noverall_soundscape:\nA quiet studio, only her voice.\n\nnon_diegetic_music:\nN/A\n\navoid:\nbody, neck, shoulders, hands, arms, camera movement, zoom, the head or hair cut off by the frame, the cap turning forward, piercings disappearing, face morphing, subtitles, on-screen text",
+ "motor": {
+  "video": "Seedance 2.5 image-to-video (paid, quote first)",
+  "imagen": "the approved still (image prompt above)",
+  "alternativa_local": "MiniMax H3 (local) was not tested for this look"
+ },
+ "encuadre_ae": {
+  "plate": "CCC Avatar Plate: Seedance clip + Object Matte roto of the head over the kinetic type wall over a coral-to-teal gradient",
+  "saltos": "cut in at 109% settling to 102% in 4 frames; a beat punch-in to 144% settling to 134%"
+ },
+ "escena_base": "master.png",
+ "sin_boca": false,
+ "h3": {
+  "turbo": "pika_h3_flex_ref2va_v1_bf16.safetensors",
+  "steps": 6,
+  "size": "768x1344",
+  "lora": null,
+  "seeds": [
+   23,
+   24,
+   25
+  ],
+  "qc_min": 0.85,
+  "nota": "no MiniDV LoRA: the look is a clean 3D render, not tape"
+ },
+ "prompt_continuacion": "subject_definitions:\n<Subject 1> is the floating art-toy head from <Picture 1>; her look matches <Picture 2> exactly: backwards 5-panel cap dyed orange to magenta-fuchsia, long dark hair floating below the head, huge icy blue-gray eyes, heavy smudged eyeliner, freckles, a thin silver septum ring, one ear stud. She is only a head: no body, no neck, no shoulders, no hands.\n\nsummary:\n[reference-to-video generation + audio generation]\nA vertical Shorts clip: the sarcastic 3D art-toy host has just finished her line and holds the moment, silent, at the end of the video.\n\nretention_analysis:\n<Subject 1>: fully_preserved (cap, hair, eyes, makeup, piercings, green gradient background)\n\ndetailed_description:\nA clean hyperreal 3D render, vertical 9:16, locked-off camera, continuing exactly from <Picture 1>: same pose to start, the head centered and fully in frame on the same smooth green gradient background. She does not speak: her mouth stays closed. Then {gesto}. Natural blinks, her hair swings with weight and settles. Smooth, continuous motion, no cuts, no jumps.\n\noverall_soundscape:\nA quiet studio. No voice.\n\nnon_diegetic_music:\nN/A\n\navoid:\nspeaking, open mouth talking, body, neck, shoulders, hands, any object, text, logo, background change, camera move"
+}
