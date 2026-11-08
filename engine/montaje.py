@@ -41,7 +41,9 @@ def main(carpeta):
     for ln in pj["lineas"]:
         lid, vo = ln["id"], carpeta / "vo" / f"{ln['id']}.mp3"
         limpia = aud / f"{lid}_limpia.wav"
-        run(["ffmpeg", "-y", "-v", "error", "-i", str(vo), "-af", filtro, "-ac", "2", "-ar", "48000", str(limpia)])
+        # with Seedance a host line has no TTS (its voice is the clip's, converted by sts.py): nothing to clean
+        if vo.exists():
+            run(["ffmpeg", "-y", "-v", "error", "-i", str(vo), "-af", filtro, "-ac", "2", "-ar", "48000", str(limpia)])
         wav = aud / f"{lid}.wav"
         if ln["tipo"] == "A" and sin_boca:
             # personaje sin boca: no hay labios que cuadrar; la linea dura lo que dura la voz (con sus pausas) y el clip arranca con ella

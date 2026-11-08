@@ -53,6 +53,10 @@ for s in tl["segmentos"]:
     d["words"] = [dict(w, s=round(w["s"] + off, 3), e=round(w["e"] + off, 3)) for w in d["words"]]
     segs.append(d)
 total = round(tl["total"] + FZ, 3)
+# the ending breathes: the reference holds ~1.5-2 s after the last word (button, host still alive); the style asks for it
+_est = Path(__file__).parent.parent / "brands" / str(pj.get("marca", "")) / "styles" / f"{pj.get('estilo', '')}.json"
+if pj.get("marca") and _est.exists():
+    total = round(total + float(json.loads(_est.read_text(encoding="utf-8")).get("cola_final_s", 0)), 3)
 
 
 def tiempo(seg, palabra):
@@ -161,7 +165,8 @@ for s in segs:
     lista = OBRAS_B.get(s["id"]) or [(o, None) for o in s["obras"][:1]]
     tiempos = [s["start"] if (i == 0 and s["id"] != primera_b) or not pal else tiempo(s, pal) for i, (o, pal) in enumerate(lista)]
     if s["id"] == primera_b:   # la ficha cubre el silencio y el principio de la linea, hasta que se nombra la obra
-        secciones.append({"tipo": "ficha", "ini": s["start"] - FZ, "fin": tiempos[0], "img": (carpeta / "obras" / f"{pj['retrato']}.jpg").as_posix(),
+        # without works on the first B line (CCC: the portrait card is the whole line) the card covers the line to its end
+        secciones.append({"tipo": "ficha", "ini": s["start"] - FZ, "fin": tiempos[0] if tiempos else fin_b, "img": (carpeta / "obras" / f"{pj['retrato']}.jpg").as_posix(),
                           "deco": [{"p": rec(), "x": 920, "y": 1660, "w": 260, "rot": 10, "t": s["start"] - FZ, "k": 1.04}]})
     # cada obra al menos MIN_OBRA s: si no cabe, la siguiente se quita
     pares = []
@@ -229,6 +234,11 @@ while i < len(secciones) - 1:
         sec["fin"] = nx["fin"]; del secciones[i + 1]
         continue
     i += 1
+
+# the ending tail (style "cola_final_s"): the last host section runs to the end, so engine/continuar.py generates new footage
+# for it instead of the edit looping the clip
+if secciones and secciones[-1].get("tipo") in ("gancho", "cabeza"):
+    secciones[-1]["fin"] = total
 
 # ---------- movimiento ambiente (v5): piezas de la obra para corrientes, profundidad y contornos por obra, tubos para reordenar
 CORRIENTE, ENJAMBRE = [], []   # piezas recortadas de las obras (formato v5-v7; el estilo v10c no interviene las obras)
@@ -413,7 +423,7 @@ OBRAS_ARTISTA = [(carpeta / "obras" / f).as_posix() for f in sorted(os.listdir(c
                  and aspecto(carpeta / "obras" / f) >= 0.8]   # sin obras muy altas: dentro de la silueta suben hasta la cara
 DATA = {"retrato": RETRATO, "obrasArtista": OBRAS_ARTISTA, "piezasRelleno": piezas(ENJAMBRE, 18) + piezas(CORRIENTE, 8), "comp": COMP, "total": total, "secciones": secciones, "subs": subs, "yBarra": Y_BARRA, "marcos": marcos, "numero": f"{pj['numero']:02d}",
         "artista": pj["artista"], "fechas": pj["fechas"], "lema": pj["lema"], "barrido": fz0, "musica": MUSICA,
-        "voces": [{"id": s["id"], "wav": Path(s["wav"]).as_posix(), "start": s["start"]} for s in segs], "desaturar": 0, "kit": KIT,
+        "voces": [{"id": s["id"], "wav": (Path(s["wav"]) if Path(s["wav"]).is_absolute() else Path.cwd() / s["wav"]).resolve().as_posix(), "start": s["start"]} for s in segs], "desaturar": 0, "kit": KIT,
         "estilo": ESTILO, "estatica": ESTATICA, "relleno": RELLENO, "marcas_docs": pj.get("marcas_docs", {}), "autodestruccion": (pj.get("autodestruccion") or {}).get("tipo")}
 (carpeta / "datos_ae.json").write_text(json.dumps(DATA, indent=1), encoding="utf-8")
 print(COMP, "|", len(secciones), "secciones |", len(subs), "subtitulos | total", total)
@@ -433,7 +443,8 @@ if (app.project.dirty && app.project.file) app.project.save();
 if (f.exists) app.open(f); else {{ app.newProject(); app.project.save(f); }}
 try {{ app.project.gpuAccelType = GpuAccelType.SOFTWARE; }} catch (e) {{}}
 return app.project.file.fsName;""", timeout=240))
-if ESTILO.get("builder") == "cinta":   # "Night Transmission" (ae/cinta.jsx): its own look, same timeline and data
+if ESTILO.get("builder") in ("cinta", "ccc"):   # "Night Transmission" (ae/cinta.jsx) or Cool Culture Club (ae/ccc.jsx): own look, same timeline and data
+    BUILDER = ESTILO["builder"]
     _mk = marca_dir(pj.get("marca")) if pj.get("marca") else None
     _fx = lambda n: ((_mk / "kit" / "fx" / f"{n}.mp4").as_posix() if _mk and (_mk / "kit" / "fx" / f"{n}.mp4").exists() else "")
     _brand = json.loads((_mk / "brand.json").read_text(encoding="utf-8")) if _mk and (_mk / "brand.json").exists() else {}
@@ -464,8 +475,23 @@ if ESTILO.get("builder") == "cinta":   # "Night Transmission" (ae/cinta.jsx): it
             if cj:
                 x0, y0, x1, y1 = cj[len(cj) // 2]["caja"]
                 sec["cabeza_xy"] = [round((x0 + x1) / 2), round(y0 + (y1 - y0) * 0.14)]
+    if BUILDER == "ccc":   # the bricolage kit, the type wall, the artist's photocopy cutout and the magnifier details (word -> time)
+        _words = [w for g in tl["segmentos"] for w in g["words"]]
+        _off = {g["id"]: next((x["start"] for x in segs if x["id"] == g["id"]), g["start"]) - g["start"] for g in tl["segmentos"]}
+        def _t(pal, desde=0.0):
+            for g in tl["segmentos"]:
+                for w in g["words"]:
+                    if w["w"].lower().strip(".,?!:;\"'").startswith(pal.lower()) and w["s"] + _off[g["id"]] >= desde:
+                        return round(w["s"] + _off[g["id"]], 3)
+            return None
+        _det = {}
+        for stem, ds in (pj.get("detalles") or {}).items():
+            _det[stem] = [dict(d, t=_t(d["palabra"])) for d in ds]
+        DATA.update({"kit": (_mk / "kit" / "bricolage").as_posix(), "type_wall": (_mk / "kit" / "loops" / "kinetic_type_wall.mp4").as_posix(),
+                     "retrato_bricolage": (carpeta / "retrato_bricolage.png").as_posix(), "detalles": _det, "etiqueta": pj.get("etiqueta_nombre", pj["artista"])})
     (carpeta / "datos_ae.json").write_text(json.dumps(DATA, indent=1), encoding="utf-8")
-    r = M.run_jsx((HERE.parent / "ae" / "cinta.jsx").read_text(encoding="utf-8") + chr(10) + f"var r = CINTA.build({json.dumps(DATA)}); app.project.save(); return r;", timeout=1800, includes=())
+    _obj = "CCC" if BUILDER == "ccc" else "CINTA"
+    r = M.run_jsx((HERE.parent / "ae" / f"{BUILDER}.jsx").read_text(encoding="utf-8") + chr(10) + f"var r = {_obj}.build({json.dumps(DATA)}); app.project.save(); return r;", timeout=1800, includes=())
     print(r.splitlines()[0])
     SON = ESTILO.get("sonidos", {})
     cues = []

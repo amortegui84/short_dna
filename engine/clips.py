@@ -17,8 +17,12 @@ MAESTRO = PJE["_dir"] / PJE["maestro"]
 CLIPS = carpeta / "clips"
 CLIPS.mkdir(exist_ok=True)
 (carpeta / "prompts").mkdir(exist_ok=True)
-PIKA = ["--turbo", "pika_h3_flex_ref2va_v1_bf16.safetensors", "--steps", "6", "--no-shift", "--size", "768x1344",
-        "--lora", "minidv_lora_h3_v1.safetensors:0.9"]
+# the character can set its own H3 recipe ("h3" in character.json): "lora": null drops the MiniDV tape look (Cool Culture Club is
+# a clean 3D render)
+_h3 = PJE.get("h3", {})
+_lora = _h3.get("lora", "minidv_lora_h3_v1.safetensors:0.9")
+PIKA = ["--turbo", _h3.get("turbo", "pika_h3_flex_ref2va_v1_bf16.safetensors"), "--steps", str(_h3.get("steps", 6)), "--no-shift",
+        "--size", _h3.get("size", "768x1344")] + (["--lora", _lora] if _lora else [])
 ENV = dict(os.environ, H3_SAMPLER="lcm", H3_SIGMAS="1.0, 0.972973, 0.923077, 0.8, 0.571429, 0.333333, 0.0")
 REJILLA = [4.46, 5.17, 5.875, 6.58, 7.29, 8.0, 8.71, 9.42]
 

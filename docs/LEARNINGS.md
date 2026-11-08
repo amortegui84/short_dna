@@ -42,6 +42,14 @@ section the moment a review note arrives.
   extended the ending began from the short clip's end. Fix: `continuar` compares the extended clip's last frame with
   `final/inicio.png` and remakes the ending when they differ.
 
+- **"Can not set expression ... property is hidden" on a text Range Selector** (ae/ccc.jsx, 2026-11-07): Units and Based On live
+  in the selector's "ADBE Text Range Advanced" group, and setting Units to index hides Percent Start. Fix: leave Units in
+  percent, set Based On through the Advanced group, drive Percent Start with an expression.
+- **Voice layers fail to import ("add ... null")**: montaje.py stores the wav paths as given on the command line, so a relative
+  project path gives relative paths After Effects cannot open. Fix: build_collage.py resolves the voice paths to absolute.
+- **Wikimedia downloads: 429 and 400**: full-size originals in a row hit the rate limit, and a hand-built thumbnail width
+  (2000 px) answers 400. Fix: ask the Commons API for `thumburl` with `iiurlwidth=1920`, pause between files.
+
 ## After Effects build (collage style)
 - **~5 frames of empty green before an artwork** → the presenter's colour background lived until cut + 0.4 s above the artwork → end it at cut + 0.02.
 - **"The same painting split by a transition"** → a voice-over line was its own section with a camera move and stripes, although the
@@ -66,6 +74,9 @@ section the moment a review note arrives.
 - **A grey box appears** → a halftone PNG in Multiply on dark → use it only inside the slab, as a track-matted layer.
 - **ExtendScript error "Function found where a Number... is needed"** → a local `var T = []` shadowed the helper `T(L)` → never reuse helper names.
 - **Labels out of the safe area** → the safe area for Shorts is x 40-950, y 150-1330, subtitles at y 1400; `check_layout` + the builder's own check with real measurements.
+- **A rebuilt brand edit looks cheaper and "faster" than its reference** → the builder was written from a dump of layer names only, so every value was a guess → run `ae/aep_dump.jsx` on a copy of the template (every modified, keyed or expression-driven property, with eases and fonts), write the values to `references/<x>_ae_rules.md`, build from them (CCC Dürer v1, 2026-11-07).
+- **A gradient in a template is not always a colour** → in CCC the host ramp is a luma track matte that fades the type wall toward the bottom, and the coral is the wall recoloured by Lumetri → check a solid's role (`IS_MATTE`, disabled) before copying it.
+- **A brand font draws as the fallback** → this After Effects reads only `C:\Windows\Fonts`, not per-user fonts → install brand fonts for all users (admin); the CCC builder falls back to Inter Tight and prints a WARN line.
 
 ## Music and sound
 - **"The song is childish"** → lute, recorder, celesta, glockenspiel, pizzicato tags → cinematic tags (cello drone, sparse piano, synth pulse), restrained; the style file keeps the default.
@@ -105,3 +116,31 @@ section the moment a review note arrives.
 - **"Too slow for a 1-minute story"** → ElevenLabs v3 ignores `speed`, and designed voices speak ~95 wpm; tags like [slowly]/[long pause] slow it more → use `eleven_multilingual_v2` with `speed` 1.2 (~120 wpm, natural) + 1.1x, pauses capped at 0.4 s. v2 reads [tags] aloud: tts.py strips them for non-v3 models.
 - **Dramatic pauses were deleted** → montaje's silenceremove cut every silence > 0.3 s → `conservar_pausas` + `pausa_max` keep pauses up to N s.
 - A mouthless narrator needs no speech-to-speech: the line lasts as long as the voice, and the clip ping-pongs if the voice is longer.
+
+## Cool Culture Club: template fidelity, voice, Seedance (2026-11-07)
+- **The edit felt cheaper and faster than the reference** → the builder was written from layer names, not values → `ae/aep_dump.jsx`
+  dumps every modified, keyed or expression-driven property with its ease; build from those values (brands/<b>/references/*_ae_rules.md).
+- **Entries floated** → every key was eased from rest → the template's pop/slide leave at 7.5x the segment's average speed and a drop
+  lands at 4x: `easeAll` takes speed multipliers; host settles are Hold keys, art moves are linear.
+- **Template art modules (3D carousel, desk scroll, slider, strip)** → reuse them as built: import the .aep, duplicate the module,
+  swap the "(swap me)" images, retime its own control. Slide comps must keep the name "Slide 0N" (their expressions read N from the
+  comp name) and expressions that name the source comp are re-pointed; unused template items are removed after the build.
+- **Black flashes in image transitions** → the template modules' "BG black" and the master background showed between pieces → the
+  head's background (teal gradient + coral wall) replaces every black background.
+- **A 4-frame close-up before a cut / the host cut before finishing a word** → a punch-in landed 0.13 s before a cut to a work, and the
+  cut to the work used the word's start → cut when the naming word ends, keep the host 1.2 s, drop punches less than 1 s before a cut.
+- **No image may start and be cut away** → every work stays 1.2 s or more; the template's scroll never rests (cap it at the last named
+  work); the carousel's last slide exits after the cut.
+- **Head and VO sounded like two voices** → STS lines (host) vs straight TTS (VO): speaker similarity 0.89 between groups →
+  `sts.py --vo` passes the VO through the same STS and `igualar_voz.py` EQs it to the host spectrum and levels every line (0.974).
+- **The ending looped (ping-pong) and looked odd** → the last host section now runs to the end (style `cola_final_s`) and
+  `continuar.py` generates real footage for it with the character's own prompt (`prompt_continuacion`); with Seedance the last clip
+  already ends on a generated closing smile.
+- **Seedance 2.5 on fal** (`engine/seedance.py`): image-to-video from the approved still, the host lines in two long clips, one clip per
+  line cut back out by aligning Whisper's words. Billing = width x height x seconds x 24 / 1024 tokens at USD 0.0214 per 1,000
+  (audio included): 9:16 costs ~USD 0.21/s at 480p, 0.46/s at 720p, 1.04/s at 1080p. Each clip took 264 s. With Seedance there is no
+  TTS for host lines (montaje skips the missing file).
+- **Deep cut QA before every delivery** → `engine/qa_cortes.py`: flashes (a shot < 0.5 s between isolated cuts), flat black areas,
+  host shots under 1.2 s, the type wall's motion against the reference.
+- **Fonts**: this After Effects reads only `C:\Windows\Fonts` (install brand fonts for all users); a font AE once failed to find stays in
+  `app.fonts.missingOrSubstitutedFonts` for the session (check_layout STOP) even after no layer uses it: verify the layers.

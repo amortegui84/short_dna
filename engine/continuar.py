@@ -16,8 +16,11 @@ carpeta = Path(sys.argv[1]).resolve(); pj = proyecto(carpeta); seco = "--dry" in
 PJE = personaje(pj)
 datos = json.loads((carpeta / "datos_ae.json").read_text(encoding="utf-8"))
 REJILLA = [4.46, 5.17, 5.875, 6.58, 7.29, 8.0, 8.71, 9.42]
-PIKA = ["--turbo", "pika_h3_flex_ref2va_v1_bf16.safetensors", "--steps", "6", "--no-shift", "--size", "768x1344",
-        "--lora", "minidv_lora_h3_v1.safetensors:0.9"]
+# the character's own H3 recipe (Cult Pixel: VHS LoRA; CCC: no LoRA), as in clips.py
+_h3 = PJE.get("h3", {})
+_lora = _h3.get("lora", "minidv_lora_h3_v1.safetensors:0.9")
+PIKA = ["--turbo", _h3.get("turbo", "pika_h3_flex_ref2va_v1_bf16.safetensors"), "--steps", str(_h3.get("steps", 6)), "--no-shift",
+        "--size", _h3.get("size", "768x1344")] + (["--lora", _lora] if _lora else [])
 ENV = dict(os.environ, H3_SAMPLER="lcm", H3_SIGMAS="1.0, 0.972973, 0.923077, 0.8, 0.571429, 0.333333, 0.0")
 lineas = pj["lineas"]; ids = [l["id"] for l in lineas]
 
@@ -46,7 +49,7 @@ def gesto(lid, ini, fin):
 
 hechos = []
 for s in datos["secciones"]:
-    if s.get("tipo") not in ("gancho", "cabeza") or not s.get("clip"):
+    if s.get("tipo") not in ("gancho", "cabeza") or not (s.get("clip") or (carpeta / "clips" / f"{s.get('id')}.mp4").exists()):
         continue
     lid = s["id"]; base = carpeta / "clips" / f"{lid}.mp4"; full = carpeta / "clips" / f"{lid}_full.mp4"
     falta = (s["fin"] - s["ini"]) - duracion(base) + 0.4
@@ -61,7 +64,12 @@ for s in datos["secciones"]:
         seg = next((x for x in REJILLA if x >= falta), REJILLA[-1])
         ini_png = carpeta / "clips" / f"{lid}_cont{k}_inicio.png"
         run(["ffmpeg", "-y", "-v", "error", "-sseof", "-0.12", "-i", str(previo), "-frames:v", "1", "-update", "1", str(ini_png)])
-        prompt = con_mesa(f"""subject_definitions:
+        # a character can bring its own continuation prompt (character.json "prompt_continuacion", with {gesto}); the default
+        # below is Cult Pixel's masked narrator
+        if PJE.get("prompt_continuacion"):
+            prompt = PJE["prompt_continuacion"].replace("{gesto}", gesto(lid, s["ini"], s["fin"])).replace("{artista}", pj.get("artista", ""))
+        else:
+          prompt = con_mesa(f"""subject_definitions:
 <Subject 1> is the hooded storyteller from <Picture 1>: black hood and robe, a smooth pale-yellow oval mask with no mouth and a single painted black eye, black gloves; his look matches <Picture 2> exactly.
 
 summary:

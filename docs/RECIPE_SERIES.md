@@ -62,6 +62,14 @@ Command: `python factory.py run <brand>/<slug> --yes` runs steps 4-13 in order a
 So today the line is reliable at about one episode a day with one person reviewing. Volume beyond ~8 a month needs paid
 publishing plans (PostWire Starter, Zapier) or posting part of it by hand; beyond one a day a batch can now run overnight; the visual QA in the morning is still a person's (or Claude's) look.
 
+## 2b. Two engines for the host clips (measured 2026-11-07, Cool Culture Club)
+| | MiniMax H3 (local) | Seedance 2.5 (fal, `engine/seedance.py`) |
+|---|---|---|
+| Host footage of one episode (~38-44 s) | ~24 min + continuations, USD 0 | ~9 min (4.5 in parallel), USD 7.81 at 480p / 17.57 at 720p / 39.52 at 1080p |
+| Expression | moderate | large (the reference's look) |
+| Words heard | 0.91-1.00 per line | 1.00 per line |
+A whole Seedance episode at 1080p: ~USD 40 of clips + ~USD 0.30 of voice, ~USD 52 with one re-take margin; the rest is local.
+
 ## 3. Running a batch
 1. Write 5-7 topics. For each: research + script against the bible (Claude), the person reads the scripts together.
 2. Queue them overnight: `factory.py run` for each, one after another (GPU stages never in parallel).

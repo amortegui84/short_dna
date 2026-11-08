@@ -15,6 +15,9 @@ vo.mkdir(exist_ok=True)
 H = {"xi-api-key": clave_eleven(), "Content-Type": "application/json"}
 VOZ = personaje(pj).get("voz", {}) if pj.get("personaje") else {}
 for ln in pj["lineas"]:
+    # with Seedance the host lines' voice comes from the clip itself (then speech-to-speech): no TTS for them
+    if pj.get("motor_clips") == "seedance" and ln["tipo"] == "A":
+        continue
     mp3 = vo / f"{ln['id']}.mp3"
     if mp3.exists():
         continue
