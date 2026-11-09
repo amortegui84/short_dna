@@ -37,9 +37,11 @@ fallos, avisos = [], []
 for a, b in zip(cortes, cortes[1:]):
     if b - a < 0.5:
         fallos.append(f"flash: a {b - a:.2f} s shot between cuts at {a:.2f} and {b:.2f} s")
+# checks 2 and 4 belong to styles with a type wall behind the host (CCC); a dark VHS style (Cult Pixel) has flat black on purpose
+CCC = bool(datos.get("type_wall"))
 # 2. black areas
 negros = []
-for k in range(n):
+for k in (range(n) if CCC else []):
     t = k / fps
     if t < 0.2 or t > dur - 0.2:
         continue
@@ -82,7 +84,7 @@ for s in datos["secciones"]:
     if d and np.mean(sd) > 1:
         mov.append(float(np.mean(d) / np.mean(sd)))
 m = float(np.mean(mov)) if mov else 0.0
-if not 0.18 <= m <= 0.45:
+if CCC and not 0.18 <= m <= 0.45:
     fallos.append(f"type wall motion {m:.2f} outside 0.18-0.45 (reference 0.24-0.36)")
 res = {"video": video.name, "duracion_s": round(dur, 2), "cortes": len(cortes), "muro_movimiento": round(m, 3), "fallos": fallos, "avisos": avisos, "ok": not fallos}
 (carpeta / "qa_cortes.json").write_text(json.dumps(res, indent=1), encoding="utf-8")
