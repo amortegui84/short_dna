@@ -44,7 +44,9 @@ MIN_OBRA = 1.8
 
 # ---------- linea de tiempo (igual que build_collage.py: la ficha entra antes de la primera B)
 segs, off, fz0 = [], 0.0, None
-primera_b = next(s["id"] for s in tl["segmentos"] if s["tipo"] == "B")
+# the portrait card goes on the first B line, or on the line the script names ("ficha_en"): CCC's "reveal" order shows who the
+# artist is only late in the video (docs: brands/ccc/BIBLE.md, variety between episodes)
+primera_b = pj.get("ficha_en") or next(s["id"] for s in tl["segmentos"] if s["tipo"] == "B")
 for s in tl["segmentos"]:
     d = dict(s)
     if s["id"] == primera_b:

@@ -104,5 +104,26 @@
   "estado": "NOT PUBLISHED: separate account and project. The publishing connections in this setup (Zapier YouTube/Instagram, PostWire TikTok) belong to Cult Pixel and must never be used for ccc.",
   "cuentas": null
  },
- "voz_id": "6u6JbqKdaQy89ENzLSju"
+ "voz_id": "6u6JbqKdaQy89ENzLSju",
+ "variedad": {
+  "gastadas": [
+   "here's the thing",
+   "look closely",
+   "scholars still argue",
+   "people still argue",
+   "tell me in the comments",
+   "i'm off to",
+   "genius or",
+   "nobody knows"
+  ],
+  "presentadores": [
+   "girl",
+   "guy"
+  ],
+  "palabras": [
+   120,
+   160
+  ],
+  "nota": "general formula: docs/templates/variedad.md; spent phrases are the ones this brand's early videos repeated"
+ }
 }

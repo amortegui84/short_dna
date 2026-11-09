@@ -1,0 +1,228 @@
+{
+ "artista": "Hilma af Klint",
+ "presentador": "ccc_girl",
+ "lineas": [
+  {
+   "id": "L01",
+   "tipo": "B",
+   "texto": "These paintings are taller than a door. They were painted in 1907, before anyone called anything abstract art.",
+   "tts": "[awed] These paintings are taller than a door. They were painted in 1907... before anyone called anything abstract art.",
+   "obras": []
+  },
+  {
+   "id": "L02",
+   "tipo": "A",
+   "texto": "The woman who painted them said she didn't paint them alone.",
+   "accion": "he appears already leaning slightly toward the lens with wide, amazed eyes; on 'didn't paint them alone' his eyebrows rise slowly and he holds a soft, stunned smile. No hands, no body."
+  },
+  {
+   "id": "L03",
+   "tipo": "B",
+   "texto": "Five women met every week in Stockholm for séances. They called themselves The Five.",
+   "tts": "Five women met every week in Stockholm... for séances. They called themselves... The Five.",
+   "obras": []
+  },
+  {
+   "id": "L04",
+   "tipo": "A",
+   "texto": "Zoom into the spirals: no sketches underneath. She swore the shapes came all at once.",
+   "accion": "he narrows his eyes and leans in slowly as if peering into the canvas on 'zoom into the spirals', then his eyes open wide in wonder on 'all at once'. No hands, no body."
+  },
+  {
+   "id": "L05",
+   "tipo": "B",
+   "texto": "The pictures were painted directly through me, without any preliminary drawings, and with great force.",
+   "tts": "[whispers] The pictures were painted directly through me... without any preliminary drawings... and with great force.",
+   "obras": [
+    "__cita__"
+   ]
+  },
+  {
+   "id": "L06",
+   "tipo": "A",
+   "texto": "She showed them to the most famous mystic of her time. He said nobody would understand them for fifty years.",
+   "accion": "he tilts his head, a little hurt on her behalf, on 'the most famous mystic'; on 'fifty years' he slowly shakes his head once, still amazed. No hands, no body."
+  },
+  {
+   "id": "L07",
+   "tipo": "B",
+   "texto": "She stopped painting for four years. Then she came back and finished the series.",
+   "tts": "She stopped painting for four years. [softly] Then she came back... and finished the series.",
+   "obras": []
+  },
+  {
+   "id": "L08",
+   "tipo": "B",
+   "texto": "Her name was Hilma af Klint. Stockholm, 1862 to 1944.",
+   "tts": "Her name was Hilma af Klint. Stockholm... 1862 to 1944.",
+   "obras": []
+  },
+  {
+   "id": "L09",
+   "tipo": "A",
+   "texto": "Before she died, she asked that this work stay hidden until twenty years after her death.",
+   "accion": "he lowers his voice and leans in close to the lens as if telling a secret, eyes wide and still. No hands, no body."
+  },
+  {
+   "id": "L10",
+   "tipo": "A",
+   "texto": "In 2019, her show became the most visited in the Guggenheim's history. The mystic was wrong. It took a century.",
+   "accion": "a slow proud smile grows on 'most visited'; on 'the mystic was wrong' one eyebrow rises; on 'it took a century' he holds the lens in silence, a small amazed shake of the head. No hands, no body."
+  }
+ ],
+ "obras": {},
+ "cita": {
+  "lineas": [
+   "The pictures were painted",
+   "directly through me,",
+   "without any preliminary",
+   "drawings, and with great force."
+  ],
+  "autor": "— Hilma af Klint, her notebook",
+  "clave": "through"
+ },
+ "retrato_recorte": "",
+ "etiqueta_nombre": "HILMA AF KLINT",
+ "fuentes": [
+  "https://en.wikipedia.org/wiki/Hilma_af_Klint"
+ ],
+ "slug": "ep01_hilma",
+ "marca": "ccc",
+ "plantilla": "ccc_artist_short",
+ "estilo": "ccc_bricolage",
+ "personaje": "ccc_guy",
+ "tema": "Hilma af Klint",
+ "numero": 1,
+ "fechas": "Stockholm, Sweden · 1862-1944",
+ "ritmo_b": 1.1,
+ "pausa_b": 0.25,
+ "pausa_max": 0.4,
+ "duracion_objetivo_s": 58,
+ "ia_disclosure": true,
+ "musica": null,
+ "variacion": {
+  "gancho": "en_frio",
+  "orden": "revelacion",
+  "tono": "asombro",
+  "final": "giro",
+  "presentador": "guy"
+ },
+ "ficha_en": "L08",
+ "gancho": "Painted with spirits",
+ "lema": "the abstract painter nobody was allowed to see",
+ "retrato": "retrato",
+ "momentos_a": {
+  "L02": [
+   [
+    "obra",
+    "diez_mayores",
+    "alone"
+   ]
+  ],
+  "L04": [
+   [
+    "obra",
+    "caos_primordial",
+    "spirals"
+   ]
+  ],
+  "L06": [
+   [
+    "obra",
+    "retablo",
+    "mystic"
+   ]
+  ],
+  "L09": [
+   [
+    "obra",
+    "cisne",
+    "hidden"
+   ]
+  ]
+ },
+ "obras_b": {
+  "L01": [
+   [
+    "diez_mayores",
+    "paintings"
+   ]
+  ],
+  "L03": [
+   [
+    "caos_primordial",
+    "five"
+   ]
+  ],
+  "L07": [
+   [
+    "cisne",
+    "stopped"
+   ],
+   [
+    "retablo",
+    "finished"
+   ]
+  ],
+  "L08": []
+ },
+ "detalles": {
+  "caos_primordial": [
+   {
+    "palabra": "spirals",
+    "foco": [
+     0.5,
+     0.45
+    ],
+    "x": 2.2
+   },
+   {
+    "palabra": "shapes",
+    "foco": [
+     0.35,
+     0.6
+    ],
+    "x": 6.5
+   }
+  ]
+ },
+ "titulos": {
+  "diez_mayores": [
+   "The Ten Largest, No. 7, Adulthood",
+   "1907"
+  ],
+  "caos_primordial": [
+   "Primordial Chaos",
+   "1906-07"
+  ],
+  "cisne": [
+   "The Swan",
+   "1914-15"
+  ],
+  "retablo": [
+   "Altarpiece, No. 1",
+   "1915"
+  ],
+  "retrato": [
+   "Hilma af Klint",
+   "photograph, c. 1910"
+  ]
+ },
+ "obras_por_bajar": [
+  "The Ten Largest No. 7 Adulthood (1907)",
+  "Primordial Chaos, group I (1906-07)",
+  "The Swan, group IX/SUW (1914-15)",
+  "Altarpiece No. 1, group X (1915)",
+  "a public-domain photograph of Hilma af Klint"
+ ],
+ "juntas": [
+  [
+   "hilma",
+   "af"
+  ],
+  [
+   "af",
+   "klint"
+  ]
+ ]
+}

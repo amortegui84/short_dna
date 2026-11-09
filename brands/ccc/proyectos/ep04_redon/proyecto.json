@@ -1,0 +1,216 @@
+{
+ "artista": "Odilon Redon",
+ "presentador": "ccc_girl",
+ "lineas": [
+  {
+   "id": "L01",
+   "tipo": "A",
+   "texto": "Pause on the sky. That balloon has an eye, and it is looking straight at you.",
+   "accion": "she stares flat into the lens with a deadpan face on 'pause on the sky'; on 'looking straight at you' only her eyes slide slowly up, then back to the lens, unimpressed. No hands, no body."
+  },
+  {
+   "id": "L02",
+   "tipo": "B",
+   "texto": "My drawings inspire, and are not to be defined.",
+   "tts": "My drawings inspire... and are not to be defined.",
+   "obras": [
+    "__cita__"
+   ]
+  },
+  {
+   "id": "L03",
+   "tipo": "A",
+   "texto": "So, don't ask what it means. He won't tell you. He's been dead since 1916.",
+   "accion": "completely flat face, one slow blink on 'he won't tell you', the smallest shrug of the head on 'dead since 1916'. No hands, no body."
+  },
+  {
+   "id": "L04",
+   "tipo": "B",
+   "texto": "Odilon Redon. Bordeaux, 1840. Born Bertrand: he took the name Odilon from his mother, Odile.",
+   "tts": "Odilon Redon. Bordeaux, 1840. Born Bertrand... he took the name Odilon from his mother, Odile.",
+   "obras": []
+  },
+  {
+   "id": "L05",
+   "tipo": "A",
+   "texto": "For decades he drew only in black. Charcoal, lithographs. He called them his noirs.",
+   "accion": "she says it flatly, eyebrows barely moving; on 'his noirs' a tiny unimpressed nod. No hands, no body."
+  },
+  {
+   "id": "L06",
+   "tipo": "B",
+   "texto": "In 1884 a famous novel gave its decadent hero a collection of Redon drawings. Suddenly, Paris wanted one.",
+   "tts": "In 1884 a famous novel gave its decadent hero a collection of Redon drawings. [dry] Suddenly... Paris wanted one.",
+   "obras": []
+  },
+  {
+   "id": "L07",
+   "tipo": "A",
+   "texto": "Then, after 1900, the black stopped. Pastels, oil, colour everywhere. Same man.",
+   "accion": "flat face; on 'colour everywhere' her eyes widen for a split second, then go flat again on 'same man'. No hands, no body."
+  },
+  {
+   "id": "L08",
+   "tipo": "B",
+   "texto": "In 1913, New York's Armory Show gave him more space than any other artist.",
+   "tts": "In 1913, New York's Armory Show gave him more space... than any other artist.",
+   "obras": []
+  },
+  {
+   "id": "L09",
+   "tipo": "A",
+   "texto": "He wanted the logic of the visible at the service of the invisible. A very normal goal.",
+   "accion": "she quotes it with a perfectly straight face, then one eyebrow lifts on 'a very normal goal'. No hands, no body."
+  },
+  {
+   "id": "L10",
+   "tipo": "A",
+   "texto": "So. The balloon with the eye? It is still looking at you. Don't look up.",
+   "accion": "deadpan into the lens; on 'still looking at you' her eyes flick up and back; on 'don't look up' she holds perfectly still, then a slow blink. No hands, no body."
+  }
+ ],
+ "obras": {},
+ "cita": {
+  "lineas": [
+   "My drawings",
+   "inspire, and are",
+   "not to be defined."
+  ],
+  "autor": "— Odilon Redon",
+  "clave": "defined"
+ },
+ "retrato_recorte": "",
+ "etiqueta_nombre": "ODILON REDON",
+ "fuentes": [
+  "https://en.wikipedia.org/wiki/Odilon_Redon"
+ ],
+ "slug": "ep04_redon",
+ "marca": "ccc",
+ "plantilla": "ccc_artist_short",
+ "estilo": "ccc_bricolage",
+ "personaje": "ccc_girl",
+ "tema": "Odilon Redon",
+ "numero": 4,
+ "fechas": "Bordeaux, France · 1840-1916",
+ "ritmo_b": 1.1,
+ "pausa_b": 0.25,
+ "pausa_max": 0.4,
+ "duracion_objetivo_s": 58,
+ "ia_disclosure": true,
+ "musica": null,
+ "variacion": {
+  "gancho": "orden",
+  "orden": "cita_primero",
+  "tono": "seco",
+  "final": "callback",
+  "presentador": "girl"
+ },
+ "gancho": "Don't look up",
+ "lema": "the man who drew in black, then in colour",
+ "retrato": "retrato",
+ "momentos_a": {
+  "L01": [
+   [
+    "obra",
+    "ojo_globo",
+    "eye"
+   ]
+  ],
+  "L05": [
+   [
+    "obra",
+    "noir",
+    "black"
+   ]
+  ],
+  "L07": [
+   [
+    "obra",
+    "flores",
+    "colour"
+   ]
+  ],
+  "L10": [
+   [
+    "obra",
+    "ojo_globo",
+    "balloon"
+   ]
+  ]
+ },
+ "obras_b": {
+  "L04": [
+   [
+    "retrato",
+    "redon"
+   ]
+  ],
+  "L06": [
+   [
+    "noir",
+    "novel"
+   ],
+   [
+    "ojo_globo",
+    "paris"
+   ]
+  ],
+  "L08": [
+   [
+    "flores",
+    "armory"
+   ],
+   [
+    "ciclope",
+    "space"
+   ]
+  ]
+ },
+ "detalles": {
+  "ojo_globo": [
+   {
+    "palabra": "eye",
+    "foco": [
+     0.5,
+     0.35
+    ],
+    "x": 2.2
+   }
+  ]
+ },
+ "titulos": {
+  "ojo_globo": [
+   "The Eye, Like a Strange Balloon, Mounts Toward Infinity",
+   "1882"
+  ],
+  "noir": [
+   "a noir (charcoal)",
+   "1870s-1890s"
+  ],
+  "flores": [
+   "Flowers (pastel)",
+   "c. 1905"
+  ],
+  "ciclope": [
+   "The Cyclops",
+   "c. 1914"
+  ],
+  "retrato": [
+   "Odilon Redon",
+   "photograph"
+  ]
+ },
+ "obras_por_bajar": [
+  "The Eye, Like a Strange Balloon, Mounts Toward Infinity (1882, To Edgar Poe, MoMA)",
+  "one charcoal noir",
+  "a flower pastel after 1900",
+  "The Cyclops (c. 1914)",
+  "a public-domain photograph or self-portrait of Redon"
+ ],
+ "juntas": [
+  [
+   "odilon",
+   "redon"
+  ]
+ ]
+}

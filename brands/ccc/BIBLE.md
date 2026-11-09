@@ -52,7 +52,80 @@ cut for anyone else. Detail lives in `brand.json`, `styles/ccc_bricolage.json` (
 | Ep | Artist | Host | Status |
 |---|---|---|---|
 | 03 | Hieronymus Bosch | girl | reference cut done (`references/bosch_final_v1.mp4`) |
-| 01, 02, 04, 05 | Hilma af Klint, William Blake, Odilon Redon, Albrecht Durer | — | scripts exist in the source project, not here yet |
+| 05 | Albrecht Dürer | girl | test cut v7 (H3 local) |
+| 02 | William Blake | girl | test cut v2 (Seedance 480p) |
+| 01, 04 | Hilma af Klint, Odilon Redon | girl / guy | scripts for review (first episodes with the variety system, §9) |
+
+The variety choices of every episode live in `episodios.json`; `engine/qa_guion.py` reads it.
+
+## 9. Variety between episodes (review 2026-11-09)
+*Review: "the template works, but the videos look the same from one to the next: we need another hook, another order,
+other dialogue, another ending, so each video feels worked from the script."*
+
+The template stays: host, work, host, work, told the same way. **Within it, every episode picks one option per row
+below.** Its combination (hook + order + tone + ending) may not repeat any of the last 4 episodes, and its hook type and
+ending type must differ from the previous episode's. Before writing, Claude proposes 3 combinations (one line each); the person
+picks one; then the script is written, `qa_guion.py` checks it, and only then is anything generated.
+
+### 9.1 Hooks (L01)
+| Type | Key | What it is | Example |
+|---|---|---|---|
+| Impossible number | `numero` | one hard number that sounds wrong | "He painted 193 paintings nobody was allowed to see for 20 years." |
+| Order to the viewer | `orden` | tell them where to look, right now | "Pause on the bottom left corner. See the eye?" |
+| The artist speaks | `voz_artista` | open on the artist's own words, said as a confession | "'I want to paint like a madman,' he wrote. He meant it." |
+| Uncomfortable question | `pregunta` | a question about the viewer | "Would you hide your best work until you're dead?" |
+| The mistake | `error` | something wrong in the work, on purpose | "There's a mistake in this painting. It's on purpose." |
+| Cold open | `en_frio` | L01 is a B line: 2 s of the work in silence, then the voice over it; the host enters on L02 | (silence on the work) "This was painted by a woman who talked to spirits." |
+
+### 9.2 Order of the beats (the alternation stays)
+| Order | Key | Sequence | Engine |
+|---|---|---|---|
+| Classic (Bosch) | `clasico` | hook, portrait card, look closer, twist, quote, story, debate, unknown, close | default |
+| Reveal | `revelacion` | hook, the work, detail, story, ... and only late the portrait card: "who made it?" | `ficha_en`: a late B line |
+| Quote first | `cita_primero` | the quote card right after the hook, then portrait, story, detail, close | the `__cita__` line placed second |
+| Detail first | `detalle_primero` | the magnifier cards on the hook's work first, then portrait, story, quote, close | `detalles` on L01's work, words in L01-L03 |
+
+### 9.3 Tone (the host acts it; it writes every `accion`)
+| Tone | Key | How she speaks and moves |
+|---|---|---|
+| Gossip | `chisme` | leaning in, eyes darting, "you did NOT hear this from me" energy (the Bosch tone) |
+| Detective | `detective` | slow, narrowed eyes, pieces laid one by one, the answer held back to the end |
+| Deadpan | `seco` | flat face, short sentences, the joke in what she does not say |
+| Awe | `asombro` | wide eyes, slower, real wonder, one whispered line |
+| Defender | `defensa` | indignant on the artist's behalf: "and people called her crazy?" |
+
+### 9.4 Endings (L10)
+| Type | Key | What it is | Example |
+|---|---|---|---|
+| Twist | `giro` | a last fact that reframes the video | "...and she asked for it all to stay hidden. We didn't listen." |
+| Callback | `callback` | close the hook's loop with its own words | hook "See the eye?" -> close "Now you can't unsee it." |
+| Challenge | `reto` | a task in the work | "Find the second face. First one in the comments wins." |
+| Cliffhanger | `cliffhanger` | point to the next artist | "Next: the man who painted his own funeral." |
+| About you | `sobre_ti` | a question about the viewer's own life | "Would you have kept them hidden?" |
+| Silent | `mudo` | no spoken call to action: a look to the lens, the button only | (a look, the button) |
+
+### 9.5 Words that are spent (never in a new script)
+They were in every early episode, so they now make the videos sound alike:
+- "here's the thing"
+- "look closely"
+- "so scholars still argue" / "so people still argue"
+- "tell me in the comments"
+- "I'm off to"
+- "genius or ..."
+- "nobody knows"
+
+Say the same idea another way each time ("wait for it", "zoom in on her left hand", "historians are split", "your call").
+
+### 9.6 Visual variety (inside the template's look, never invented)
+- Host: alternate the girl and the guy between episodes (`presentador`).
+- Art modules: which module carries which beat (carousel, desk scroll, slider, strip, Ken Burns) changes per episode; the
+  rotation already starts at a different module each episode.
+- Punch-in pattern and the quote's position follow the chosen order.
+
+### 9.7 In the project
+`proyecto.json` carries `"variacion": {"gancho", "orden", "tono", "final", "presentador"}`. The engine reads `ficha_en` (the line
+that carries the portrait card) for the reveal order; the other orders are just the order of the lines. `episodios.json` gets
+one entry per episode when its script is approved.
 
 ## 6. Known pitfalls (from the handoff)
 - Wipe Reveal reveals right to left by default: set the angle to 270 for left to right, 0 for drips.

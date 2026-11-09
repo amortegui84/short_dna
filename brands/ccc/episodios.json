@@ -1,0 +1,8 @@
+{
+ "_nota": "One entry per episode, in publishing order, written when its script is approved. qa_guion.py reads it: the new combination (gancho + orden + tono + final) must not repeat any of the last 4, and gancho and final must differ from the previous episode's. 'dato_raro' and 'debate' are the template's original hook and ending (Bosch, Dürer, Blake): spent, not to be reused for a while.",
+ "episodios": [
+  {"ep": "03", "artista": "Hieronymus Bosch", "estado": "reference", "gancho": "dato_raro", "orden": "clasico", "tono": "chisme", "final": "debate", "presentador": "girl"},
+  {"ep": "05", "artista": "Albrecht Dürer", "estado": "test cut", "gancho": "dato_raro", "orden": "clasico", "tono": "chisme", "final": "debate", "presentador": "girl"},
+  {"ep": "02", "artista": "William Blake", "estado": "test cut", "gancho": "dato_raro", "orden": "clasico", "tono": "chisme", "final": "debate", "presentador": "girl"}
+ ]
+}
