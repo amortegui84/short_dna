@@ -41,6 +41,16 @@ differ. *(review 2026-11-09, Cool Culture Club: "the template works, but the vid
 | `defensa` | Defender | indignant on the subject's behalf |
 A brand with a fixed narrator voice (Cult Pixel's masked storyteller) maps tone onto pace, pauses and the size of his gestures.
 
+## 3b. Acting direction, line by line (every host line)
+Every host line in the script carries `"direccion": {"emocion", "entra", "gesto", "sale"}` so the scenes connect:
+- **emocion**: what the host feels in this line (follows the episode's tone, but moves: awe, then indignation, then a secret);
+- **entra**: how the line starts, tied to how the scene before ended (after a quote: eyes low out of respect; after a punch-in:
+  landing big);
+- **gesto**: the gesture and the word it lands on;
+- **sale**: the pose the line ends on, which is where the edit cuts to the next scene.
+The `accion` sent to the video model is built from these four. `qa_guion.py` refuses a host line without them.
+*(review 2026-11-09: "a description of what the head does, so we have context between scene and scene")*
+
 ## 4. Endings (the last line)
 | Key | Type | What it is | Example |
 |---|---|---|---|

@@ -6,7 +6,8 @@ Checks a project's proyecto.json against the brand's episodios.json:
   4. no spent phrase in any line (said text and the TTS text);
   5. the order is wired: "revelacion" needs "ficha_en" on a late B line, "cita_primero" puts the quote second, "en_frio"
      starts on a B line, "mudo" has no spoken call to action;
-  6. length: 120-160 words (about 55-65 s at the host's pace), research.md exists.
+  6. length in the brand's range, research.md exists;
+  7. every host line has its acting direction (emocion, entra, gesto, sale).
 Prints the result and exits 1 when a check fails. --registrar adds the episode to episodios.json once it passes.
 Usage: python qa_guion.py <project> [--registrar]"""
 import json, re, sys
@@ -75,6 +76,15 @@ if v.get("final") == "mudo" and lineas and re.search(r"comment|below|tell me", l
 if not cita:
     avisos.append("no quote card in this script")
 
+# every host line carries its acting direction: emotion, how it starts (tied to the scene before), the gesture on its word,
+# and how it ends (the pose the edit cuts on) -- review 2026-11-09: "context between scene and scene"
+if VAR.get("direccion", True):
+    for ln in lineas:
+        if ln["tipo"] == "A":
+            d = ln.get("direccion") or {}
+            falta = [k for k in ("emocion", "entra", "gesto", "sale") if not d.get(k)]
+            if falta:
+                fallos.append(f"{ln['id']}: acting direction missing {', '.join(falta)}")
 palabras = sum(len(l["texto"].split()) for l in lineas)
 if not PMIN <= palabras <= PMAX:
     fallos.append(f"{palabras} words (the brand's range is {PMIN}-{PMAX})")

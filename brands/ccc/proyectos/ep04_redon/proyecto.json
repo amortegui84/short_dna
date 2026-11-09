@@ -6,7 +6,13 @@
    "id": "L01",
    "tipo": "A",
    "texto": "Pause on the sky. That balloon has an eye, and it is looking straight at you.",
-   "accion": "she stares flat into the lens with a deadpan face on 'pause on the sky'; on 'looking straight at you' only her eyes slide slowly up, then back to the lens, unimpressed. No hands, no body."
+   "accion": "Emotion: flat, expressionless. She starts deadpan, eyes fixed on the lens; on 'looking straight at you' only her eyes slide slowly up to the sky and back; she ends eyes back on the lens, zero expression. No hands, no body.",
+   "direccion": {
+    "emocion": "flat, expressionless",
+    "entra": "deadpan, eyes fixed on the lens",
+    "gesto": "on 'looking straight at you' only her eyes slide slowly up to the sky and back",
+    "sale": "eyes back on the lens, zero expression (cut to his quote)"
+   }
   },
   {
    "id": "L02",
@@ -21,7 +27,13 @@
    "id": "L03",
    "tipo": "A",
    "texto": "So, don't ask what it means. He won't tell you. He's been dead since 1916.",
-   "accion": "completely flat face, one slow blink on 'he won't tell you', the smallest shrug of the head on 'dead since 1916'. No hands, no body."
+   "accion": "Emotion: ironic disinterest. She starts the same flat face she left with; one slow blink on 'he won't tell you'; the smallest shrug of the head on 'dead since 1916'; she ends motionless. No hands, no body.",
+   "direccion": {
+    "emocion": "ironic disinterest",
+    "entra": "the same flat face she left with",
+    "gesto": "one slow blink on 'he won't tell you'; the smallest shrug of the head on 'dead since 1916'",
+    "sale": "motionless (cut to the portrait card)"
+   }
   },
   {
    "id": "L04",
@@ -34,7 +46,13 @@
    "id": "L05",
    "tipo": "A",
    "texto": "For decades he drew only in black. Charcoal, lithographs. He called them his noirs.",
-   "accion": "she says it flatly, eyebrows barely moving; on 'his noirs' a tiny unimpressed nod. No hands, no body."
+   "accion": "Emotion: dry. She starts flat, the voice even; her eyebrows barely move; a tiny unimpressed nod on 'his noirs'; she ends still. No hands, no body.",
+   "direccion": {
+    "emocion": "dry",
+    "entra": "flat, the voice even",
+    "gesto": "her eyebrows barely move; a tiny unimpressed nod on 'his noirs'",
+    "sale": "still (cut to the black drawings)"
+   }
   },
   {
    "id": "L06",
@@ -47,7 +65,13 @@
    "id": "L07",
    "tipo": "A",
    "texto": "Then, after 1900, the black stopped. Pastels, oil, colour everywhere. Same man.",
-   "accion": "flat face; on 'colour everywhere' her eyes widen for a split second, then go flat again on 'same man'. No hands, no body."
+   "accion": "Emotion: held-back surprise. She starts flat; her eyes widen for a split second on 'colour everywhere' and go flat again on 'same man'; she ends flat again, as if nothing happened. No hands, no body.",
+   "direccion": {
+    "emocion": "held-back surprise",
+    "entra": "flat",
+    "gesto": "her eyes widen for a split second on 'colour everywhere' and go flat again on 'same man'",
+    "sale": "flat again, as if nothing happened (cut to the flowers)"
+   }
   },
   {
    "id": "L08",
@@ -60,13 +84,25 @@
    "id": "L09",
    "tipo": "A",
    "texto": "He wanted the logic of the visible at the service of the invisible. A very normal goal.",
-   "accion": "she quotes it with a perfectly straight face, then one eyebrow lifts on 'a very normal goal'. No hands, no body."
+   "accion": "Emotion: irony. She starts a perfect poker face while she quotes him; one eyebrow lifts on 'a very normal goal'; she ends the eyebrow stays up. No hands, no body.",
+   "direccion": {
+    "emocion": "irony",
+    "entra": "a perfect poker face while she quotes him",
+    "gesto": "one eyebrow lifts on 'a very normal goal'",
+    "sale": "the eyebrow stays up (jump cut to the last line)"
+   }
   },
   {
    "id": "L10",
    "tipo": "A",
    "texto": "So. The balloon with the eye? It is still looking at you. Don't look up.",
-   "accion": "deadpan into the lens; on 'still looking at you' her eyes flick up and back; on 'don't look up' she holds perfectly still, then a slow blink. No hands, no body."
+   "accion": "Emotion: dry, slightly eerie. She starts landing big from the punch-in, deadpan; her eyes flick up and back on 'still looking at you'; on 'don't look up' she holds perfectly still, then one slow blink; she ends still, looking at us: the button appears. No hands, no body.",
+   "direccion": {
+    "emocion": "dry, slightly eerie",
+    "entra": "landing big from the punch-in, deadpan",
+    "gesto": "her eyes flick up and back on 'still looking at you'; on 'don't look up' she holds perfectly still, then one slow blink",
+    "sale": "still, looking at us: the button appears"
+   }
   }
  ],
  "obras": {},
