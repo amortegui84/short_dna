@@ -20,6 +20,7 @@ var COLLAGE = (function () {
         var f = new File(p.indexOf(":") > 0 ? p : ROOT + p);
         if (!f.exists) { cache[p] = null; return null; }
         var it = app.project.importFile(new ImportOptions(f)); it.parentFolder = fold;
+        try { it.mainSource.reload(); } catch (eR) {}   // review 2026-11-14: AE kept the old duration of a file re-made at the same path
         if (recta && it.mainSource.hasAlpha) it.mainSource.alphaMode = AlphaMode.STRAIGHT;
         cache[p] = it; return it;
     }
@@ -691,7 +692,9 @@ var COLLAGE = (function () {
         var tp = c.layers.add(imp("imagenes/texturas/Paper002_2k.jpg", false)); S(tp).setValue([H * 1.05 / tp.source.height * 100, H * 1.05 / tp.source.height * 100]); P(tp).setValue([W / 2, H / 2]); mult(tp, 8);
         if (D.estilo && D.estilo.vhs) vhs();
         var gn = c.layers.addSolid([0, 0, 0], "grano", W, H, 1, DUR); gn.adjustmentLayer = true; fx(gn, "ADBE Noise").property(1).setValue(6);
-        for (i = 0; i < D.voces.length; i++) { var V = c.layers.add(imp(D.voces[i].wav, false)); V.name = D.voces[i].id + " voz"; V.startTime = D.voces[i].start; }
+        for (i = 0; i < D.voces.length; i++) { var V = c.layers.add(imp(D.voces[i].wav, false)); V.name = D.voces[i].id + " voz"; V.startTime = D.voces[i].start;
+            if (Math.abs(V.source.duration - D.voces[i].dur) > 0.05) { V.source.mainSource.reload(); if (Math.abs(V.source.duration - D.voces[i].dur) > 0.05) throw new Error("voice " + D.voces[i].id + " is " + V.source.duration.toFixed(2) + " s in AE, " + D.voces[i].dur.toFixed(2) + " s on disk"); }
+            V.outPoint = Math.min(DUR, D.voces[i].start + V.source.duration); }
         if (D.musica) { var mu = c.layers.add(imp(D.musica, false)); mu.name = "Musica"; mu.outPoint = DUR; var nv = D.musica.indexOf("elegida") >= 0 ? 0 : -13.2, al = mu.property("Audio").property("Audio Levels"); al.setValueAtTime(0, [nv, nv]); al.setValueAtTime(Math.max(0, DUR - 1.8), [nv, nv]); al.setValueAtTime(DUR, [-48, -48]); }   // v10c: musica propia ya normalizada; se apaga al final
         return "ok " + c.numLayers + " capas\n" + D.medidas.join("\n");
     }

@@ -90,11 +90,63 @@ if not PMIN <= palabras <= PMAX:
     fallos.append(f"{palabras} words (the brand's range is {PMIN}-{PMAX})")
 if not (carpeta / "research.md").exists():
     fallos.append("research.md missing (every fact needs its source)")
+else:
+    # depth and coherence (review 2026-11-12: "deep research, relevant facts, a coherent script"): a brand can ask for a
+    # minimum of sources from different sites, and every number or year said in the script must be in research.md
+    rs = (carpeta / "research.md").read_text(encoding="utf-8")
+    urls = set(re.findall(r"https?://[^\s|)>\]]+", rs))
+    dominios = {re.sub(r"^www\.", "", u.split("/")[2]) for u in urls}
+    smin, dmin = VAR.get("fuentes_min", [0, 0])
+    if len(urls) < smin or len(dominios) < dmin:
+        fallos.append(f"research.md cites {len(urls)} sources from {len(dominios)} sites (the brand asks for {smin} from {dmin})")
+    num = lambda t: {re.sub(r"[,\s]", "", n) for n in re.findall(r"\b\d[\d,]*(?:\.\d+)?\b", t)}
+    pal_num = {"one": "1", "two": "2", "three": "3", "four": "4", "five": "5", "six": "6", "seven": "7", "eight": "8", "nine": "9",
+               "ten": "10", "twelve": "12", "thirteen": "13", "twenty": "20", "fifty": "50", "hundred": "100"}
+    en_rs = num(rs) | {k for k, n in pal_num.items() if n in num(rs)}
+    for ln in lineas:
+        for n in sorted(num(ln["texto"])):
+            if n not in en_rs:
+                fallos.append(f"{ln['id']}: '{n}' is in the script but not in research.md (unsourced number)")
+    # real media first: archival photos, documents, footage (Wikimedia Commons, government archives, newspapers in the public
+    # domain) are more gripping than reconstructions; generated images fill only the gaps (review 2026-11-12)
+    rmin = VAR.get("reales_min", 0)
+    if rmin:
+        reales = len(pj.get("obras_descarga") or []) + sum(len(d.get("paginas", {})) for d in pj.get("documentos", []))
+        total_ev = reales + len(pj.get("visuales") or {})
+        if total_ev and reales / total_ev < rmin and "## No real media" not in rs:
+            fallos.append(f"{reales} of {total_ev} evidence images are real (the brand asks for {rmin:.0%}); find archival media or "
+                          "explain in research.md under '## No real media' why none exists")
+    if VAR.get("contexto") and lineas:
+        # the first 4 lines place the story: a year and a place name (a capitalised word after in/at/near or a comma pair)
+        cab = " ".join(l["texto"] for l in lineas[:4])
+        if not re.search(r"\b1\d{3}\b|\b20\d{2}\b", cab):
+            fallos.append("no year in the first 4 lines: the viewer needs to know when this happened")
+        if not re.search(r"\b[A-Z][a-z]+(?: [A-Z][a-z]+)*, [A-Z][a-z]+|\b(?:in|at|near|outside|from|to|over|off) [A-Z][a-z]+", cab):
+            fallos.append("no place in the first 4 lines: the viewer needs to know where this happened")
+
+# dynamic shots (library/tomas, engine/tomas_lib.py): variety of shot categories, a lively first talking shot
+if VAR.get("tomas_lib"):
+    import tomas_lib
+    lib = tomas_lib.cargar()
+    usadas = [lib[l["toma_lib"]["id"]] for l in lineas if l["tipo"] == "A" and l.get("toma_lib") and l["toma_lib"]["id"] in lib]
+    if len(usadas) < sum(1 for l in lineas if l["tipo"] == "A") - 1:
+        fallos.append("talking lines without a library shot (toma_lib): every narrator line but the main-set one picks a shot")
+    fallos += tomas_lib.revisar(usadas)
+    # storyteller voice text: whispers on 1-2 lines only, at most one CAPS word per line
+    sus = sum("[whispers]" in l.get("tts", "") for l in lineas)
+    if sus > 2:
+        fallos.append(f"[whispers] on {sus} lines: keep the whisper drop for 1-2 lines so it lands")
+    for l in lineas:
+        caps = [w for w in re.findall(r"\b[A-Z]{3,}\b", re.sub(r"\[[^\]]+\]", "", l.get("tts", ""))) if w not in ("FBI", "UFO", "USA", "NASA", "CIA")]
+        if len(caps) > 1:
+            fallos.append(f"{l['id']}: {len(caps)} CAPS words in the voice text; one emphasis per line")
 
 res = {"proyecto": pj.get("slug"), "variacion": v, "palabras": palabras, "fallos": fallos, "avisos": avisos, "ok": not fallos}
 print(json.dumps(res, ensure_ascii=False, indent=1))
 if not fallos and "--registrar" in sys.argv:
-    reg["episodios"] = eps + [{"ep": f"{pj.get('numero', 0):02d}", "artista": pj.get("artista"), "estado": "script approved", **v}]
+    plan = {k: pj["plan"][k] for k in ("estructura", "gancho", "tono", "final", "edicion", "recursos") if k in (pj.get("plan") or {})}
+    reg["episodios"] = eps + [{"ep": f"{pj.get('numero', 0):02d}", "artista": pj.get("artista"), "estado": "script approved", **v,
+                               **({"plan": plan} if plan else {})}]
     reg_p.write_text(json.dumps(reg, ensure_ascii=False, indent=1), encoding="utf-8")
     print("registered in", reg_p)
 sys.exit(0 if not fallos else 1)

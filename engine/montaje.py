@@ -12,12 +12,24 @@ import numpy as np
 sys.path.insert(0, str(Path(__file__).parent))
 from comun import duracion, palabras, personaje, proyecto, run  # noqa: E402
 
+
+PJ_ESTIRAR = None
+
+
+def tempo(r):
+    """Voice speed-up: rubberband keeps the timbre and the consonants (proyecto.json "estirar": "rubberband"; the v3 storyteller
+    voice comes out at ~90 wpm and needs 1.6-1.8x, review 2026-11-12); atempo smears a gravelly voice past ~1.05."""
+    if r == 1.0:
+        return "anull"
+    return f"rubberband=tempo={r}:transients=crisp:formant=preserved" if PJ_ESTIRAR == "rubberband" else f"atempo={r}"
+
 GAP = 0.12
 NIVELES = [1.0, 1.32, 1.12, 1.45]   # encuadres del avatar en cada salto de zoom
-SIL = "silenceremove=start_periods=1:start_threshold=-45dB:stop_periods=-1:stop_duration=0.3:stop_threshold=-45dB"
+SIL = ("silenceremove=start_periods=1:start_threshold=-55dB:start_silence=0.06:stop_periods=-1:stop_duration=0.3:stop_silence=0.08:stop_threshold=-55dB,afade=t=in:d=0.012")
 # conservar_pausas (narradores dramaticos): solo se recortan el silencio del principio y del final; las pausas y silencios quedan
-SIL_BORDES_T = ("silenceremove=start_periods=1:start_threshold=-45dB:stop_periods=-1:stop_duration={pausa}:stop_silence={pausa}:stop_threshold=-45dB,"   # pausas de hasta 0.9 s
-              "areverse,silenceremove=start_periods=1:start_threshold=-45dB,areverse")
+SIL_BORDES_T = ("silenceremove=start_periods=1:start_threshold=-55dB:start_silence=0.06:stop_periods=-1:stop_duration={pausa}:stop_silence={pausa}:stop_threshold=-55dB,"   # pausas de hasta 0.9 s
+              "areverse,silenceremove=start_periods=1:start_threshold=-55dB:start_silence=0.08,areverse,afade=t=in:d=0.012")
+# the -45 dB threshold ate soft onsets and word tails of a breathy voice; -55 dB plus 60-80 ms of kept air does not
 
 
 def tiempos_guion(texto, oidas, ini, fin, sustituir):
@@ -31,7 +43,9 @@ def tiempos_guion(texto, oidas, ini, fin, sustituir):
 
 
 def main(carpeta):
+    global PJ_ESTIRAR
     pj = proyecto(carpeta)
+    PJ_ESTIRAR = pj.get("estirar")
     sus = pj.get("sustituir", {})
     aud = carpeta / "audio"
     aud.mkdir(exist_ok=True)
@@ -49,7 +63,7 @@ def main(carpeta):
             # personaje sin boca: no hay labios que cuadrar; la linea dura lo que dura la voz (con sus pausas) y el clip arranca con ella
             clip = carpeta / "clips" / f"{lid}.mp4"
             ritmo_a = pj.get("ritmo_a", 1.0)   # narrador sin boca: se puede acelerar sin romper labios (ep de ~1 min)
-            run(["ffmpeg", "-y", "-v", "error", "-i", str(limpia), "-af", f"atempo={ritmo_a},apad=pad_dur=0.2,loudnorm=I=-20:TP=-2:LRA=9", "-ar", "48000", str(wav)])
+            run(["ffmpeg", "-y", "-v", "error", "-i", str(limpia), "-af", f"{tempo(ritmo_a)},apad=pad_dur=0.2,loudnorm=I=-20:TP=-2:LRA=9", "-ar", "48000", str(wav)])
             ws = palabras(wav)
             pal = tiempos_guion(ln["texto"], ws, ws[0][1], ws[-1][2], sus)
             segs.append({"id": lid, "tipo": "A", "clip": str(clip), "t0": 0.0, "dur": duracion(wav), "pal": pal, "wav": str(wav), "atempo": "voz"})
@@ -77,12 +91,23 @@ def main(carpeta):
         else:
             # la voz en off va a 1.08; las cabezas flotantes piden mas ritmo (sin labios en estas lineas, se puede acelerar)
             ritmo_b = pj.get("ritmo_b") or (1.2 if pj.get("cabeza") else 1.08)   # proyecto.json "ritmo_b" manda (avatar v10b: 1.05, para ver las obras)
-            run(["ffmpeg", "-y", "-v", "error", "-i", str(limpia), "-af", f"atempo={ritmo_b},apad=pad_dur=0.15,loudnorm=I=-20:TP=-2:LRA=7",
+            run(["ffmpeg", "-y", "-v", "error", "-i", str(limpia), "-af", f"{tempo(ritmo_b)},apad=pad_dur=0.15,loudnorm=I=-20:TP=-2:LRA=7",
                  "-ar", "48000", str(wav)])
             ws = palabras(wav)
             pal = tiempos_guion(ln["texto"], ws, ws[0][1], ws[-1][2], sus)
             segs.append({"id": lid, "tipo": "B", "dur": duracion(wav), "pal": pal, "wav": str(wav), "obras": ln.get("obras", [])})
 
+    # the first word must not sit on frame 0: players and phones swallow the first ~100 ms, and silenceremove leaves no breath
+    # before it ("the Cooper audio is cut at the start", review 2026-11-13). The first line gets a 0.35 s lead-in.
+    ENTRADA = 0.35
+    if segs and segs[0]["tipo"] == "B" or (segs and segs[0].get("atempo") == "voz"):
+        s0 = segs[0]
+        con = Path(s0["wav"]).with_name(Path(s0["wav"]).stem + "_entrada.wav")
+        ms = int(ENTRADA * 1000)
+        run(["ffmpeg", "-y", "-v", "error", "-i", s0["wav"], "-af", f"adelay={ms}|{ms}", "-ar", "48000", str(con)])
+        con.replace(s0["wav"])
+        s0["dur"] += ENTRADA
+        s0["pal"] = [(p, a + ENTRADA, b + ENTRADA) for p, a, b in s0["pal"]]
     linea, t = [], 0.0
     for s in segs:
         d = {k: v for k, v in s.items() if k != "pal"}
@@ -99,6 +124,13 @@ def main(carpeta):
         t += s["dur"] + (pj.get("pausa_b", GAP) if s["tipo"] == "B" else GAP)   # "pausa_b": la obra se queda un momento despues de la voz en off
     (carpeta / "timeline.json").write_text(json.dumps({"total": round(t, 3), "gap": GAP, "segmentos": linea}, indent=1,
                                                       ensure_ascii=False), encoding="utf-8")
+    # gate: the cleaned, sped-up lines are checked again (silenceremove or rubberband must not eat a word or cut into a sound)
+    from qa_lineas import revisar
+    fallas = revisar(carpeta, audio=True)
+    if fallas:
+        for f in fallas:
+            print("qa_lineas FAIL", f)
+        sys.exit(f"montaje: {len(fallas)} line(s) cut or silent after cleaning (qa_lineas_audio.json)")
     print("timeline", round(t, 1), "s |", " ".join(f"{s['id']}x{s.get('atempo', '')}" for s in segs if s["tipo"] == "A"))
 
 

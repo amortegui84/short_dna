@@ -13,8 +13,8 @@
     "comfy_dir": "D:/ComfyUI_windows_portable_nvidia/ComfyUI_windows_portable/ComfyUI"
   },
   "comfy_klein": {
-    "url": "http://127.0.0.1:8189",
-    "comfy_dir": "D:/ComfyUI_QI21/ComfyUI_windows_portable/ComfyUI"
+    "url": "http://127.0.0.1:8188",
+    "comfy_dir": "D:/ComfyUI_windows_portable_nvidia/ComfyUI_windows_portable/ComfyUI"
   },
   "face_check": {
     "python": "D:/ComfyUI_windows_portable_nvidia/ComfyUI_windows_portable/python_embeded/python.exe",

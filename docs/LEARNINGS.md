@@ -15,6 +15,38 @@ section the moment a review note arrives.
 - **Likeness of start frames 0.68-0.86** (ArcFace vs master) is fine with the head turned; 0.90 is not reachable at three-quarter angles.
   The approved looks scored 0.84-0.90.
 
+- **Smoke drifts across the narrator's mask** → "mist"/"fog" in his place or start frame; H3 animates it into puffs that cross his
+  face (review 2026-11-12, ep09) → `comun.sin_niebla` strips mist, fog, smoke and haze from his places, start frames and sets, and
+  the character prompts ask for "a warm, dry, still summer night" (naming "no breath vapour" made H3 draw breath puffs under the mask); evidence images keep their mist. The edit also laid a full-frame smoke loop (`humo_volutas`, 22 % screen) over every narrator section: the style flag `"humo_narrador": false` turns it off (Cult Pixel).
+- **Cars that cannot exist** (a taxi with five doors and a seat in the door, a car with no windshield and a roof bending behind the
+  driver, a "1970 two-door" drawn as a four-door 1980s sedan, a 2000s seat in a 1970 car) → generators drift on vehicles and the
+  script's details → name the body ("two-door hardtop coupe, one long door on each side, no rear doors"), the seat ("a wide vinyl
+  bench seat, no headrests") and the view; put a narrator in a car seen through the open front door, not through a missing windshield;
+  check every frame with `qa_realidad.py` (stage `realidad`).
+- **Fake letters on signs, papers and screens** ("1998" on a 1981 cabinet, "Spoal Town" headlines) → Z-Image writes gibberish →
+  end the prompt with "no letters, numbers or words anywhere"; for a newspaper show the stack or the paper out of focus.
+- **A shot inside the look's own place copies the look** (the dashboard frame became the look's car) → `"inicio_solo_maestro": true`
+  on that line draws it from the master portrait alone; `inicios.py --solo L06 L08` redraws just those lines.
+
+- **The narrator sounds flat and rushed** → three causes found 2026-11-12: ElevenLabs multilingual_v2 (tts.py strips [whispers]/[pause]
+  tags for v2), the voice sped up twice (speed 1.2 in TTS and atempo 1.15-1.2 in the edit, ~1.4x), one TTS call per line (every
+  sentence starts fresh and falls the same way) → eleven_v3, `bloques_voz` (3-4 blocks by beat, cut back per line with Whisper),
+  storyteller text (mixed sentence length, one CAPS word, whispers on 1-2 lines, a pause before the reveal), and the speed-up done
+  with rubberband (`estirar: rubberband`, 1.6x = 143 wpm, the user's choice): v3 renders this designed voice at ~90 wpm and ignores
+  its speed setting; atempo smears a gravelly voice. Measure with `qa_voz.py`.
+- **Library shots come out as the same frontal pose** → with the look image as reference, Klein copies the look's composition and
+  ignores the framing → library shots are drawn from the master portrait alone and the prompt leads with the framing in capitals
+  ("SELFIE FRAMING:", "WORM'S-EYE VIEW:"); never name an object in the place text that should not be drawn ("the phone lies on the
+  sand" drew a modern phone in 1980).
+
+- **Archival footage cut in the wrong place** (a burnt-out cockpit shot instead of the F-89 in flight) → a researcher's timestamps are
+  guesses → scan the reel before choosing: grab one frame every 6 s over HTTP (`ffmpeg -ss T -i URL -frames:v 1`), tile them, pick the
+  stretch, then set `desde`/`hasta`; obras.py reads only that stretch of a remote file.
+- **Z-Image draws a "radar scope" as a dish antenna with digital screens** → name the object physically: "the circular green phosphor
+  screen of a 1950s cathode-ray-tube radar display, flush in a steel panel; not a dish antenna, no digital displays".
+- **A renamed evidence stem breaks the edit** (`salto_noche.jpg` missing) → when replacing an evidence image, rename it in
+  momentos_a / obras_b / titulos / visuales / obras_descarga together (load the JSON, never a text replace).
+
 ## Talking clips, voice, lipsync
 - **H3 invents words in pauses** → "..." in the dialogue → replace with commas. **H3 says stage directions aloud** → text outside `<d>`.
 - **Lips don't match and "the voice isn't hers"** → H3 audio muted and the ElevenLabs voice-over stretched with atempo on top →
@@ -38,6 +70,11 @@ section the moment a review note arrives.
   halfway; transcript, loudness and black-frame checks all passed. Cause: H3 drift; nothing measured the picture itself.
   Fix: `comun.clip_roto` (sharpness at 1/4 resolution so VHS grain does not count, plus brightness, both against the first
   frame; broken 0.49-0.60, good never below 0.90); `clips`, `continuar` and survivor endings re-seed a broken take.
+- **The smear check rejects good moving-camera takes** (ep14 L02, ep15 L02, 2026-11-13): a walking selfie and a camera
+  turned from a bright chart to the dark mask scored 0.43-0.67 and burned four seeds each. Cause: the first frame is not
+  the same picture as the rest, so sharpness against it means nothing. Fix: every shot whose framing changes (CH01-CH07,
+  push-ins, angles) carries `acerca: true` in `library/tomas/tomas.json` and gets the looser threshold; look at a contact
+  sheet before re-seeding a take the check calls smeared.
 - **The ending starts from the wrong pose** (ep05 v3): stage `final` runs before `continuar`, so when the last section was
   extended the ending began from the short clip's end. Fix: `continuar` compares the extended clip's last frame with
   `final/inicio.png` and remakes the ending when they differ.
@@ -77,6 +114,21 @@ section the moment a review note arrives.
 - **A rebuilt brand edit looks cheaper and "faster" than its reference** → the builder was written from a dump of layer names only, so every value was a guess → run `ae/aep_dump.jsx` on a copy of the template (every modified, keyed or expression-driven property, with eases and fonts), write the values to `references/<x>_ae_rules.md`, build from them (CCC Dürer v1, 2026-11-07).
 - **A gradient in a template is not always a colour** → in CCC the host ramp is a luma track matte that fades the type wall toward the bottom, and the coral is the wall recoloured by Lumetri → check a solid's role (`IS_MATTE`, disabled) before copying it.
 - **A brand font draws as the fallback** → this After Effects reads only `C:\Windows\Fonts`, not per-user fonts → install brand fonts for all users (admin); the CCC builder falls back to Inter Tight and prints a WARN line.
+- **An evidence insert on a narrator line never shows** (ep16 L08/L10, 2026-11-13: the Arecibo collapse on "arecibo", the
+  flare on "flare") → `momentos_a` keys the insert to a spoken word, and both words came at the very end of the line, so the
+  narrator cut ended before the insert could hold → key an insert to a word in the first half of the line, and look at the
+  render at that word before calling it done.
+- **The voice seems to cut out a few seconds in** (ep13, review 2026-11-13: "14 to 17 s se corta") → `build_collage.py` put
+  1.8 s of silence (`FZ`) before the first B line so the title card plays alone; after a fast narrator line that reads as a
+  drop-out → `proyecto.json` `ficha_pausa` (Cult Pixel 0.4 s, template default) and the card stays 2.6 s in all (the tagline finishes typing), over the
+  first words of the line.
+- **The first word of the video sounds cut** (ep13-16, review 2026-11-13: "el de Cooper se corta el audio al inicio") → 
+  `montaje.py` strips leading silence (silenceremove) and the first line started on frame 0; players and phones swallow
+  the first ~100 ms → the first line now gets a 0.35 s lead-in (`ENTRADA`), words and captions shifted with it.
+- **Captions too fast to read on a quick storyteller line** (ep15, 2026-11-13: 6 groups at 22-28 characters per second, one on
+  screen 0.36 s) → the merge rule only joined captions under 0.6 s with a gap under 0.35 s → `build_collage.py` also joins a
+  caption over 20 cps with the next when the pair fits 40 characters and reads slower, and `cinta.jsx` shows it as two lines
+  (`br`), never shrunk.
 
 ## Music and sound
 - **"The song is childish"** → lute, recorder, celesta, glockenspiel, pizzicato tags → cinematic tags (cello drone, sparse piano, synth pulse), restrained; the style file keeps the default.
@@ -106,6 +158,13 @@ section the moment a review note arrives.
 - **TikTok pays Creator Rewards only for originals over 1 minute** → keep TikTok cuts at 61 s or more.
 - **Templated AI series risk "inauthentic content"** (YouTube, July 2025) and repost demotion (Meta) → every episode its own script, argument and visuals.
 - **Facebook demotes engagement bait, even spoken** ("comment YES") → ask for an opinion ("Genius or fraud?"), never "comment 1 or 2".
+
+- **Wikimedia thumbnail URL returns 400 "Use thumbnail sizes listed"** (ep16, 2026-11-13: `1600px-...svg.png`) → Commons now
+  serves only fixed thumbnail widths → `obras.py` rewrites any `/thumb/.../<n>px-` to 1280 or 1920 before downloading.
+
+- **The night runner cannot bring ComfyUI back** (ep16, 2026-11-13 06:30): the 15-hour-old ComfyUI process stayed alive but
+  stopped listening on 8188, so the runner's `.bat` relaunch exited at once → stop only that `main.py` process (never AE, never a
+  tree) and relaunch the central `START_COMFY_H3_FAST.bat`; restart ComfyUI before a long unattended run.
 
 ## App and Claude
 - **A one-word reply cost $0.70** → the Agent SDK loaded every connector of the account (~80 MCP servers) → strict MCP config with only
@@ -144,3 +203,43 @@ section the moment a review note arrives.
   host shots under 1.2 s, the type wall's motion against the reference.
 - **Fonts**: this After Effects reads only `C:\Windows\Fonts` (install brand fonts for all users); a font AE once failed to find stays in
   `app.fonts.missingOrSubstitutedFonts` for the session (check_layout STOP) even after no layer uses it: verify the layers.
+
+### Voice lines silent or cut after the block cut (2026-11-13)
+- Symptom: after the new block voice, every line that does not open its block came out silent (ep13 L05/L06, 91 dB down) and
+  montaje crashed on an empty Whisper list; before that, words were clipped at 2, 14 and 35 s.
+- Cause: the per-line cut used output seeking (`-i take -ss a`), so `afade=t=out:st=...` was read on the take's clock and muted
+  the whole line; the valley search window (±0.12 s) was narrower than Whisper's word-time error, so a cut could land inside
+  "Then"; eleven_v3 sometimes skips the first words of a line ("His price?") and the block still scored 0.89.
+- Fix: input seeking (`-ss a -to b -i take`); valley window ±0.25 s; a join with no recognised word splits by word share; and a
+  gate, `engine/qa_lineas.py`, run by tts.py (each line: not silent, edges 15 dB under speech, first and last words heard,
+  Whisper match ≥ 0.80 with numbers ignored) that asks the failing block again up to 4 more rounds, then stops the stage;
+  montaje runs it again on the cleaned, sped-up lines and stops before After Effects if a line was cut.
+
+### After Effects kept the old length of a re-made voice file (2026-11-14)
+- Symptom: ep13 at 1:08, "what he left behind" lost "behind"; L01 lost the tail of its last word too. Every line gate and the
+  overall transcript match (0.97) passed.
+- Cause: the voice was re-made under the same path (audio/L11.wav) while After Effects stayed open; AE kept the previous,
+  shorter file's duration (old take 6.5 s, new 7.4 s) and ended the layer there. The line files were fine; only the render was cut.
+- Fix: build_collage hands AE a copy named by content (`ae/voz/L11_<md5>.wav`); collage.jsx reloads every import, checks each
+  voice layer's length against the disk and stops if it differs; and `engine/qa_audio_render.py` (run by qc) listens to the
+  final MP4 line by line: each wav is located by envelope correlation and every speaking 10 ms frame must be loud in the render
+  (12 dB drop for ≥ 0.10 s = cut, words named), plus Whisper on the render against what Whisper heard in each line's own file.
+  A gate on the parts is not a gate on the render: always check the file the viewer gets.
+
+### A caption over the narrator's mask during a move (2026-11-14)
+- Symptom: ep19 1:13, the narrator lifts the phone and rises through the caption line; for 0.7 s the caption sat on the mask.
+- Cause: VHS captions are always at y 1430 (cinta.jsx); a shot that starts low crosses that line.
+- Fix: `proyecto.json` `"subs_y": [[t0, t1, y]]` moves every caption starting in that window (y 330 = top, clear of the HUD).
+  Check the contact sheet of shots that start low or rise ("grabs the camera", "stands up") before rendering.
+
+### B-line images belong in "obras_b", not in the line's "obras" (2026-11-14)
+- Symptom: build_collage crashed "cannot use 'list' as a dict key" at the ae stage (ep17-19).
+- Cause: the script builder put `[["stem", "keyword"]]` pairs in the B line's own `obras` list; montaje copies that list into
+  timeline.json and build_collage expects plain stems there (or "__cita__").
+- Fix: pairs go in `proyecto.json` `"obras_b": {"L03": [["stem", "keyword"]]}`; a line's `obras` holds only "__cita__".
+  After fixing it, montaje must run again (timeline.json keeps the old list).
+
+### The hook line needs an image (2026-11-14)
+- Symptom: ep17 opened on 2.6 s of black with only captions (blackdetect 1.4-4.0 s).
+- Cause: L01 (a B line) had no `obras_b` entry, so the collage had nothing to show under the hook.
+- Fix: every B line, and always L01, gets an `obras_b` image; run blackdetect on the render before sending.

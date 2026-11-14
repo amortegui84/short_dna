@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-klein_gen.py - FLUX 3 Image Klein (distilado, int8) con hasta 10 imagenes de referencia, por la API del ComfyUI 0.41 paralelo (puerto 8189).
+klein_gen.py - FLUX 3 Image Klein (distilado, int8) con hasta 10 imagenes de referencia, por la API del ComfyUI 0.41 paralelo (puerto 8188).
 Sirve para fotogramas clave y looks de personajes. Las referencias dan la identidad; el prompt describe la escena completa.
 
   python klein_gen.py -p "texto" --refs a.png b.png -o salida.png [--size 1344x768] [--seed 7] [--steps 16]
   python klein_gen.py --spec items.json        # {"out_dir": "...", "items": [{"name","prompt","refs":[...],"size","seed"}]}
 
-Instalacion: D:\ComfyUI_QI21 (ComfyUI 0.41, NO tocar el 0.34 de MiniMax). Arrancar: python_embeded\python.exe -s ComfyUI\main.py --windows-standalone-build --port 8189
+Instalacion: the single central ComfyUI 0.45 (D:/RUTAS_ACTUALES.md), port 8188, shared with H3; config/local.json comfy_klein.
 Modelos (compartidos por extra_model_paths): flux3_image_klein_sd_int8_convrot, qwen3vl_4b_int8_convrot (tipo flux3), flux2-vae.
 Los modelos de Black Forest Labs estan en un repositorio restringido: se bajan con la sesion de Hugging Face del usuario (licencia FLUX Kommunity, no comercial).
 """

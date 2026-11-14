@@ -10,7 +10,7 @@ import json, os, subprocess, sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
-from comun import H3, PY_PORTABLE, clip_roto, con_mesa, duracion, personaje, proyecto, run  # noqa: E402
+from comun import toma, H3, PY_PORTABLE, clip_roto, con_mesa, duracion, personaje, proyecto, run  # noqa: E402
 
 carpeta = Path(sys.argv[1]).resolve(); pj = proyecto(carpeta); seco = "--dry" in sys.argv
 PJE = personaje(pj)
@@ -80,14 +80,32 @@ retention_analysis:
 <Subject 1>: fully_preserved (mask, hood, robe, gloves, room, the objects on the table)
 
 detailed_description:
-A realistic, grainy vertical 9:16 video, static camera at eye level, medium shot, continuing exactly from <Picture 1>, same pose to start, same room: CRT televisions with static behind him, clear plastic sheeting, melted candles, red light from one side and cold blue CRT glow from the other. He does not speak and his mask never moves or gets a mouth. Then {gesto(lid, s['ini'], s['fin'])}. Smooth, continuous motion, no cuts, no jumps. Whatever is in his hands in <Picture 1> stays the same; nothing new appears in his hands and nothing vanishes.
+A realistic, grainy vertical 9:16 video, static camera at eye level, medium shot, continuing exactly from <Picture 1>, same pose to start, same room: CRT televisions with static behind him, clear plastic sheeting, melted candles, red light from one side and cold blue CRT glow from the other. He does not speak and his mask never moves or gets a mouth. It is a warm, dry, still night and the air around him is perfectly clear. Then {gesto(lid, s['ini'], s['fin'])}. Smooth, continuous motion, no cuts, no jumps. Whatever is in his hands in <Picture 1> stays the same; nothing new appears in his hands and nothing vanishes.
 
 overall_soundscape:
 Low room tone and a faint CRT hum only. No voice.
 
 non_diegetic_music:
 N/A
-""", pj)
+""", pj) if not (next((l for l in pj["lineas"] if l["id"] == lid), {}).get("toma")) else toma(f"""subject_definitions:
+<Subject 1> is the hooded storyteller from <Picture 1>: black hood and robe, a smooth pale-yellow oval mask with no mouth and a single painted black eye, black gloves; his look matches <Picture 2> exactly.
+
+summary:
+[reference-to-video generation + audio generation]
+A vertical horror-storytelling Shorts clip: the masked narrator goes on without words while his voice-over plays.
+
+retention_analysis:
+<Subject 1>: fully_preserved (mask, hood, robe, gloves, the place)
+
+detailed_description:
+A realistic, grainy vertical 9:16 video, static camera at eye level, medium shot, continuing exactly from <Picture 1>, same pose to start, same place: {(next(l for l in pj["lineas"] if l["id"] == lid)["toma"]["lugar"])}. He does not speak and his mask never moves or gets a mouth. It is a warm, dry, still night and the air around him is perfectly clear. Then {gesto(lid, s['ini'], s['fin'])}. Smooth, continuous motion, no cuts, no jumps. Whatever is in his hands in <Picture 1> stays the same; nothing new appears and nothing vanishes.
+
+overall_soundscape:
+The place's ambience only. No voice.
+
+non_diegetic_music:
+N/A
+""", pj, lid)
         pf = carpeta / "prompts" / f"{lid}_cont{k}.txt"; pf.parent.mkdir(exist_ok=True); pf.write_text(prompt, encoding="utf-8")
         out = carpeta / "clips" / f"{lid}_cont{k}.mp4"
         # H3 sometimes collapses mid-clip (ep05 L10_cont1 went dark and smeared): check every take, re-seed up to 3 times

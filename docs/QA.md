@@ -8,6 +8,12 @@ Automatic (the `render` and `qc` stages write `qa_render.json` and `qc.json`):
 - transcript: Whisper of the final video vs the script ≥ 0.85;
 - layout: Motion DNA `check_layout` + the builder's own check with real sizes (labels in the safe area, away from the face boxes).
 
+Reality (stage `realidad`, before `musica`; `engine/qa_realidad.py <project>`): a review sheet of every evidence image, start frame,
+look and three frames of every clip, each card with what it must show. Check each against the checklist in the script's header
+(doors per body type, wheels, windshield and steering wheel in front of the driver, five fingers, possible poses, nothing fused or
+floating, no fake letters, no smoke or mist on the narrator, the story's year and object), then record `--ok ID...` or
+`--mal ID "what and the fix"`. The stage passes only when every item is ok; a redrawn file is checked again.
+
 By eye (`render_frame` in AE, or ffmpeg frames from the mp4):
 1. every presenter <-> artwork cut is under the stripes, with no empty colour frames;
 2. every slide shows both artworks moving, no pop on arrival, no overhang;

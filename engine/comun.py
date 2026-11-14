@@ -54,7 +54,7 @@ def con_mesa(texto, pj):
     description of the character's ritual room and its CRT hum is replaced by the episode's place (e.g. a jungle at night)."""
     e = pj.get("escenario")
     if e:
-        lugar, sonido = e["lugar"], e.get("sonido", "night ambience")
+        lugar, sonido = sin_niebla(e["lugar"]), e.get("sonido", "night ambience")
         texto = texto.replace("the dark ritual room with CRT televisions, plastic sheeting and candles, the red and blue light",
                               "the place: " + lugar)
         texto = re.sub(r"(?:sits )?(?:in )?(?:a |his )?dark ritual room[^.]*?glow from the other", "sits " + lugar, texto)
@@ -70,6 +70,38 @@ def con_mesa(texto, pj):
         texto = re.sub(r"\b" + re.escape(v) + r"\b", m, texto)
     return texto
 
+
+
+def sin_niebla(texto):
+    """No mist, fog or smoke where the narrator is: H3 turned "mist" into smoke drifting across his mask (review 2026-11-12,
+    ep09 "quita el humo de su cara"). Used on his places and start-frame prompts; evidence images keep their mist."""
+    niebla = r"\b(?:thin |light |low |thick )?(?:mist|fog|smoke|haze|steam)\b(?: (?:in|on|over) the (?:water|light|beams|road|air))?"
+    texto = re.sub(niebla + r" and ", "", texto)                 # "mist and one street lamp" -> "one street lamp"
+    texto = re.sub(r",?\s*(?:and )?" + niebla, "", texto)        # ", mist" / "and fog in the beams"
+    return re.sub(r"\s+([,.;])", r"\1", texto).replace(";,", ";").strip(" ,")
+
+
+def toma(texto, pj, lid=None):
+    """con_mesa for one line: a line may bring its own place and camera (proyecto.json lineas[i] "toma": {"lugar", "sonido",
+    "mesa", "camara", "verbo"}), e.g. a selfie walk through the ship while the rest of the episode stays in the cabin
+    (review 2026-11-10: "shots of him holding the camera and walking, for more dynamism"). "camara" replaces the static
+    camera of the character's prompts; "verbo" replaces "sits" in front of the place (e.g. "walks")."""
+    ln = next((l for l in pj.get("lineas", []) if l.get("id") == lid), {}) if lid else {}
+    t = ln.get("toma") or {}
+    if not t:
+        return con_mesa(texto, pj)
+    q = dict(pj)
+    if t.get("lugar"):
+        t = dict(t, lugar=sin_niebla(t["lugar"]))
+        q["escenario"] = {"lugar": t["lugar"], "sonido": t.get("sonido", (pj.get("escenario") or {}).get("sonido", "night ambience"))}
+    if "mesa" in t:
+        q["mesa"] = t["mesa"]
+    texto = con_mesa(texto, q)
+    if t.get("camara"):
+        texto = re.sub(r"static camera at eye level, medium shot", t["camara"], texto)
+    if t.get("verbo") and t.get("lugar"):
+        texto = texto.replace("sits " + t["lugar"], t["verbo"] + " " + t["lugar"])
+    return texto
 
 def escena_de(pj, carpeta):
     """Imagen de partida del video: proyecto "escena" (ruta del proyecto) > el look del personaje ("look") > su escena base."""
@@ -145,7 +177,7 @@ def parecido(a, b):
     return difflib.SequenceMatcher(None, norm_palabras(a), norm_palabras(b)).ratio()
 
 
-def clip_roto(path, n=12):
+def clip_roto(path, n=12, acerca=False):
     """None if a generated clip holds up, else the reason. H3 sometimes collapses mid-clip (ep05 L10_cont1: the picture went
     dark and smeared and every QC passed it). Measured at a quarter of the resolution so the VHS grain does not count:
     sharpness of the later frames against the first (broken clips fell to 0.49-0.60, good ones never below 0.90) and
@@ -165,7 +197,9 @@ def clip_roto(path, n=12):
     s0, l0 = nitidez(fs[0]) or 1e-6, float(fs[0].mean()) or 1e-6
     sharp = float(np.median([nitidez(f) / s0 for f in fs[1:]]))
     luma = min(float(f.mean()) / l0 for f in fs[1:])
-    if sharp < 0.75:
+    # a shot that moves toward him (push-in, lean into the lens) loses background detail by design: only a collapse counts
+    # (ep13 L10/L12, 2026-11-12: three good seeds each were thrown away as "smeared" at 0.7)
+    if sharp < (0.45 if acerca else 0.75):
         return f"smeared (sharpness {sharp:.2f} of the first frame)"
     if luma < 0.7:
         return f"went dark (brightness {luma:.2f} of the first frame)"

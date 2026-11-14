@@ -1,0 +1,101 @@
+{
+ "_doc": "Story library for short mystery/true-story episodes (research 2026-11-12: 7 top story Shorts measured beat by beat + craft sources; see docs/STORY_METHOD.md). engine/plan_episodio.py combines these items for a story, inside the viral ranges and without repeating the last episodes. Keys: fits = story natures, requires = story flags/fact kinds, cooldown = episodes before reuse.",
+ "naturalezas": ["disappearance", "signal_or_transmission", "unidentified_body", "hoax_or_legend", "vanished_craft", "encounter", "cover_up", "forensic_puzzle", "cursed_object", "crime_unsolved"],
+ "ganchos": [
+  {"id": "H01", "nombre": "Detail that doesn't fit", "formula": "[normal scene] + [one wrong object]", "ejemplo": "His wedding ring was on the kitchen counter. The TV was still on the game.", "fits": ["disappearance", "unidentified_body", "crime_unsolved", "forensic_puzzle"], "requires": ["object"], "cooldown": 3},
+  {"id": "H02", "nombre": "Impossible number", "formula": "[number] + why it is impossible", "ejemplo": "By 11:30 he was three hours away, with three quarters of a tank.", "fits": ["signal_or_transmission", "vanished_craft", "forensic_puzzle", "crime_unsolved"], "requires": ["number"], "cooldown": 3},
+  {"id": "H03", "nombre": "Pattern vs exception", "formula": "Normally X. Here, Y.", "ejemplo": "Drowned crews are found at the exits. These men were at their posts.", "fits": ["forensic_puzzle", "vanished_craft", "unidentified_body"], "requires": [], "cooldown": 3},
+  {"id": "H04", "nombre": "Cold open on the end", "formula": "the last image first", "ejemplo": "Two words, torn from a book of poetry, sewn into a dead man's pocket.", "fits": ["*"], "requires": [], "cooldown": 3},
+  {"id": "H05", "nombre": "Quote first", "formula": "an archival line, then who said it", "ejemplo": "'Miss, I have a bomb in my briefcase.'", "fits": ["signal_or_transmission", "cover_up", "crime_unsolved", "vanished_craft"], "requires": ["quote_verified"], "cooldown": 3},
+  {"id": "H06", "nombre": "Post-video task", "formula": "When this ends, you'll search...", "ejemplo": "When this video ends, you're going to look up two words.", "fits": ["*"], "requires": ["searchable_detail"], "cooldown": 10},
+  {"id": "H07", "nombre": "You are there", "formula": "You're [role]. [anomaly].", "ejemplo": "You're a radar operator in 1953. Two blips just became one.", "fits": ["signal_or_transmission", "vanished_craft", "encounter"], "requires": [], "cooldown": 3},
+  {"id": "H08", "nombre": "Myth told straight", "formula": "the legend as true, flipped later", "ejemplo": "In 1953 a jet was swallowed by a UFO. That's the story everyone tells.", "fits": ["hoax_or_legend", "vanished_craft"], "requires": ["myth_layer"], "cooldown": 4},
+  {"id": "H09", "nombre": "Stakes in one line", "formula": "[who] + [lost what] + [clock]", "ejemplo": "Fourteen men, five planes, two hours of fuel.", "fits": ["vanished_craft", "disappearance"], "requires": ["timeline"], "cooldown": 3},
+  {"id": "H10", "nombre": "The object", "formula": "one evidence item: this is all that's left", "ejemplo": "He jumped from a jet into the night. He left one thing behind.", "fits": ["*"], "requires": ["object"], "cooldown": 3},
+  {"id": "H11", "nombre": "Official contradiction", "formula": "The report says X. The record says Y.", "ejemplo": "The Navy blamed the leader. Then it erased his name from the report.", "fits": ["cover_up", "vanished_craft", "crime_unsolved"], "requires": ["official_record"], "cooldown": 3},
+  {"id": "H12", "nombre": "Why would someone", "formula": "Why would [person] do [odd act]?", "ejemplo": "Why would a man cut every label off his own clothes?", "fits": ["unidentified_body", "disappearance", "crime_unsolved"], "requires": [], "cooldown": 3},
+  {"id": "H13", "nombre": "Countdown promise", "formula": "Three things nobody can explain about X", "ejemplo": "Three things about Flight 19 the Navy never answered.", "fits": ["*"], "requires": [], "cooldown": 6},
+  {"id": "H14", "nombre": "Late identity tease", "formula": "We know who. That's when it got stranger.", "ejemplo": "In 2022, DNA gave him a name. It didn't answer anything.", "fits": ["unidentified_body", "crime_unsolved"], "requires": ["identity_twist"], "cooldown": 4},
+  {"id": "H15", "nombre": "Sound first", "formula": "a sound or radio line, then 1 s of silence", "ejemplo": "(radio static) 'Target at your two o'clock...'", "fits": ["signal_or_transmission", "vanished_craft"], "requires": [], "cooldown": 4},
+  {"id": "H16", "nombre": "You've heard it wrong", "formula": "You've heard X. It's wrong.", "ejemplo": "You've heard the Triangle took Flight 19. It had nothing to do with it.", "fits": ["hoax_or_legend", "vanished_craft", "cover_up"], "requires": ["myth_layer"], "cooldown": 4},
+  {"id": "H17", "nombre": "Ordinary turning wrong", "formula": "no claim: the setting turns wrong", "ejemplo": "A man takes a shortcut. Ahead, a car is parked sideways across the road.", "fits": ["encounter", "hoax_or_legend", "cursed_object"], "requires": [], "cooldown": 3}
+ ],
+ "estructuras": [
+  {"id": "S01", "nombre": "Classic escalation", "beats": [["hook", 0, 4], ["context", 4, 17], ["escalation", 17, 43], ["rehook", 43, 49], ["deepening", 49, 74], ["reveal", 74, 82], ["close", 82, 100]], "cronologica": true, "energia": [4, 2, 3, 4, 3, 5, 2], "fits": ["*"], "requires": [], "cooldown": 4},
+  {"id": "S02", "nombre": "Cold open on the end", "beats": [["end_image", 0, 7], ["earlier", 7, 14], ["chronology", 14, 64], ["return_understood", 64, 79], ["open_question", 79, 100]], "cronologica": false, "energia": [5, 2, 3, 5, 2], "fits": ["*"], "requires": [], "cooldown": 4},
+  {"id": "S03", "nombre": "Impossibility stack", "beats": [["hook", 0, 4], ["baseline", 4, 14], ["impossible_1", 14, 26], ["impossible_2", 26, 38], ["impossible_3", 38, 50], ["impossible_4", 50, 62], ["explanation_attempt", 62, 74], ["except", 74, 100]], "cronologica": true, "energia": [4, 2, 3, 3, 4, 4, 2, 5], "fits": ["signal_or_transmission", "vanished_craft", "encounter", "forensic_puzzle"], "requires": [], "cooldown": 4},
+  {"id": "S04", "nombre": "False resolution", "beats": [["hook", 0, 4], ["case", 4, 36], ["official_answer", 36, 46], ["but", 46, 51], ["new_thread", 51, 79], ["recap_reveal", 79, 92], ["close", 92, 100]], "cronologica": true, "energia": [4, 3, 1, 4, 3, 5, 2], "fits": ["disappearance", "crime_unsolved", "cover_up", "unidentified_body"], "requires": ["official_record"], "cooldown": 4},
+  {"id": "S05", "nombre": "Two threads converge", "beats": [["hook", 0, 4], ["thread_a", 4, 28], ["thread_b", 28, 50], ["alternate", 50, 72], ["meet", 72, 80], ["meaning", 80, 100]], "cronologica": false, "energia": [4, 3, 3, 4, 5, 2], "fits": ["*"], "requires": ["two_threads"], "cooldown": 5},
+  {"id": "S06", "nombre": "Myth vs fact", "beats": [["thesis", 0, 4], ["legend_straight", 4, 57], ["flip", 57, 63], ["debunk_facts", 63, 89], ["what_remains", 89, 100]], "cronologica": false, "energia": [4, 3, 5, 3, 2], "fits": ["hoax_or_legend", "vanished_craft", "cover_up"], "requires": ["myth_layer"], "cooldown": 5},
+  {"id": "S07", "nombre": "Evidence by evidence (dossier)", "beats": [["exhibit_1_hook", 0, 6], ["context", 6, 14], ["exhibit_2", 14, 28], ["exhibit_3", 28, 42], ["rehook", 42, 46], ["exhibit_4", 46, 64], ["overturning_exhibit", 64, 80], ["close", 80, 100]], "cronologica": false, "energia": [4, 2, 3, 3, 4, 3, 5, 2], "fits": ["*"], "requires": [], "cooldown": 4},
+  {"id": "S08", "nombre": "Countdown", "beats": [["promise", 0, 4], ["item_3", 4, 22], ["item_2", 22, 44], ["rehook", 44, 48], ["item_1", 48, 80], ["close", 80, 100]], "cronologica": false, "energia": [4, 3, 3, 4, 5, 2], "fits": ["*"], "requires": [], "cooldown": 6},
+  {"id": "S09", "nombre": "Second-person POV", "beats": [["you_are", 0, 4], ["in_scene", 4, 57], ["what_you_didnt_know", 57, 72], ["real_record", 72, 100]], "cronologica": true, "energia": [4, 3, 5, 2], "fits": ["signal_or_transmission", "vanished_craft", "encounter", "disappearance"], "requires": [], "cooldown": 5},
+  {"id": "S10", "nombre": "Ticking clock", "beats": [["stakes_time", 0, 4], ["clock_1", 4, 20], ["clock_2", 20, 36], ["clock_3", 36, 52], ["clock_4", 52, 68], ["last_transmission", 68, 76], ["silence", 76, 80], ["aftermath", 80, 100]], "cronologica": true, "energia": [4, 3, 3, 4, 4, 5, 1, 2], "fits": ["vanished_craft", "signal_or_transmission", "disappearance", "crime_unsolved"], "requires": ["timeline"], "cooldown": 4},
+  {"id": "S11", "nombre": "Kishotenketsu", "beats": [["ki_setup", 0, 21], ["sho_development", 21, 50], ["ten_flip", 50, 72], ["ketsu_reconcile", 72, 100]], "cronologica": true, "energia": [2, 2, 5, 2], "fits": ["encounter", "hoax_or_legend", "cursed_object", "unidentified_body"], "requires": [], "cooldown": 5},
+  {"id": "S12", "nombre": "Reverse chronology", "beats": [["latest_fact", 0, 7], ["back_1", 7, 25], ["back_2", 25, 43], ["back_3", 43, 61], ["back_4", 61, 79], ["earliest_explains", 79, 100]], "cronologica": false, "energia": [4, 3, 3, 4, 4, 5], "fits": ["*"], "requires": ["timeline"], "cooldown": 5},
+  {"id": "S13", "nombre": "Whodunit lineup", "beats": [["event", 0, 7], ["rules", 7, 20], ["theory_1", 20, 37], ["theory_2", 37, 54], ["theory_3", 54, 71], ["best_remaining", 71, 85], ["vote", 85, 100]], "cronologica": false, "energia": [4, 2, 3, 3, 4, 5, 2], "fits": ["crime_unsolved", "disappearance", "unidentified_body", "vanished_craft"], "requires": ["theories"], "cooldown": 5}
+ ],
+ "tonos": [
+  {"id": "T01", "nombre": "Archivist", "voz": "dry, exact, dates and numbers, never awed", "voz_tags": ["[calm]"], "cooldown": 2},
+  {"id": "T02", "nombre": "Campfire teller", "voz": "conversational, 'there's this man...', leans in", "voz_tags": ["[curious]", "[whispers]"], "cooldown": 2},
+  {"id": "T03", "nombre": "Witness", "voz": "hearsay framed honestly: 'I was told...'", "voz_tags": ["[hesitant]"], "cooldown": 2},
+  {"id": "T04", "nombre": "Interrogator", "voz": "asks the viewer questions, leaves pauses", "voz_tags": ["[pause]"], "cooldown": 2},
+  {"id": "T05", "nombre": "Straight-faced unreliable", "voz": "tells the legend as true, flips later", "voz_tags": ["[confident]"], "cooldown": 3, "solo_con": ["S06"]},
+  {"id": "T06", "nombre": "Detective", "voz": "'Look at this. Now look at this.'", "voz_tags": ["[intrigued]"], "cooldown": 2},
+  {"id": "T07", "nombre": "Mourner", "voz": "slow and quiet, the victims first", "voz_tags": ["[sad]", "[quietly]"], "cooldown": 3, "nunca_con": ["E05", "E07"]},
+  {"id": "T08", "nombre": "Skeptic", "voz": "'here's what we can actually prove'", "voz_tags": ["[matter-of-fact]"], "cooldown": 2},
+  {"id": "T09", "nombre": "Second-person guide", "voz": "'you', present tense", "voz_tags": ["[whispers]"], "cooldown": 3, "solo_con": ["S09"]},
+  {"id": "T10", "nombre": "Conspirator", "voz": "low voice, documented cover-ups only", "voz_tags": ["[whispers]"], "cooldown": 4, "requires": ["official_record"]},
+  {"id": "T11", "nombre": "Calm unsettler", "voz": "very flat; the horror sits in the facts", "voz_tags": ["[calm]"], "cooldown": 3}
+ ],
+ "finales": [
+  {"id": "E01", "nombre": "Open question, two theories", "efecto": "comments", "cooldown": 3},
+  {"id": "E02", "nombre": "The last fact", "efecto": "rewatch + comments", "cooldown": 2},
+  {"id": "E03", "nombre": "Loop line", "efecto": "the last sentence flows into the first", "cooldown": 2, "requires_estructura": ["S02", "S07", "S12", "S01"]},
+  {"id": "E04", "nombre": "Reveal as the final line", "efecto": "shares", "cooldown": 2},
+  {"id": "E05", "nombre": "Ironic reversal", "efecto": "shares", "cooldown": 3},
+  {"id": "E06", "nombre": "Lingering residue", "efecto": "rewatch", "cooldown": 2},
+  {"id": "E07", "nombre": "Viewer task", "efecto": "searches, comments", "cooldown": 5},
+  {"id": "E08", "nombre": "Silence and the date", "efecto": "rewatch", "cooldown": 3},
+  {"id": "E09", "nombre": "Rule or warning", "efecto": "saves", "cooldown": 3},
+  {"id": "E10", "nombre": "Mid-sentence cut", "efecto": "replay", "cooldown": 4},
+  {"id": "E11", "nombre": "Callback, read differently", "efecto": "rewatch", "cooldown": 2},
+  {"id": "E12", "nombre": "Name the unanswered part", "efecto": "comments", "cooldown": 2}
+ ],
+ "recursos": [
+  {"id": "D01", "nombre": "Rule of three, the third breaks it"}, {"id": "D02", "nombre": "The number that doesn't add up", "clave": true},
+  {"id": "D03", "nombre": "Detail planted early, paid off late", "clave": true}, {"id": "D04", "nombre": "False resolution, then 'but'"},
+  {"id": "D05", "nombre": "Misdirection: kill the obvious theory with one fact"}, {"id": "D06", "nombre": "Reframe / perspective flip", "grande": true},
+  {"id": "D07", "nombre": "Late identity reveal", "grande": true}, {"id": "D08", "nombre": "Two threads converge", "grande": true},
+  {"id": "D09", "nombre": "Recap timeline as reveal"}, {"id": "D10", "nombre": "Reveal by archival quote"},
+  {"id": "D11", "nombre": "Dramatic irony"}, {"id": "D12", "nombre": "Ticking-clock timestamps"},
+  {"id": "D13", "nombre": "Escalating absurd numbers before a flip"}, {"id": "D14", "nombre": "Redaction reveal", "grande": true}
+ ],
+ "edicion": [
+  {"id": "X01", "nombre": "Dossier", "piezas": ["evidence cards", "punch-in on key words", "redaction reveal", "document highlight"], "musica": "low pads, typewriter ticks"},
+  {"id": "X02", "nombre": "Map and clock", "piezas": ["map route animation", "clock cards", "whip transitions between places"], "musica": "engine hum, wind, risers"},
+  {"id": "X03", "nombre": "Scope and static", "piezas": ["radar/scope graphics", "static bursts on cuts", "silence before reveal"], "musica": "radio static, pulsing sub-bass"},
+  {"id": "X04", "nombre": "Crop to detail", "piezas": ["wide-to-detail punch-ins (250-400%)", "outline on the detail", "freeze frame"], "musica": "ticking clock, cello"},
+  {"id": "X05", "nombre": "Match cuts then and now", "piezas": ["match cuts", "archival footage", "split then/now"], "musica": "sparse piano, low drone"},
+  {"id": "X06", "nombre": "Countdown slates", "piezas": ["big numbers 3-2-1", "snap transitions", "kinetic word per item"], "musica": "pulse, builds per item"}
+ ],
+ "por_naturaleza": {
+  "disappearance": {"estructuras": ["S01", "S04", "S12"], "ganchos": ["H01", "H10", "H12"], "finales": ["E06", "E11", "E01"], "edicion": ["X04", "X05"], "musica": "low drone, sparse piano"},
+  "signal_or_transmission": {"estructuras": ["S10", "S03", "S09"], "ganchos": ["H05", "H15", "H07"], "finales": ["E08", "E10"], "edicion": ["X03", "X02"], "musica": "radio static, pulsing sub-bass"},
+  "unidentified_body": {"estructuras": ["S07", "S02", "S13"], "ganchos": ["H04", "H10", "H14"], "finales": ["E12", "E07"], "edicion": ["X01", "X04"], "musica": "ticking clock, cello"},
+  "hoax_or_legend": {"estructuras": ["S06", "S13"], "ganchos": ["H08", "H16"], "finales": ["E04", "E05"], "edicion": ["X05", "X01"], "musica": "starts heroic, turns dry"},
+  "vanished_craft": {"estructuras": ["S10", "S05", "S01"], "ganchos": ["H09", "H02", "H11"], "finales": ["E08", "E02"], "edicion": ["X02", "X03"], "musica": "engine hum, wind, risers"},
+  "encounter": {"estructuras": ["S01", "S09", "S11"], "ganchos": ["H17", "H07"], "finales": ["E09", "E06"], "edicion": ["X04", "X03"], "musica": "room tone, minimal"},
+  "cover_up": {"estructuras": ["S07", "S04"], "ganchos": ["H11", "H05"], "finales": ["E02", "E01"], "edicion": ["X01"], "musica": "low pads, typewriter"},
+  "crime_unsolved": {"estructuras": ["S01", "S10", "S13", "S07"], "ganchos": ["H10", "H05", "H02", "H01"], "finales": ["E01", "E11", "E12"], "edicion": ["X01", "X02"], "musica": "noir piano, low drone"},
+  "forensic_puzzle": {"estructuras": ["S07", "S03"], "ganchos": ["H03", "H01", "H02"], "finales": ["E02", "E12"], "edicion": ["X04", "X01"], "musica": "ticking clock, cello"},
+  "cursed_object": {"estructuras": ["S11", "S08"], "ganchos": ["H17", "H10"], "finales": ["E09", "E06"], "edicion": ["X04"], "musica": "music box, low drone"}
+ },
+ "rangos_virales": {
+  "duracion_s": [60, 80], "gancho_s_max": 2.5, "gancho_palabras_max": 12, "anomalia_en_pantalla_s_max": 1.5,
+  "contexto_s_max": 8, "wpm": [160, 195], "toma_b_s": [1.8, 3.5], "toma_narrador_s": [3, 6], "estatico_s_max": 6,
+  "rehook_cada_s": [18, 25], "hechos_por_10s": [1.5, 2.5], "revelacion_pct": [72, 82], "narrador_pantalla_pct": [20, 35],
+  "silencio_antes_revelacion_s": [0.4, 1.2], "recursos_por_episodio": [3, 5], "and_then_entre_beats": 0
+ },
+ "anti_repeticion": {"ventana": 8, "estructura": 4, "gancho": 3, "final": 2, "tono_seguidos_max": 2, "distancia_min": 4}
+}

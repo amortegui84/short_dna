@@ -71,6 +71,14 @@ for s in datos["secciones"]:
     primero = dentro[0] if dentro else s["fin"]
     if primero - s["ini"] < 1.2:
         fallos.append(f"host {s['id']} cut after {primero - s['ini']:.2f} s (min 1.2)")
+# 3b. the host is on screen in his sections (Cult ep08 v2: a stale matte left two host lines as an empty dark frame and every
+# other check passed): the middle of the frame, sampled every 0.5 s outside evidence cuts, must not be near black
+for s in datos["secciones"]:
+    if s.get("tipo") not in ("gancho", "cabeza"):
+        continue
+    ks = [int(t * fps) for t in np.arange(s["ini"] + 0.2, min(s["fin"], s["ini"] + 1.2), 0.25) if int(t * fps) < n]
+    if ks and max(float(G[k][50:130, 24:84].mean()) for k in ks) < 18:
+        fallos.append(f"host {s['id']}: no narrator on screen at {s['ini']:.2f} s (the middle of the frame is near black)")
 # 4. type wall motion in host shots (first second of each host section, before any punch-in)
 mov = []
 for s in datos["secciones"]:
@@ -86,6 +94,8 @@ for s in datos["secciones"]:
 m = float(np.mean(mov)) if mov else 0.0
 if CCC and not 0.18 <= m <= 0.45:
     fallos.append(f"type wall motion {m:.2f} outside 0.18-0.45 (reference 0.24-0.36)")
+if dur <= 0:
+    fallos.append(f"{video.name} missing or empty: nothing was checked")
 res = {"video": video.name, "duracion_s": round(dur, 2), "cortes": len(cortes), "muro_movimiento": round(m, 3), "fallos": fallos, "avisos": avisos, "ok": not fallos}
 (carpeta / "qa_cortes.json").write_text(json.dumps(res, indent=1), encoding="utf-8")
 print(json.dumps(res, indent=1))

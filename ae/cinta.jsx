@@ -70,15 +70,19 @@ var CINTA = (function () {
 
     // ---------------- pieces
     // tracking glitch that hides a hard cut at t: the picture rolls, the colour splits and a static burst flashes (5 frames)
+    // strength from the style ("glitch": {"fuerza": 0..1, "evidencias": bool}); review 2026-11-10: "the glitch is too much and
+    // breaks the concentration" -> Cult Pixel runs it at 0.3 and only on section cuts
+    function glitchCfg() { return (D && D.glitch && typeof D.glitch === "object") ? D.glitch : {}; }
     function glitch(t, why) {
-        var a = Math.max(0, t - 0.07), b = Math.min(DUR, t + 0.13);
+        var GK = glitchCfg().fuerza != null ? glitchCfg().fuerza : 1;
+        var a = Math.max(0, t - 0.07 * Math.max(0.5, GK)), b = Math.min(DUR, t + 0.13 * Math.max(0.4, GK));
         var ad = c.layers.addSolid([0, 0, 0], "glitch " + why, W, H, 1, DUR); ad.adjustmentLayer = true; vida(ad, a, b);
-        var of = fx(ad, "ADBE Offset"); of.property(1).expression = "posterizeTime(30); seedRandom(" + Math.round(t * 100) + ",false); [540+random(-60,60), 960+random(-420,420)];";
-        try { var cs = fx(ad, "ADBE Channel Blur"); cs.property(1).setValue(40); cs.property(3).setValue(30); cs.property(5).setValue(2); } catch (e) {}
+        var of = fx(ad, "ADBE Offset"); of.property(1).expression = "posterizeTime(30); seedRandom(" + Math.round(t * 100) + ",false); [540+random(-" + Math.round(60 * GK) + "," + Math.round(60 * GK) + "), 960+random(-" + Math.round(420 * GK) + "," + Math.round(420 * GK) + ")];";
+        try { var cs = fx(ad, "ADBE Channel Blur"); cs.property(1).setValue(40 * GK); cs.property(3).setValue(30 * GK); cs.property(5).setValue(2); } catch (e) {}
         var st = imp(D.fx_estatica) || imp(D.estatica);
         if (st) { var L = c.layers.add(st); L.name = "static burst"; S(L).setValue([W / st.width * 104, H / st.height * 104]); P(L).setValue([W / 2, H / 2]); L.blendingMode = BlendingMode.SCREEN; L.audioEnabled = false;
-            O(L).expression = "posterizeTime(30); 30+random(45);"; if (st.duration > 0.5) L.startTime = a - (t * 7.3) % Math.max(0.1, st.duration - 0.5); vida(L, a, b); }
-        cue(a, "glitch", -6, why);
+            O(L).expression = "posterizeTime(30); (30+random(45))*" + GK + ";"; if (st.duration > 0.5) L.startTime = a - (t * 7.3) % Math.max(0.1, st.duration - 0.5); vida(L, a, b); }
+        cue(a, "glitch", Math.round(-6 - 10 * (1 - GK)), why);
     }
     function narrador(sec) {
         var clip = sec.clip || (sec.mate || "").replace("/mates/", "/clips/").replace(/\.mov$/, ".mp4"), it = imp(clip);
@@ -111,6 +115,8 @@ var CINTA = (function () {
         try { fx(hum, "ADBE Gaussian Blur 2").property(1).setValue(40); } catch (e) {}
         var bk = caja("CRT negro", SX, SY, SW, SH, "#000000", 100); vida(bk, t0, t1);
         var L = c.layers.add(it); L.name = "EVIDENCE " + nEv + " " + (stem || ""); L.audioEnabled = false;
+        // archival footage (obras/<stem>.mp4): it starts playing when the evidence appears and loops if it is shorter
+        if (it.hasVideo && !(it.mainSource && it.mainSource.isStill) && it.duration > 0.5) { L.startTime = t0; if (it.duration < t1 - t0 + 0.1) bucle(L); }
         var marcas = D.marcas_docs && stem ? D.marcas_docs[stem] : null;
         var k = Math.max(SW / it.width, SH / it.height) * 100;
         P(L).setValue([SX, SY]);
@@ -243,7 +249,8 @@ var CINTA = (function () {
         for (var i = 0; i < D.subs.length; i++) {
             var s = D.subs[i], ws = [], K = [];
             for (var j = 0; j < s.words.length; j++) { ws.push(s.words[j].w.toUpperCase()); if (esClave(s.words[j].w)) K.push(j); }
-            var L = texto(ws.join(" "), F_MONO, 52, PH, ParagraphJustification.CENTER_JUSTIFY); L.name = "caption " + (i + 1); anclar(L, true); ajustar(L, 900); P(L).setValue([W / 2, y]);
+            var tx = s.br ? ws.slice(0, s.br).join(" ") + "\r" + ws.slice(s.br).join(" ") : ws.join(" ");   // a merged fast caption reads as two lines
+            var L = texto(tx, F_MONO, 52, PH, ParagraphJustification.CENTER_JUSTIFY); L.name = "caption " + (i + 1); anclar(L, true); ajustar(L, 900); P(L).setValue([W / 2, s.y || y]);   // s.y: proyecto.json "subs_y" moves a caption off a face (review 2026-11-14, ep19 1:13)
             var sh = fx(L, "ADBE Drop Shadow"); sh.property("Opacity").setValue(230); sh.property("Distance").setValue(3); sh.property("Softness").setValue(10);
             teclear(L, s.ini, Math.min(0.25, (s.fin - s.ini) * 0.5)); rojas(L, K); vida(L, s.ini, s.fin);
         }
@@ -331,12 +338,13 @@ var CINTA = (function () {
             if (i) GL.push([s.ini, "cut to " + s.tipo]);
             if (s.tipo === "gancho" || s.tipo === "cabeza") {
                 var L = narrador(s); if (L) ultimo = L;
-                // evidence named while he talks: cut to the CRT and back (at least 2.4 s, never past the line)
+                // evidence named while he talks: cut to the CRT and back (at least 2.4 s, never past the line); he stays at least 1.2 s
+                // before the first cut (review 2026-11-10, same rule as CCC: a host shot shorter than that reads as a lost frame)
                 var ob = s.obras || [];
                 for (var j = 0; j < ob.length; j++) {
-                    var a = Math.max(s.ini + 0.6, ob[j].t), b = Math.min(s.fin - 0.5, a + 2.8, j + 1 < ob.length ? Math.max(ob[j + 1].t, a + 2.4) : 1e9);
+                    var a = Math.max(s.ini + 1.2, ob[j].t), b = Math.min(s.fin - 0.5, a + 2.8, j + 1 < ob.length ? Math.max(ob[j + 1].t, a + 2.4) : 1e9);
                     if (b - a < 1.6) continue;
-                    evidencia(ob[j].img, a, b, ob[j].stem, true); GL.push([a, "evidence in"]); GL.push([b, "evidence out"]);
+                    evidencia(ob[j].img, a, b, ob[j].stem, true); if (glitchCfg().evidencias !== false) { GL.push([a, "evidence in"]); GL.push([b, "evidence out"]); }
                 }
             } else if (s.tipo === "ficha") casoTitulo(s);
             else if (s.tipo === "cita") teletexto(s);
@@ -350,7 +358,23 @@ var CINTA = (function () {
         // glitches last: an adjustment layer only touches what is below it
         for (i = 0; i < GL.length; i++) glitch(GL[i][0], GL[i][1]);
         for (i = 0; i < D.voces.length; i++) { var V = c.layers.add(imp(D.voces[i].wav)); V.name = D.voces[i].id + " voice"; V.startTime = D.voces[i].start; }
-        if (D.musica) { var mu = c.layers.add(imp(D.musica)); mu.name = "Music"; mu.outPoint = DUR; var nv = D.musica.indexOf("elegida") >= 0 ? 0 : -13.2, al = mu.property("Audio").property("Audio Levels"); al.setValueAtTime(0, [nv, nv]); al.setValueAtTime(Math.max(0, D.total - 0.3), [nv, nv]); if (finDur) al.setValueAtTime(D.total + 0.4, [nv - 10, nv - 10]); al.setValueAtTime(DUR, [-48, -48]); }
+        if (D.musica) { var mu = c.layers.add(imp(D.musica)); mu.name = "Music"; mu.outPoint = DUR; var nv = D.musica.indexOf("elegida") >= 0 ? 0 : -13.2, al = mu.property("Audio").property("Audio Levels");
+            // ducking (review 2026-11-12: the music sat ~1 dB under the speech and competed with the words): under every voice
+            // line it drops to musica_db_voz, in the pauses it rises back to musica_db_pausa (style keys; off = the old flat level)
+            var dv = D.musica_db_voz, dp = D.musica_db_pausa;
+            if (dv !== undefined && dv !== null) {
+                var tk = [], fade = 0.25;
+                tk.push([0, nv + dp]);
+                for (var vi = 0; vi < D.voces.length; vi++) {
+                    var v0 = D.voces[vi].start, v1 = v0 + (D.voces[vi].dur || 0), sig = vi + 1 < D.voces.length ? D.voces[vi + 1].start : D.total;
+                    tk.push([Math.max(0, v0 - fade), nv + dp]); tk.push([v0, nv + dv]); tk.push([v1, nv + dv]);
+                    if (sig - v1 > 2 * fade + 0.3) { tk.push([v1 + fade, nv + dp]); tk.push([sig - fade, nv + dp]); }
+                }
+                tk.sort(function (p, q) { return p[0] - q[0]; });
+                for (var ti = 0; ti < tk.length; ti++) if (tk[ti][0] < D.total - 0.3) al.setValueAtTime(tk[ti][0], [tk[ti][1], tk[ti][1]]);
+                nv = nv + dp;
+            }
+            al.setValueAtTime(Math.max(0, D.total - 0.3), [nv, nv]); if (finDur) al.setValueAtTime(D.total + 0.4, [nv - 10, nv - 10]); al.setValueAtTime(DUR, [-48, -48]); }
         return "ok " + c.numLayers + " layers\n" + CUES.join("\n");
     }
     return { build: build };

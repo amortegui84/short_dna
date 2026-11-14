@@ -28,7 +28,10 @@ AEP = (carpeta / "ae" / f"{pj['slug']}.aep").as_posix()   # un proyecto de After
 G = KIT
 COMP = pj.get("comp") or f"{pj['numero']:02d} {pj['artista']} {pj['slug']}"
 MUSICA = (carpeta / "musica" / "elegida.wav").as_posix() if (carpeta / "musica" / "elegida.wav").exists() else ""   # musica.py la deja ahi (-27 LUFS)
-FZ = 1.8
+# silence before the first B line while the title card shows alone; Cult Pixel uses 0.4 and lets the card sit over the voice
+# (review 2026-11-13: "the voice cuts out around 14-17 s" was this 1.8 s hole after the first narrator line)
+FZ = float(pj.get("ficha_pausa", 1.8))
+FICHA_MIN = 2.6   # the card stays at least this long in all, pause plus voice (the tagline finishes typing)
 W, H = 1080, 1920
 SEGURA = (40, 150, 950, 1330)
 Y_BARRA = 1400
@@ -61,6 +64,13 @@ if pj.get("marca") and _est.exists():
     total = round(total + float(json.loads(_est.read_text(encoding="utf-8")).get("cola_final_s", 0)), 3)
 
 
+def ev(stem):
+    """Evidence file for a stem: archival footage (obras/<stem>.mp4, downloaded real video) wins over the still (review
+    2026-11-12: "download the images and videos we find")."""
+    v = carpeta / "obras" / f"{stem}.mp4"
+    return (v if v.exists() else carpeta / "obras" / f"{stem}.jpg").as_posix()
+
+
 def tiempo(seg, palabra):
     for w in seg["words"]:
         if w["w"].lower().strip(".,?!:;\"'\u201c\u201d").startswith(palabra.lower()):
@@ -68,13 +78,25 @@ def tiempo(seg, palabra):
     return seg["start"] + 0.4
 
 
+def fija(img):
+    """A still for measuring: footage gives its frame at 1 s (cached in obras/_cuadros/)."""
+    img = Path(img)
+    if img.suffix.lower() not in (".mp4", ".mov", ".webm"):
+        return img
+    out = img.parent / "_cuadros" / f"{img.stem}.jpg"
+    if not out.exists():
+        out.parent.mkdir(exist_ok=True)
+        subprocess.run(["ffmpeg", "-v", "error", "-y", "-ss", "1", "-i", str(img), "-frames:v", "1", str(out)], check=True)
+    return out
+
+
 def aspecto(img):
-    w, h = Image.open(img).size
+    w, h = Image.open(fija(img)).size
     return w / h
 
 
 def muestras(img, n=4):
-    im = Image.open(img).convert("RGB"); im.thumbnail((200, 200))
+    im = Image.open(fija(img)).convert("RGB"); im.thumbnail((200, 200))
     cnt = sorted(im.quantize(colors=10, method=Image.Quantize.MEDIANCUT).convert("RGB").getcolors(40000), reverse=True)
     sel = []
     for _, c in cnt:
@@ -136,7 +158,7 @@ for s in segs:
         for it in INTER.get(s["id"], []):
             t = tiempo(s, it[-1])
             if it[0] == "obra" and len(sec["obras"]) < 2:
-                img = (carpeta / "obras" / f"{it[1]}.jpg").as_posix(); x, y = SLOTS_OBRA[len(sec["obras"])] if sec["tipo"] != "gancho" else (205, 1160)
+                img = ev(it[1]); x, y = SLOTS_OBRA[len(sec["obras"])] if sec["tipo"] != "gancho" else (205, 1160)
                 sec["obras"].append({"img": img, "stem": it[1], "marco": MARCOS[(n + len(sec["obras"])) % 3], "x": x, "y": y, "w": 300 if sec["tipo"] == "gancho" else 380, "t": t,
                                      "rot": -2 if len(sec["obras"]) else 2})
             elif it[0] == "cta":
@@ -166,6 +188,8 @@ for s in segs:
         continue
     lista = OBRAS_B.get(s["id"]) or [(o, None) for o in s["obras"][:1]]
     tiempos = [s["start"] if (i == 0 and s["id"] != primera_b) or not pal else tiempo(s, pal) for i, (o, pal) in enumerate(lista)]
+    if s["id"] == primera_b and tiempos:   # a short pause: the card keeps the screen over the first words of the line
+        tiempos[0] = max(tiempos[0], round(s["start"] - FZ + FICHA_MIN, 3))
     if s["id"] == primera_b:   # la ficha cubre el silencio y el principio de la linea, hasta que se nombra la obra
         # without works on the first B line (CCC: the portrait card is the whole line) the card covers the line to its end
         secciones.append({"tipo": "ficha", "ini": s["start"] - FZ, "fin": tiempos[0] if tiempos else fin_b, "img": (carpeta / "obras" / f"{pj['retrato']}.jpg").as_posix(),
@@ -180,7 +204,7 @@ for s in segs:
     for i, (o, ini) in enumerate(pares):
         fin = pares[i + 1][1] if i + 1 < len(pares) else fin_b
         n = len(secciones)
-        img = (carpeta / "obras" / f"{o}.jpg").as_posix(); ti, fe = TITULOS.get(o, (o, ""))
+        img = ev(o); ti, fe = TITULOS.get(o, (o, ""))
         sec = {"tipo": "obra", "ini": ini, "fin": fin, "img": img, "stem": o, "aspecto": round(aspecto(img), 3), "titulo": ti, "fecha": fe,
                "trat": ["lupa", "reflecto", "craquelado"][n % 3], "vista": ["marco", "circulo", "pincelada"][n % 3], "muestras": muestras(img), "etqs": [],
                "deco": [{"p": rec(), "x": 920, "y": 215, "w": 210, "rot": -10, "t": ini + 0.25, "k": 0.95},
@@ -217,7 +241,9 @@ for sec in secciones:
 # con corte ya no es una seccion aparte (sin camara ni franjas): la obra que estaba a sangre sigue, o la nueva entra con un fundido.
 # Si la ultima obra de la linea se veria menos de MIN_VISTA s, sigue esa obra en vez de cambiar.
 MIN_VISTA = 1.8
-i = 0
+# a style can keep every voice-over line as its own section ("unir_obras_b": false): Cult Pixel shows evidence inside a
+# narrator shot for 2.8 s at most, so a merged B line fell back to the narrator (review 2026-11-12, ep09 "1939" over the ballroom)
+i = 0 if json.loads(buscar("styles", pj.get("estilo", "collage_v10c"), pj.get("marca")).read_text(encoding="utf-8")).get("unir_obras_b", True) else len(secciones)
 while i < len(secciones) - 1:
     sec, nx = secciones[i], secciones[i + 1]
     if sec["tipo"] == "cabeza" and sec.get("corte") and sec.get("obras") and nx["tipo"] == "obra":
@@ -270,7 +296,7 @@ def vivas(stem, n=8):   # figuras de la obra recortadas con SAM3 y su sitio (pie
 
 
 def clara(img):   # obra clara: lapiz oscuro; obra oscura (el infierno): lapiz claro
-    im = Image.open(img).convert("L"); im.thumbnail((200, 200))
+    im = Image.open(fija(img)).convert("L"); im.thumbnail((200, 200))
     return float(np.asarray(im).mean()) / 255 > 0.42
 
 
@@ -412,6 +438,28 @@ for s in segs:
 for i, s in enumerate(subs):
     nxt = subs[i + 1]["ini"] if i + 1 < len(subs) else total
     s["fin"] = round(min(nxt, s["words"][-1]["e"] + 0.5, total), 3)
+# a caption on screen under 0.6 s cannot be read (qa_lectura, review 2026-11-12): join it to the next one when they fit on
+# two short lines, else hold it into the gap before the next. A caption read faster than 20 characters per second (fast
+# storyteller lines, ep15 2026-11-13: 6 groups at 22-28 cps) joins the next one too when the pair fits two lines and reads slower.
+def _cps(x):
+    return len(" ".join(w["w"] for w in x["words"])) / max(0.01, x["fin"] - x["ini"])
+
+
+i = 0
+while i < len(subs) - 1:
+    a, b = subs[i], subs[i + 1]
+    txt = " ".join(w["w"] for w in a["words"] + b["words"])
+    corto = a["fin"] - a["ini"] < 0.6 and b["ini"] - a["fin"] < 0.35 and len(txt) <= 30
+    rapido = (_cps(a) > 20 and b["ini"] - a["fin"] < 0.6 and len(txt) <= 40 and len(a["words"] + b["words"]) <= 8
+              and len(txt) / max(0.01, b["fin"] - a["ini"]) < _cps(a))
+    if corto or rapido:
+        if rapido and not corto:
+            a["br"] = len(a["words"])   # two lines on screen, broken where the two captions met (ae/cinta.jsx)
+        a["words"] += b["words"]; a["fin"] = b["fin"]; subs.pop(i + 1); continue
+    i += 1
+for i, s in enumerate(subs):
+    nxt = subs[i + 1]["ini"] if i + 1 < len(subs) else total
+    s["fin"] = round(min(nxt, max(s["fin"], s["ini"] + 0.6), total), 3)
 
 marcos = {m: abertura(Path(G) / "alfa3" / f"{m}.png") for m in MARCOS}
 RETRATO = (carpeta / "retrato_recorte.png").as_posix()
@@ -423,9 +471,36 @@ _kit = marca_dir(pj.get("marca")) / "kit"
 RELLENO = [(_kit / f"{n}.png").as_posix() for n in ESTILO.get("relleno_ficha", []) if (_kit / f"{n}.png").exists()]   # el retrato del artista recortado (etapa "retrato")
 OBRAS_ARTISTA = [(carpeta / "obras" / f).as_posix() for f in sorted(os.listdir(carpeta / "obras")) if f.endswith(".jpg") and not f.startswith("00_")
                  and aspecto(carpeta / "obras" / f) >= 0.8]   # sin obras muy altas: dentro de la silueta suben hasta la cara
+def voz_unica(wav):
+    """Copy of a voice wav under a name made from its content (ae/voz/L11_<md5>.wav). Review 2026-11-14 (ep13 1:08): After
+    Effects kept the duration of the previous L11.wav at the same path and ended the layer 0.7 s early ("left behind" lost
+    "behind"); a new name per take means AE can never reuse a stale file."""
+    import hashlib, shutil
+    wav = Path(wav).resolve()
+    h = hashlib.md5(wav.read_bytes()).hexdigest()[:8]
+    d = carpeta / "ae" / "voz"
+    d.mkdir(parents=True, exist_ok=True)
+    dst = d / f"{wav.stem}_{h}{wav.suffix}"
+    for old in d.glob(f"{wav.stem}_*{wav.suffix}"):
+        if old != dst:
+            try:
+                old.unlink()
+            except OSError:
+                pass
+    if not dst.exists():
+        shutil.copy2(wav, dst)
+    return dst.resolve().as_posix()
+
+
+# proyecto.json "subs_y": [[t0, t1, y], ...] puts every caption that starts inside [t0, t1) at height y (a narrator rising
+# through the caption line, ep19 L12); times on the timeline clock
+for s in subs:
+    for t0, t1, yy in pj.get("subs_y", []):
+        if t0 <= s["ini"] < t1:
+            s["y"] = yy
 DATA = {"retrato": RETRATO, "obrasArtista": OBRAS_ARTISTA, "piezasRelleno": piezas(ENJAMBRE, 18) + piezas(CORRIENTE, 8), "comp": COMP, "total": total, "secciones": secciones, "subs": subs, "yBarra": Y_BARRA, "marcos": marcos, "numero": f"{pj['numero']:02d}",
         "artista": pj["artista"], "fechas": pj["fechas"], "lema": pj["lema"], "barrido": fz0, "musica": MUSICA,
-        "voces": [{"id": s["id"], "wav": (Path(s["wav"]) if Path(s["wav"]).is_absolute() else Path.cwd() / s["wav"]).resolve().as_posix(), "start": s["start"]} for s in segs], "desaturar": 0, "kit": KIT,
+        "voces": [{"id": s["id"], "wav": voz_unica(Path(s["wav"]) if Path(s["wav"]).is_absolute() else Path.cwd() / s["wav"]), "start": s["start"], "dur": s["dur"]} for s in segs], "desaturar": 0, "kit": KIT,
         "estilo": ESTILO, "estatica": ESTATICA, "relleno": RELLENO, "marcas_docs": pj.get("marcas_docs", {}), "autodestruccion": (pj.get("autodestruccion") or {}).get("tipo")}
 (carpeta / "datos_ae.json").write_text(json.dumps(DATA, indent=1), encoding="utf-8")
 print(COMP, "|", len(secciones), "secciones |", len(subs), "subtitulos | total", total)
@@ -451,7 +526,9 @@ if ESTILO.get("builder") in ("cinta", "ccc"):   # "Night Transmission" (ae/cinta
     _fx = lambda n: ((_mk / "kit" / "fx" / f"{n}.mp4").as_posix() if _mk and (_mk / "kit" / "fx" / f"{n}.mp4").exists() else "")
     _brand = json.loads((_mk / "brand.json").read_text(encoding="utf-8")) if _mk and (_mk / "brand.json").exists() else {}
     DATA.update({"claves": [k[1] for k in pj.get("palabras_clave", []) if len(k) > 1], "titulos": pj.get("titulos", {}), "handle": _brand.get("handle", ""),
-                 "fx_humo": _fx("humo_volutas"), "fx_estatica": _fx("estatica_rafaga")})
+                 "fx_humo": _fx("humo_volutas") if ESTILO.get("humo_narrador", True) else None,   # off in Cult Pixel: smoke over his mask (review 2026-11-12)
+                 "fx_estatica": _fx("estatica_rafaga"), "glitch": ESTILO.get("glitch"),
+                 "musica_db_voz": ESTILO.get("musica_db_voz"), "musica_db_pausa": ESTILO.get("musica_db_pausa", 0)})
     _fin = carpeta / "final" / "autodestruccion.mp4"   # the generated self-destruct (engine/final.py)
     if _fin.exists():
         _d = float(subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", str(_fin)], capture_output=True, text=True).stdout.strip() or 5.17)

@@ -53,7 +53,7 @@ If the user wants to see frames first: docs/FIGMA.md (Figma MCP with the style t
 ## 4. Generate and build
 `python factory.py run <slug>`; it stops at checkpoints and failed stages (see `factory.log`). Before paid providers
 (Seedance, Suno, remote images) quote the cost in USD. One GPU job at a time.
-Checkpoints to show the user: the start frames (`inicios/`), one talking clip, the music takes (`musica/`), key frames of the AE build.
+Checkpoints to show the user: the start frames (`inicios/`), one talking clip, the reality sheets (stage `realidad`, `qa_realidad/hoja_*.jpg`: you check every card and record the verdicts), the music takes (`musica/`), key frames of the AE build.
 
 ## 5. QA before sending (docs/QA.md)
 Look at frames of every cut, slide, card and the quote; `qa_render.json` must have 0 black frames and -20 ± 1.5 LUFS; explain every

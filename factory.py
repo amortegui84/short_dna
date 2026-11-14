@@ -38,6 +38,7 @@ STAGES = [
     ("montaje", "cpu", "timeline: voice pace, holds, subtitles timing", ["montaje.py"]),
     ("mates", "gpu:h3", "cut-out of the presenter + face boxes", ["mates.py"]),
     ("final", "gpu:h3", "the signature ending: the narrator self-destructs (H3 from his last frame, tied to the story)", ["final.py"]),
+    ("realidad", "claude", "reality QA: every image and clip makes sense (doors, bodies, text, no smoke on the narrator); engine/qa_realidad.py sheets, a verdict per item", None),
     ("musica", "gpu:h3", "music (ACE-Step locally; or the music provider)", ["musica.py"]),
     ("ae", "ae", "build the comp in After Effects with Motion DNA (sound, layout QA)", ["build_collage.py"]),
     ("continuar", "gpu:h3", "new narrator footage where a section outlasts his clip (never a ping-pong loop), then matte + comp again", ["continuar.py"]),
@@ -83,6 +84,10 @@ def check(name, carpeta, pj):
     if name == "look":
         c = json.loads((buscar("characters", pj["personaje"], pj.get("marca")) / "character.json").read_text(encoding="utf-8"))
         return not pj.get("look") or pj["look"] in c["looks"]
+    if name == "realidad":   # builds the sheets (keeps verdicts of unchanged files); passes only when every item is ok
+        r = subprocess.run([sys.executable, str(E / "qa_realidad.py"), str(carpeta)], capture_output=True, text=True)
+        print(r.stdout[-1500:])
+        return r.returncode == 0
     return False
 
 

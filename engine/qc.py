@@ -24,6 +24,11 @@ brillo = round(sum(ImageStat.Stat(Image.open(f).convert("L")).mean), 1)
 f.unlink()
 r = {"video": v.name, "duracion_s": round(duracion(v), 1), "lufs": float(lufs), "idioma": lang,
      "coincidencia_guion": round(parecido(guion, oido), 2), "brillo_avatar": brillo}
-r["ok"] = r["coincidencia_guion"] >= 0.85 and lang == "en" and -21.5 <= r["lufs"] <= -18.5
+# review 2026-11-14 (ep13 1:08): the overall match passed a render that lost the last word of two lines; listen line by line
+from qa_audio_render import revisar as revisar_render  # noqa: E402
+ar = revisar_render(carpeta, v)
+r["audio_render"] = "ok" if ar["ok"] else ar["fallas"]
+r["ok"] = r["coincidencia_guion"] >= 0.85 and lang == "en" and -21.5 <= r["lufs"] <= -18.5 and ar["ok"]
 (carpeta / "qc.json").write_text(json.dumps(r, indent=1, ensure_ascii=False), encoding="utf-8")
 print(json.dumps(r, ensure_ascii=False))
+sys.exit(0 if r["ok"] else 1)

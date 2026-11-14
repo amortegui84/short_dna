@@ -1,0 +1,123 @@
+COOL CULTURE CLUB - SCRIPTS FOR REVIEW (2 scripts)
+Variety formula: docs/templates/variedad.md. Both scripts pass engine/qa_guion.py.
+Each host line has its acting direction: emotion, how it starts (tied to the scene before), the gesture and the word it lands on, and how it ends (the pose the edit cuts on).
+
+========================================================================
+EPISODE 01 - HILMA AF KLINT
+Hook: cold open | Order: reveal | Tone: awe | Ending: twist | Host: guy
+153 words, about 59 s
+========================================================================
+
+L01  [Work, cold open (The Ten Largest): silence, then the voice]
+   "These paintings are taller than a door. They were painted in 1907, before anyone called anything abstract art."
+
+L02  [Host]
+   "The woman who painted them said she didn't paint them alone."
+   Emotion: contained awe
+   Starts:  already leaning slightly toward the lens, as if he has just seen the paintings with us
+   Gesture: his eyebrows rise slowly on 'didn't paint them alone' and a disbelieving smile forms
+   Ends:    he holds still with wide eyes, as if he can't believe it (cut to The Five)
+
+L03  [Work (Primordial Chaos)]
+   "Five women met every week in Stockholm for séances. They called themselves The Five."
+
+L04  [Host, then magnifier cards on the spirals]
+   "Zoom into the spirals: no sketches underneath. She swore the shapes came all at once."
+   Emotion: intense curiosity
+   Starts:  from a neutral face, his eyes narrow
+   Gesture: he leans in toward the lens as if peering into the canvas on 'zoom into the spirals'; his eyes snap open on 'all at once'
+   Ends:    eyes wide, lips slightly parted (cut to her words on the torn strips)
+
+L05  [Quote card (torn strips)]
+   "The pictures were painted directly through me, without any preliminary drawings, and with great force."
+
+L06  [Host]
+   "She showed them to the most famous mystic of her time. He said nobody would understand them for fifty years."
+   Emotion: soft indignation on her behalf
+   Starts:  eyes low and quiet after her quote, out of respect, then up to the lens
+   Gesture: he tilts his head on 'the most famous mystic'; on 'fifty years' he slowly shakes his head once
+   Ends:    after the shake he holds a steady, serious look (cut to 'she stopped painting')
+
+L07  [Works (The Swan, Altarpiece)]
+   "She stopped painting for four years. Then she came back and finished the series."
+
+L08  [Portrait card (the reveal)]
+   "Her name was Hilma af Klint. Stockholm, 1862 to 1944."
+
+L09  [Host]
+   "Before she died, she asked that this work stay hidden until twenty years after her death."
+   Emotion: complicity, a secret
+   Starts:  very close to the lens, as if about to whisper
+   Gesture: his voice drops; his eyes stay still on 'stay hidden'; one slow blink on 'twenty years'
+   Ends:    he stays close and still for a beat (jump cut, punch-in to the last line)
+
+L10  [Host, close-up (punch-in)]
+   "In 2019, her show became the most visited in the Guggenheim's history. The mystic was wrong. It took a century."
+   Emotion: pride and final awe
+   Starts:  landing big from the punch-in, a slow proud smile growing on 'most visited'
+   Gesture: one eyebrow rises on 'the mystic was wrong'; on 'it took a century' he holds the lens in silence with a small amazed shake of the head
+   Ends:    still, looking at us, smiling: the button appears
+
+
+========================================================================
+EPISODE 04 - ODILON REDON
+Hook: order to the viewer | Order: quote first | Tone: deadpan | Ending: callback | Host: girl
+145 words, about 56 s
+========================================================================
+
+L01  [Host, then a magnifier card on the eye]
+   "Pause on the sky. That balloon has an eye, and it is looking straight at you."
+   Emotion: flat, expressionless
+   Starts:  deadpan, eyes fixed on the lens
+   Gesture: on 'looking straight at you' only her eyes slide slowly up to the sky and back
+   Ends:    eyes back on the lens, zero expression (cut to his quote)
+
+L02  [Quote card (torn strips)]
+   "My drawings inspire, and are not to be defined."
+
+L03  [Host]
+   "So, don't ask what it means. He won't tell you. He's been dead since 1916."
+   Emotion: ironic disinterest
+   Starts:  the same flat face she left with
+   Gesture: one slow blink on 'he won't tell you'; the smallest shrug of the head on 'dead since 1916'
+   Ends:    motionless (cut to the portrait card)
+
+L04  [Portrait card]
+   "Odilon Redon. Bordeaux, 1840. Born Bertrand: he took the name Odilon from his mother, Odile."
+
+L05  [Host, then a noir]
+   "For decades he drew only in black. Charcoal, lithographs. He called them his noirs."
+   Emotion: dry
+   Starts:  flat, the voice even
+   Gesture: her eyebrows barely move; a tiny unimpressed nod on 'his noirs'
+   Ends:    still (cut to the black drawings)
+
+L06  [Works (a noir, the eye balloon)]
+   "In 1884 a famous novel gave its decadent hero a collection of Redon drawings. Suddenly, Paris wanted one."
+
+L07  [Host, then flower pastels]
+   "Then, after 1900, the black stopped. Pastels, oil, colour everywhere. Same man."
+   Emotion: held-back surprise
+   Starts:  flat
+   Gesture: her eyes widen for a split second on 'colour everywhere' and go flat again on 'same man'
+   Ends:    flat again, as if nothing happened (cut to the flowers)
+
+L08  [Works (flowers, The Cyclops)]
+   "In 1913, New York's Armory Show gave him more space than any other artist."
+
+L09  [Host]
+   "He wanted the logic of the visible at the service of the invisible. A very normal goal."
+   Emotion: irony
+   Starts:  a perfect poker face while she quotes him
+   Gesture: one eyebrow lifts on 'a very normal goal'
+   Ends:    the eyebrow stays up (jump cut to the last line)
+
+L10  [Host, close-up (punch-in)]
+   "So. The balloon with the eye? It is still looking at you. Don't look up."
+   Emotion: dry, slightly eerie
+   Starts:  landing big from the punch-in, deadpan
+   Gesture: her eyes flick up and back on 'still looking at you'; on 'don't look up' she holds perfectly still, then one slow blink
+   Ends:    still, looking at us: the button appears
+
+
+Before production (not done yet): download the public-domain works and confirm their exact titles (obras_por_bajar in each project); voice, clips, edit and render once the scripts are approved; then python engine/qa_guion.py <project> --registrar.

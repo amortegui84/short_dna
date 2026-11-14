@@ -6,7 +6,7 @@ import difflib, json, os, re, subprocess, sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
-from comun import H3, PY_PORTABLE, clip_roto, con_mesa, duracion, escena_de, palabras, personaje, proyecto, run  # noqa: E402
+from comun import toma, H3, PY_PORTABLE, clip_roto, con_mesa, duracion, escena_de, palabras, personaje, proyecto, run  # noqa: E402
 
 carpeta = Path(sys.argv[1])
 pj = proyecto(carpeta)
@@ -33,6 +33,8 @@ if not voz_ref.exists():
     run(["ffmpeg", "-y", "-v", "error", "-i", str(bs[0]), "-i", str(bs[1]), "-filter_complex",
          "[0:a][1:a]concat=n=2:v=0:a=1,atrim=0:8", "-ac", "1", "-ar", "24000", str(voz_ref)])
 
+import tomas_lib  # noqa: E402
+TOMAS_LIB = tomas_lib.cargar()
 ids = [a for a in sys.argv[2:] if a.startswith("L")] or [l["id"] for l in pj["lineas"] if l["tipo"] == "A"]
 for ln in [l for l in pj["lineas"] if l["id"] in ids]:
     lid = ln["id"]
@@ -48,18 +50,19 @@ for ln in [l for l in pj["lineas"] if l["id"] in ids]:
         vd = duracion(carpeta / "vo" / f"{lid}.mp3") + 0.3
         seg = next((s for s in REJILLA if s >= vd), REJILLA[-1])
     prompt = PJE["prompt_clip"].format(artista=pj.get("artista", pj.get("tema", "")), accion=ln["accion"], dialogo=dialogo)
-    prompt = con_mesa(prompt, pj)   # the episode's own props on the table instead of the candles
+    prompt = toma(prompt, pj, lid)   # the episode's props and place (or this line's own place and camera, comun.toma)
     pf = carpeta / "prompts" / f"{lid}.txt"
     pf.write_text(prompt, encoding="utf-8")
     esperado = re.sub(r"[^a-z ]", "", ln["texto"].lower()).split()
     mejor = (-1, None)
-    for seed in (23, 24, 25):
+    for seed in [int(x) for x in os.environ.get("CLIPS_SEEDS", "23,24,25").split(",")]:   # CLIPS_SEEDS=31,32 for a fresh try
         tmp = CLIPS / f"{lid}_s{seed}.mp4"
         subprocess.run([PY_PORTABLE, H3, "-p", str(pf), "--img", str(escena), str(MAESTRO), "--audio", str(voz_ref),
                         "--seconds", str(seg), *PIKA, "--gen-audio", "--seeds", str(seed), "-o", str(tmp)], check=True, env=ENV)
         oido = [re.sub(r"[^a-z]", "", w.lower()) for w, _, _ in palabras(tmp)]   # QC: Whisper sobre el audio que genero H3
         ratio = difflib.SequenceMatcher(None, esperado, [w for w in oido if w]).ratio()
-        roto = clip_roto(tmp)   # a take that collapses mid-clip (dark, smeared) loses to any sound take
+        acerca = bool(ln.get("toma_lib")) and TOMAS_LIB.get(ln["toma_lib"]["id"], {}).get("acerca", False)
+        roto = clip_roto(tmp, acerca=acerca)   # a take that collapses mid-clip (dark, smeared) loses to any sound take
         if roto:
             ratio -= 1
         print(f"[{lid}] seed {seed}: ratio={ratio:.2f} oido={' '.join(oido)}" + (f" BROKEN: {roto}" if roto else ""), flush=True)
