@@ -27,6 +27,8 @@ SIN_BOCA = bool(pj.get("personaje") and _pers(pj).get("sin_boca"))   # narrador 
 AEP = (carpeta / "ae" / f"{pj['slug']}.aep").as_posix()   # un proyecto de After por video
 G = KIT
 COMP = pj.get("comp") or f"{pj['numero']:02d} {pj['artista']} {pj['slug']}"
+# aerender hangs before launching AE when the -comp name has an apostrophe (2026-11-15, ep23 "Byrd's"): keep names plain.
+COMP = COMP.replace("'", "").replace("’", "")
 MUSICA = (carpeta / "musica" / "elegida.wav").as_posix() if (carpeta / "musica" / "elegida.wav").exists() else ""   # musica.py la deja ahi (-27 LUFS)
 # silence before the first B line while the title card shows alone; Cult Pixel uses 0.4 and lets the card sit over the voice
 # (review 2026-11-13: "the voice cuts out around 14-17 s" was this 1.8 s hole after the first narrator line)

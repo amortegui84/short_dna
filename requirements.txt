@@ -5,3 +5,7 @@ scipy
 faster-whisper
 # face check (qa_cara.py) runs in the ComfyUI portable python: opencv-python, onnxruntime (+ faceid.py, see config face_check)
 # mattes (Motion DNA tools/video_matte.py) run in the ComfyUI portable python: torch, transparent-background
+# downloads (engine/descargar.py): Chrome TLS fingerprint, social galleries, JS pages (yt-dlp itself comes from winget or pip)
+curl_cffi>=0.17
+gallery-dl
+playwright

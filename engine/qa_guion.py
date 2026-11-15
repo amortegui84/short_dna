@@ -141,6 +141,27 @@ if VAR.get("tomas_lib"):
         if len(caps) > 1:
             fallos.append(f"{l['id']}: {len(caps)} CAPS words in the voice text; one emphasis per line")
 
+# ideas over data (review 2026-11-15: "too much data, few ideas that give people ideas; the script turned into only data"):
+# few numbers, and at least two lines that hand the viewer a thought of their own (what it means, what if, what it says about us)
+if VAR.get("ideas"):
+    imax_l, imax_t, imin = VAR["ideas"] if isinstance(VAR["ideas"], list) else (2, 6, 2)
+    pal = r"one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|twenty|thirty|forty|fifty|" \
+          r"sixty|seventy|eighty|ninety|hundred|thousand|million|billion|first|second|third"
+    cuenta = lambda t: len(re.findall(r"\b\d[\d,:.]*(?:st|nd|rd|th)?\b", t)) + len(re.findall(rf"\b(?:{pal})(?:[- ](?:{pal}))*\b", t, re.I))
+    total = 0
+    for ln in lineas:
+        n = cuenta(ln["texto"]); total += n
+        if n > imax_l:
+            fallos.append(f"{ln['id']}: {n} numbers in one line (max {imax_l}); keep the one that matters, turn the rest into an image")
+    if total > imax_t:
+        fallos.append(f"{total} numbers in the script (max {imax_t}): it reads like a data sheet; trade numbers for ideas")
+    ideas = [l for l in lineas if l.get("idea")]
+    if len(ideas) < imin:
+        fallos.append(f"{len(ideas)} idea lines (mark them \"idea\": true; at least {imin}): a thought the viewer keeps, not a fact")
+    for l in ideas:
+        if cuenta(l["texto"]):
+            fallos.append(f"{l['id']}: an idea line carries no numbers")
+
 res = {"proyecto": pj.get("slug"), "variacion": v, "palabras": palabras, "fallos": fallos, "avisos": avisos, "ok": not fallos}
 print(json.dumps(res, ensure_ascii=False, indent=1))
 if not fallos and "--registrar" in sys.argv:

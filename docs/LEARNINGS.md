@@ -243,3 +243,34 @@ section the moment a review note arrives.
 - Symptom: ep17 opened on 2.6 s of black with only captions (blackdetect 1.4-4.0 s).
 - Cause: L01 (a B line) had no `obras_b` entry, so the collage had nothing to show under the hook.
 - Fix: every B line, and always L01, gets an `obras_b` image; run blackdetect on the render before sending.
+
+### Over-the-shoulder with no prop makes a second person (2026-11-14)
+- Symptom: ep23 L10 showed a second hooded figure with a bare hand across the table for the whole clip.
+- Cause: shot AN05 ("over his right shoulder... {prop} glowing") got an empty prop ("nothing in his hands"), so the model drew the shoulder as another person.
+- Fix: give AN05 a real prop (screen, microfilm reader) or use a plain medium shot from across the table; check every clip for extra people in qa_realidad.
+
+### Props with writing get fake letters when pushed to the lens (2026-11-14)
+- Symptom: ep22 L08, the Soviet stamp pushed to the lens carried invented words ("EAOI DCTSSCUE AROA").
+- Cause: a printed object filling the frame; the model writes gibberish no matter what the prompt says.
+- Fix: hold printed props with their blank back to the lens and let the real document appear as the evidence card.
+
+### aerender hangs when ComfyUI holds the VRAM (2026-11-14)
+- Symptom: ep23 render stage sat 40 min with aerender.exe at 0 CPU and an empty _aerender.log; twice.
+- Cause: ComfyUI kept the H3 models in VRAM (21 of 24 GB) for the next episode's clips; aerender stalls at GPU init.
+- Fix: render_ae.py now waits for ComfyUI's queue to be empty and POSTs /free (unload models) before aerender. Also purge After Effects caches between renders (its disk cache had reached 101 GB).
+
+- **A seated figure seen from behind gets its feet facing the camera** (2026-11-15, ep21 L10 on a cliff edge: back view, yet both boots pointed at the lens instead of hanging over the drop; the user caught it after publishing). Cause: the model draws a front-facing lower body under a back-facing torso. Fix: never frame a seated narrator from behind; use a side profile with the legs hidden below the edge and say in the start frame that chest, knees and feet all face the same way. Check feet and knees in every back or three-quarter view on the reality sheet.
+- **aerender hangs before "Launching After Effects" when the -comp name has an apostrophe** (2026-11-15, ep23 "Byrd's": hours at 0 CPU, log with only the version line; ep21 rendered fine at the same time). Fix: build_collage.py strips apostrophes from comp names; render_ae.py waits only 5 min for ComfyUI (the VRAM was not the cause).
+
+### Pages that block the downloader (2026-11-15)
+- Symptom: real media failed with 403/401 (Wikimedia originals, Daily Mail, Reuters), JS-only galleries came back empty, social
+  posts could not be fetched at all.
+- Cause: the old User-Agent read as a script and Python's TLS fingerprint is flagged by bot walls; galleries load images with
+  JavaScript; X/Instagram/Reddit need their own extractors.
+- Fix: `engine/descargar.py` (used by `obras.py`): plain HTTP with a descriptive UA, then curl_cffi with a Chrome fingerprint,
+  then the Wayback copy (`id_`); a 429 waits for `Retry-After`. yt-dlp runs with `--impersonate chrome --sleep-requests 1`;
+  `obras_descarga` entries take `"galeria": N` (gallery-dl, N-th file of a post) or `"de_pagina": N` (Playwright, N-th biggest
+  image of a JS page). A direct video that blocks ffmpeg is downloaded whole and cut locally. Cookies only from the user's own
+  browser, opt-in (`SHORTS_COOKIES_BROWSER`). Tested: Wikimedia 403 -> ok, Daily Mail 403 -> ok, Reuters 401 -> Wayback ok.
+- Never: CAPTCHA solvers, other people's accounts, proxy pools. A challenge wall is reported for a manual download; a page
+  that only has a reCAPTCHA in a form is not a wall (match the title, not the word "captcha").

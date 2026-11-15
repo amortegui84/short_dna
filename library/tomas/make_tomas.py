@@ -97,7 +97,7 @@ t("AN04", "Tilted close-up", "angulo", 3, ["wrongness"], "tilts with the frame",
 t("AN05", "Over the shoulder", "angulo", 2, ["research"], "looks at a screen", "over-the-shoulder shot, slow push past his shoulder toward the screen",
   "Over his right shoulder in {lugar}: the hood edge in the foreground and {prop} glowing in front of him, out of focus.", "seated before {prop}",
   "the camera pushes slowly past his shoulder toward the glow; at the end he turns his head back to the lens", "head turned back to the lens",
-  "L: screen text garbles, keep it blank", props=["an old CRT screen", "a microfilm reader", "a laptop"])
+  "L: screen text garbles, keep it blank; without a prop the 'over the shoulder' framing invents a second hooded person across the table (ep23), so never use it with an empty prop", props=["an old CRT screen", "a microfilm reader", "a laptop"])
 t("AN06", "Ultra-wide close-up", "angulo", 4, ["hook"], "bobs toward the lens", "ultra-wide close-up 30 cm from the lens, handheld micro-shake",
   "Ultra-wide close-up 30 cm from the lens in {lugar}: the mask big, the shoulders small.", "very close to the lens",
   "he bobs slightly closer and tilts his head", "very close, head tilted", "M: distortion can warp the mask; say the mask shape is unchanged",
