@@ -45,6 +45,7 @@ Motion DNA (After Effects), Blender and Figma connected, and the estimated cost 
 | `library/costs.json` | the price table behind every cost estimate |
 | `docs/` | architecture, app, the end-to-end recipe, style, learnings, providers, models (MiniMax H3, Z-Image, Qwen, Klein, ACE-Step, APIs), platforms, QA, Figma |
 | `.claude/skills/shorts-factory/` | the skill Claude follows |
+| `engine/reaccion.py`, `engine/reaccion_voz.py` | the reaction format: cut-out narrator talking over real news footage (docs/REACTION_FORMAT.md) |
 
 ## Quick start
 1. Requirements (docs/ARCHITECTURE.md › Machine): Python 3.11+, ffmpeg, After Effects with

@@ -274,3 +274,18 @@ section the moment a review note arrives.
   browser, opt-in (`SHORTS_COOKIES_BROWSER`). Tested: Wikimedia 403 -> ok, Daily Mail 403 -> ok, Reuters 401 -> Wayback ok.
 - Never: CAPTCHA solvers, other people's accounts, proxy pools. A challenge wall is reported for a manual download; a page
   that only has a reCAPTCHA in a form is not a wall (match the title, not the word "captcha").
+
+### Reaction format: a dark box around the narrator (2026-11-15)
+Symptom: a darker rectangle with scanlines around the cut-out narrator. Cause: the tape texture (scanlines + noise) was applied
+to his whole bounding box, not to his silhouette. Fix: `reaccion.py` masks the texture with the cut-out alpha, and chokes the
+alpha by 1 px and feathers it 2 px (`borde_suave`) so no rim shows on bright footage.
+
+### Reaction format: jump cuts between narrator clips felt abrupt (2026-11-15)
+Symptom: every new narrator clip popped in. Fix: the narrator wears a small lavalier mic and talks to the lens the whole time
+(reads as one self-recorded take, like a vlogger), every other clip is punched in 7 %, and where a cut would jar he ducks
+out of the frame while the footage plays ("fuera"). A 5-frame cross-dissolve was tried and rejected: it shows two masks. A small corner host (720 px) read as weak; the selfie framing (head and chest, ~960 px, lower half) is the format.
+
+### Reaction format: the script debunked its own mystery (2026-11-15)
+Symptom: "maybe it really was a kite, most of them are" plus kite comparison footage closed the case. Cause: the "fair
+counter-explanation" beat of generic commentary guides. Fix for Cult Pixel: the explanation is quoted as a claim and answered
+by the witness or the silence (BIBLE rule 15); no debunk footage; end on a question.

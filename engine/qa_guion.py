@@ -125,7 +125,8 @@ else:
             fallos.append("no place in the first 4 lines: the viewer needs to know where this happened")
 
 # dynamic shots (library/tomas, engine/tomas_lib.py): variety of shot categories, a lively first talking shot
-if VAR.get("tomas_lib"):
+# the reaction format (docs/REACTION_FORMAT.md) cuts the narrator out of his set: shots from the library do not apply
+if VAR.get("tomas_lib") and pj.get("formato") != "reaccion":
     import tomas_lib
     lib = tomas_lib.cargar()
     usadas = [lib[l["toma_lib"]["id"]] for l in lineas if l["tipo"] == "A" and l.get("toma_lib") and l["toma_lib"]["id"] in lib]

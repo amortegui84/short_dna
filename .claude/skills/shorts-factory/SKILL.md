@@ -29,6 +29,12 @@ For several episodes at once, follow docs/RECIPE_SERIES.md (the line, times, lim
 - `python factory.py new <NN_slug> --topic "<topic>" --character <c> --look <look> --style <s> --template <t>`.
 - New character or look? docs/NEW_CHARACTER.md (Klein candidates with `engine/looks.py`; the user picks; spread head angles).
 
+### Reaction format (a narrator reacting to real news footage)
+When the user wants a reaction / commentary short ("the narrator reacts to this news", green-screen style, mostly real video),
+follow `docs/REACTION_FORMAT.md` instead of the collage stages: research + downloads, script with `"formato": "reaccion"`,
+tts + montaje, `engine/reaccion_voz.py --slots`, inicios/clips/mates (lavalier mic, talking throughout), `reaccion.json`,
+`engine/reaccion.py`, -14 LUFS. Keep the mystery open (brand BIBLE rule 15). Folder name `rNN_<slug>`.
+
 ## 1. Research (you, with web search)
 Fill `research.md` from `docs/templates/research.md`: 6-10 surprising, verifiable facts with a source URL each, the artworks with
 their Wikimedia Commons file URLs and public-domain status, one real quote with its source, dates. No fact without a source.
