@@ -43,7 +43,7 @@ Motion DNA (After Effects), Blender and Figma connected, and the estimated cost 
 | `app/` | the Electron app (main process, Claude Agent SDK, renderer) |
 | `library/platforms/`, `library/hooks.json` | strategy per network (specs, safe areas, length, CTA, AI disclosure) and the hook catalogue, with sources |
 | `library/costs.json` | the price table behind every cost estimate |
-| `docs/` | architecture, app, the end-to-end recipe, style, learnings, providers, models (MiniMax H3, Z-Image, Qwen, Klein, ACE-Step, APIs), platforms, QA, Figma |
+| `docs/` | architecture, app, the end-to-end recipe, publishing (PUBLISHING.md) and the nightly autopilot (AUTOPILOT.md), style, learnings, providers, models (MiniMax H3, Z-Image, Qwen, Klein, ACE-Step, APIs), platforms, QA, Figma |
 | `.claude/skills/shorts-factory/` | the skill Claude follows |
 | `engine/reaccion.py`, `engine/reaccion_voz.py` | the reaction format: cut-out narrator talking over real news footage (docs/REACTION_FORMAT.md) |
 

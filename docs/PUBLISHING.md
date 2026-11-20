@@ -4,10 +4,12 @@
 |---|---|---|
 | YouTube Shorts | Zapier MCP (YouTube actions + YouTube API requests) | free plan; private upload, then the AI label and public |
 | Instagram Reels | Zapier MCP (Instagram for Business + Graph API requests) | free plan; Zapier's own Publish Video times out, the Graph API route does not |
-| TikTok | PostWire MCP (`postwire-mcp`) | Zapier has no TikTok action; PostWire is an audited TikTok app, so it can post publicly, privately or as a draft, with TikTok's AI label |
+| TikTok (**main route since 2026-11-18**) | TikTok Studio in the person's own Chrome, driven by Claude in Chrome (Part C) | no middleman and no quota: the account's own session and TikTok's own scheduler (up to 10 days ahead) |
+| TikTok (fallback) | PostWire MCP (`postwire-mcp`) | Zapier has no TikTok action; PostWire is an audited TikTok app (public, private or draft, with TikTok's AI label), but its free plan is 10 posts a month and the video passes through a third party |
 
 PostWire can also post to YouTube, Instagram, Facebook, LinkedIn, X, Bluesky and Mastodon. On its free plan (10 posts a
-month, 2 networks per post) it is kept for TikTok. Zapier covers YouTube and Instagram.
+month, 2 networks per post) it is only a TikTok fallback. Zapier covers YouTube and Instagram. A brand that publishes
+every day (docs/AUTOPILOT.md) uses Part C for TikTok.
 
 The app's **Publish** view follows this guide. Part A is done once per brand (accounts and links). Part B is done for every
 episode.
@@ -191,3 +193,96 @@ Zapier works in the cloud, so it needs a **direct download link** to each video,
 | TikTok post `publish_complete` but no link | It went out as `SELF_ONLY`: only the account sees it | Expected for the test. For the real post, send it again as `PUBLIC_TO_EVERYONE` |
 | PostWire refuses a post with a monthly limit error | Free plan: 10 posts a month | Wait for the reset (1st of the month) or upgrade |
 | Zapier stops working mid-month | The ~100 free tasks are used up | Wait for the reset or upgrade; each episode costs ~10 tasks |
+
+## Part C: TikTok Studio in the person's own Chrome (no middleman)
+**Proven 2026-11-18:** 20 Cult Pixel posts (Nov 19–28, two a day) scheduled in TikTok Studio this way, after PostWire's
+free month ran out. Nothing passes through a third party: Claude drives the Chrome where the person is already signed in.
+
+### C0. Connect once (each person who will schedule TikTok)
+Nothing here needs an API key, a developer app or a paid plan. The video goes from this PC to TikTok through the
+person's own browser session; no other company receives it.
+1. **The brand's TikTok account.** Created in the TikTok app by the person who owns it. Settings → Account → switch to
+   a **Business** or **Creator** account (both give TikTok Studio on desktop). Two-step verification on.
+2. **Chrome on the PC that holds the videos.** Sign in at `tiktok.com` with the brand's account, typed by the person
+   (or by QR from the phone). Open `tiktok.com/tiktokstudio/upload` once and accept any terms yourself. If the team
+   shares one Chrome, use a Chrome profile just for the brand.
+3. **Claude in Chrome.** Install the Claude extension from the Chrome Web Store in that same profile, sign in to Claude
+   and allow it on `tiktok.com`. In Claude Code, the `claude-in-chrome` tools must show as connected
+   (`tabs_context_mcp` lists the Chrome window).
+4. **Test with one post scheduled for later.** Ask Claude to schedule one kit post (steps below), then open TikTok
+   Studio → Posts and check its date, time, caption and the AI-generated label. Delete it there if it was only a test.
+5. **Record it** in `brand.json` → `publicar.tiktok_via: "tiktok_studio_chrome"`, and tell whoever runs the kits which
+   Chrome profile holds the session.
+
+Who does what: the person signs in, accepts terms and answers any code, CAPTCHA or "is this you?" check; Claude only
+uploads the file, writes the caption, sets the schedule and the AI label, and never touches the login, the password
+or the account settings. If TikTok logs the session out, Claude stops and asks the person to sign in again.
+
+Account health first: on 2026-11-19 every @cult_pixel post showed 0 views in Studio, with no violation notice. Before
+scheduling a new batch, open TikTok Studio → **Account status** (and the inbox's System notifications) and check that
+recent posts get views. Schedule a few days at a time (two posts a day at most), not weeks in bulk.
+
+What it needs:
+- The person opens `tiktok.com/tiktokstudio/upload` in **their own Chrome**, signed in to the brand's account, with the
+  **Claude in Chrome** extension connected. Claude never types the login.
+- A kit: `brands/<brand>/tiktok_kit/build_kit.py` writes `kit.json` (date, time, video, caption per post),
+  `KIT_TIKTOK.html` (the same as cards with copy buttons, for doing it by hand) and `videos/` (the files in posting order,
+  hard links to the -14 LUFS cuts).
+
+Why the file goes in as parts: Claude in Chrome's `file_upload` takes at most ~10 MB per call, and TikTok's "Select video"
+button opens a native file picker that never appears while Chrome is driven remotely. TikTok's page also blocks fetches
+from localhost and GitHub, so the page cannot download the file itself.
+
+Per post:
+1. `python tools/browser_upload_chunks.py <video>` splits it into ≤9 MB parts and prints three page scripts.
+2. Run script 1 (`javascript_tool`): it adds a hidden input labelled `kitin chunk input`.
+3. `find "kitin chunk input"`, then `file_upload` each part into it, **one part per call**.
+4. Run script 3: it joins the parts in order into one `File` and hands it to TikTok's own `<input type=file>` with a
+   `DataTransfer` and a `change` event. TikTok then uploads it as if it had been picked.
+5. Paste the caption into the description box (clear TikTok's prefilled file name first).
+6. Under **When to post**, choose **Schedule**, set the date in the calendar and the time (hour and minute lists: click
+   until the wanted value is selected; the minute list recentres after each click).
+7. **Show more** → turn on **AI-generated content** (TikTok's AI label, mandatory for the brand).
+8. Press **Schedule**, then check the post in TikTok Studio → Posts with its date and time.
+
+Pitfalls:
+- `ref_N` ids change after each upload: run `find` again before clicking.
+- Videos over 60 s get an extra line ("Duet and Stitch not available") under **Show more**, which moves the AI
+  toggle down; locate it with `find` and check it is on (zoom) before pressing Schedule.
+- Quote cards: keep them off faces. A card's `y` sets its height; a long credit line is cut at the right edge, so keep
+  `autor` short.
+- Several `file_upload` calls in one `browser_batch` fail on the 10 MB total; send them one by one.
+- Scheduling reaches 10 days ahead at most; schedule the rest later.
+- If the person closes Chrome or the extension disconnects, the step in flight is lost: check the Posts list before
+  retrying, so nothing is posted twice.
+
+## Part D: a batch on autopilot (approved cuts only)
+The whole daily cycle (night production, approval, publishing) is in docs/AUTOPILOT.md. This part is only the posting task.
+For a run of episodes, a scheduled task posts one a day without anyone at the PC
+(`cult-pixel-reacts-daily`, every day at 19:00):
+- `proyectos/_gen/cola_publicacion.json` is the queue: one row per day with `fecha`, `slug`, `aprobado`, `youtube`,
+  `instagram`. **Only the person flips `aprobado` to true**, after watching the cut. The task never posts an unapproved row.
+- Step 1: today's approved row goes out as an Instagram Reel (Graph API, B8). Before posting it lists recent media, so a
+  retry never posts twice.
+- Step 2: tomorrow's approved row is uploaded to YouTube **private with `publishAt`** (15:00 UTC = 10:00 Bogota) and the
+  AI label. YouTube makes it public on its own at that time.
+- Step 3: it fills the row's ids, appends to `posts.md` and reports in 2–4 lines.
+- TikTok is not in this task: approved cuts are scheduled in TikTok Studio a few days at a time (Part C).
+- Best hours for this channel (Bogota time, from its own history): YouTube 10:00, Instagram ~19:00, TikTok 13:00 and
+  20:00.
+
+## Going direct: no middleman per network
+Zapier and PostWire are only bridges. Every network can be reached without them; the trade-off is a one-time setup that
+only the person can do (their accounts, their consent screens).
+
+| Network | Direct route | One-time setup (the person) | Limits | Status |
+|---|---|---|---|---|
+| YouTube | YouTube Data API v3 with an own OAuth client: `videos.insert` (resumable upload of the local file, no public link needed), `status.publishAt`, `containsSyntheticMedia` | Google Cloud project → enable YouTube Data API → OAuth client "Desktop app" → sign in once with the brand channel; the refresh token stays in the `.env` | 10,000 units a day; an upload costs ~1,600 (≈6 a day). Videos from an unverified app may be locked private until the app passes Google's audit: test one first | not built yet |
+| YouTube (browser) | YouTube Studio in the person's Chrome, same method as Part C (it has its own scheduler) | none | Studio's layout changes; slower | works in principle, not tried |
+| Instagram | Instagram Graph API with an own Meta app (same calls as B8) and a long-lived token | Meta developer app → Instagram Graph API → token for the Business account | 50 API posts a day; still needs a public video URL | not built yet (today through Zapier) |
+| Instagram (browser) | Meta Business Suite in Chrome (it schedules Reels) | none | layout changes | not tried |
+| TikTok | TikTok Studio in Chrome (Part C) | none | 10 days ahead | **in use** |
+| TikTok (API) | Content Posting API | a TikTok developer app; until TikTok audits it, posts can only be private | audit takes weeks | not worth it now |
+
+Rule of thumb: an official API is the steadier route (no screen to break); the browser route needs no app or audit and
+uses the person's own session, so it is the fallback when an API is closed or capped.
