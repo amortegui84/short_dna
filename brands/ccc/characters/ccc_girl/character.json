@@ -18,17 +18,21 @@
  "voz": {
   "proveedor": "elevenlabs",
   "tipo": "voice_design + speech_to_speech",
-  "estado": "CHOSEN 2026-11-07",
+  "estado": "CHOSEN 2026-11-17 (Voice Design cand 3, stable take)",
   "descripcion": "young American woman in her twenties, bright and smooth, gossipy, playful and sarcastic, quick (about 2.6 words a second), close to the mic, conversational, laughs and scoffs come through",
   "flujo": "Seedance's own voice for lip sync, then ElevenLabs speech-to-speech to the series voice; B lines straight ElevenLabs v3",
-  "voice_id": "6u6JbqKdaQy89ENzLSju",
-  "stability": 0.0,
+  "voice_id": "WtzueDduRplMmiMJ3rZx",
+  "stability": 0.5,
   "sts_ajustes": {
    "stability": 0.35,
    "similarity_boost": 0.85,
    "style": 0.6
   },
-  "notas_vivacidad": "2026-11-07 review 'the voice could sound more alive like the original': VO in v3 Creative (stability 0.0) with attitude tags, STS style 0.6 / stability 0.35 for every line"
+  "notas_vivacidad": "2026-11-07 review 'the voice could sound more alive like the original': VO in v3 Creative (stability 0.0) with attitude tags, STS style 0.6 / stability 0.35 for every line",
+  "modelo": "eleven_v3",
+  "etiquetas": "[sarcastic] [dismissive] [casual]; never [rushed] or [rapid-fire]",
+  "ritmo_objetivo": "natural, about 2.5 words a second (the 10 s test line runs ~10.5 s); never sped up",
+  "regla_2026_11_17": "RULE (user, updated 2026-11-17 evening): Cap's voice-over is generated as ONE continuous block per voice-over run (proyecto.json bloques_voz), eleven_v3 stability 0.5 (Natural, was 1.0), attitude tags without [rushed], then the gaps between words are tightened (comun.apretar_pausas); no speed-up. Chosen by ear: vo/prueba_cap/5_estab05_un_bloque_sin_huecos.wav ('suena mucho mejor en bloque')."
  },
  "identidad_fija": "Keep her identity exactly as in the image: a floating hyperreal 3D art-toy head of a young woman, no body, no neck, no hands; backwards 5-panel cap (strap and back panels facing forward over the forehead) dyed in a diagonal ombre from vivid orange at the lower left to magenta-fuchsia at the upper right; long straight dark espresso-brown hair floating below the head; very large icy blue-gray eyes; heavy smudged dark eyeliner; freckles; thin silver septum ring; one tiny silver ear stud.",
  "mirada": "She faces the lens; head turns only when a line calls for it, then back to the lens for each punchline.",
@@ -68,5 +72,14 @@
   "qc_min": 0.85,
   "nota": "no MiniDV LoRA: the look is a clean 3D render, not tape"
  },
- "prompt_continuacion": "subject_definitions:\n<Subject 1> is the floating art-toy head from <Picture 1>; her look matches <Picture 2> exactly: backwards 5-panel cap dyed orange to magenta-fuchsia, long dark hair floating below the head, huge icy blue-gray eyes, heavy smudged eyeliner, freckles, a thin silver septum ring, one ear stud. She is only a head: no body, no neck, no shoulders, no hands.\n\nsummary:\n[reference-to-video generation + audio generation]\nA vertical Shorts clip: the sarcastic 3D art-toy host has just finished her line and holds the moment, silent, at the end of the video.\n\nretention_analysis:\n<Subject 1>: fully_preserved (cap, hair, eyes, makeup, piercings, green gradient background)\n\ndetailed_description:\nA clean hyperreal 3D render, vertical 9:16, locked-off camera, continuing exactly from <Picture 1>: same pose to start, the head centered and fully in frame on the same smooth green gradient background. She does not speak: her mouth stays closed. Then {gesto}. Natural blinks, her hair swings with weight and settles. Smooth, continuous motion, no cuts, no jumps.\n\noverall_soundscape:\nA quiet studio. No voice.\n\nnon_diegetic_music:\nN/A\n\navoid:\nspeaking, open mouth talking, body, neck, shoulders, hands, any object, text, logo, background change, camera move"
+ "prompt_continuacion": "subject_definitions:\n<Subject 1> is the floating art-toy head from <Picture 1>; her look matches <Picture 2> exactly: backwards 5-panel cap dyed orange to magenta-fuchsia, long dark hair floating below the head, huge icy blue-gray eyes, heavy smudged eyeliner, freckles, a thin silver septum ring, one ear stud. She is only a head: no body, no neck, no shoulders, no hands.\n\nsummary:\n[reference-to-video generation + audio generation]\nA vertical Shorts clip: the sarcastic 3D art-toy host has just finished her line and holds the moment, silent, at the end of the video.\n\nretention_analysis:\n<Subject 1>: fully_preserved (cap, hair, eyes, makeup, piercings, green gradient background)\n\ndetailed_description:\nA clean hyperreal 3D render, vertical 9:16, locked-off camera, continuing exactly from <Picture 1>: same pose to start, the head centered and fully in frame on the same smooth green gradient background. She does not speak: her mouth stays closed. Then {gesto}. Natural blinks, her hair swings with weight and settles. Smooth, continuous motion, no cuts, no jumps.\n\noverall_soundscape:\nA quiet studio. No voice.\n\nnon_diegetic_music:\nN/A\n\navoid:\nspeaking, open mouth talking, body, neck, shoulders, hands, any object, text, logo, background change, camera move",
+ "kling": {
+  "elemento": "frontal image = maestro; reference_image_urls = the views in referencias",
+  "referencias": [
+   "smile.png"
+  ],
+  "wps": 2.5,
+  "voz": "young American woman in her twenties, slightly raspy, sarcastic pop-culture gossip, relaxed natural pace, never rushed, close to the mic",
+  "voice_id_kling": null
+ }
 }

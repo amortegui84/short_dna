@@ -17,7 +17,7 @@ from pathlib import Path
 import numpy as np
 
 sys.path.insert(0, str(Path(__file__).parent))
-from comun import palabras, pcm16k, proyecto  # noqa: E402
+from comun import palabras, pcm16k, proyecto, ultimo_render  # noqa: E402
 
 HOP = 160          # 10 ms at 16 kHz
 CAIDA_DB = 12      # render this far under the wav (after gain) = voice missing
@@ -56,7 +56,7 @@ def ubicar(w_db, f_db, s0, busca=80):
 def revisar(carpeta, video=None):
     carpeta = Path(carpeta)
     pj = proyecto(carpeta)
-    video = Path(video) if video else carpeta / f"{pj['slug']}.mp4"
+    video = Path(video) if video else ultimo_render(carpeta, pj["slug"])
     datos = json.loads((carpeta / "datos_ae.json").read_text(encoding="utf-8"))
     tl = {s["id"]: s for s in json.loads((carpeta / "timeline.json").read_text(encoding="utf-8"))["segmentos"]}
     textos = {l["id"]: l["texto"] for l in pj["lineas"]}
@@ -70,7 +70,18 @@ def revisar(carpeta, video=None):
     f_db = env_db(pcm16k(video))
     oidas = palabras(video)
     lineas, fallas = [], []
-    for v in datos["voces"]:
+    voces = datos.get("voces")
+    if voces is None:   # news/reaction format: one voice track; its lines are vo/_lineas/Lxx.wav placed at tiempos_reaccion
+        tr = json.loads((carpeta / "vo" / "tiempos_reaccion.json").read_text(encoding="utf-8"))["ini"]
+        voces = [{"id": k, "wav": str(carpeta / "vo" / "_lineas" / f"{k}.wav"), "start": s} for k, s in tr.items()
+                 if (carpeta / "vo" / "_lineas" / f"{k}.wav").exists()]
+        for v in voces:     # timeline word times are on the pre-tightening clock: shift them to the line's real start
+            seg = tl.get(v["id"])
+            if seg and seg.get("words"):
+                d = v["start"] - seg.get("start", 0)
+                tl[v["id"]] = {**seg, "start": v["start"], "words": [{**w, "s": w["s"] + d, "e": w["e"] + d} for w in seg["words"]]}
+    mudos = {l["id"] for l in pj["lineas"] if l.get("mudo")}   # a silent beat (a grimace) has no voice to find
+    for v in [v for v in voces if v["id"] not in mudos]:
         lid, ini = v["id"], v["start"]
         w_db = env_db(pcm16k(v["wav"]))
         lag, corr = ubicar(w_db, f_db, int(round(ini * 100)))

@@ -12,9 +12,33 @@ carpeta = Path(sys.argv[1])
 pj = proyecto(carpeta)
 vo = carpeta / "vo"
 vo.mkdir(exist_ok=True)
-H = {"xi-api-key": clave_eleven(), "Content-Type": "application/json"}
 VOZ = personaje(pj).get("voz", {}) if pj.get("personaje") else {}
+# per-video override of the character's voice settings (2026-11-20, N04: Buns at speed 0.9 natively instead of 1.15 then a
+# 22 % rubberband stretch, which sounded "raro"): proyecto.json "voz_ajustes": {"speed": 0.9}
+VOZ = dict(VOZ, **pj.get("voz_ajustes", {}))
+# "motor_voz": "qwen3" (2026-11-19, out of ElevenLabs credit): a local clone of the same voice (engine/tts_local.py), from
+# brands/<brand>/voces/<voice id>.wav + .txt; everything after (blocks, cuts, qa_lineas) is the same
+MOTOR = pj.get("motor_voz") or VOZ.get("motor") or "eleven"
+H = {"xi-api-key": clave_eleven(pj), "Content-Type": "application/json"} if MOTOR == "eleven" else {}
+
+
+def pedir_local(texto):
+    import os, tempfile
+    from comun import marca_dir
+    ref = marca_dir(pj.get("marca")) / "voces" / f"{pj['voz']}.wav"
+    if not ref.exists():
+        sys.exit(f"motor_voz qwen3: no reference clip {ref} (+ .txt with its words)")
+    fd, out = tempfile.mkstemp(suffix=".mp3"); os.close(fd)
+    py = r"D:\ComfyUI_windows_portable_nvidia\ComfyUI_windows_portable\python_embeded\python.exe"
+    subprocess.run([py, "-I", str(Path(__file__).with_name("tts_local.py")), str(ref), str(ref.with_suffix(".txt")), out, texto],
+                   check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    datos = Path(out).read_bytes(); os.remove(out)
+    return datos
+
+
 def pedir_tts(texto):
+    if MOTOR == "qwen3":
+        return pedir_local(texto)
     modelo = VOZ.get("modelo", "eleven_v3")
     if modelo != "eleven_v3":   # solo v3 entiende [etiquetas]; en v2 se quitan (si no, las lee)
         texto = re.sub(r"\s*\[[^\]]+\]\s*", " ", texto).strip()
@@ -32,7 +56,7 @@ def pedir_tts(texto):
 # by blocks (review 2026-11-12: "the voice is very flat"; research: generating line by line makes every sentence start fresh and
 # fall the same way): proyecto.json "bloques_voz": [["L01","L02","L03"], ...] sends each block in one call, so the intonation
 # flows across the lines; Whisper's word times cut it back into vo/<id>.mp3 at the gaps between lines (nothing else changes).
-import subprocess  # noqa: E402
+import re, subprocess  # noqa: E402
 import numpy as np  # noqa: E402
 from comun import palabras  # noqa: E402
 
@@ -49,7 +73,9 @@ def valle(x, a, b, sr=16000, win=0.01):
         return round((a + b) / 2, 3)
     e = np.convolve(x[i0:i1] ** 2, np.ones(w) / w, mode="valid")
     return round((i0 + int(np.argmin(e)) + w // 2) / sr, 3)
-for bloque in pj.get("bloques_voz", []):
+# blocks are for ElevenLabs only: Qwen3 runs lines together without a pause, so a cut fell inside "preaching" (R22, 2026-11-19);
+# the local clone speaks each line alone (the per-line loop below)
+for bloque in (pj.get("bloques_voz", []) if MOTOR == "eleven" else []):
     lns = [l for l in pj["lineas"] if l["id"] in bloque]
     if all((vo / f"{l['id']}.mp3").exists() for l in lns):
         continue
@@ -61,7 +87,11 @@ for bloque in pj.get("bloques_voz", []):
             # tone tags first (character "voz.etiquetas", review 2026-11-13: "too whispered, make it more normal"), and a closing
             # [pause]: eleven_v3 stopped mid-syllable at the end of 12 of 16 takes
             texto = " ".join(l.get("tts", l["texto"]) for l in lns)
-            toma.write_bytes(pedir_tts((VOZ.get("etiquetas", "") + " " + texto).strip() + " [pause]"))
+            # "voz.etiquetas" is a description of the host's tags, not text to read (2026-11-17: the block started with
+            # "Reactions, ha ha ha"): only its first [tag], and only when the block does not open with its own tag
+            tags = re.findall(r"\[[^\]]+\]", VOZ.get("etiquetas", ""))
+            pre = tags[0] if tags and not texto.lstrip().startswith("[") else ""
+            toma.write_bytes(pedir_tts((pre + " " + texto).strip() + " [pause]"))
         ws = palabras(toma)
         oido = " ".join(w for w, _, _ in ws)
         p = parecido(" ".join(l["texto"] for l in lns), oido)
@@ -105,7 +135,9 @@ for bloque in pj.get("bloques_voz", []):
     for i, l in enumerate(lns):
         a, b = cortes[i], cortes[i + 1]
         # no click at a cut; the take's own end gets a longer fade: eleven_v3 often stops mid-syllable (2026-11-13: 12 of 16 takes)
-        bordes = "afade=t=in:d=0.01," + (f"afade=t=out:st={max(0.0, b - a - 0.02):.3f}:d=0.02" if b else "areverse,afade=t=in:d=0.06,areverse")
+        # a block's first line starts at the take's t=0, and multilingual_v2 at speed 0.9 voices the first consonant from sample 0
+        # (A04 "Nine", 2026-11-20: 5 takes failed qa_lineas "cut at start" with the word whole): 60 ms of air in front
+        bordes = ("adelay=60:all=1," if a < 0.01 else "") + "afade=t=in:d=0.01," + (f"afade=t=out:st={max(0.0, b - a - 0.02):.3f}:d=0.02" if b else "areverse,afade=t=in:d=0.06,areverse")
         # seek on the input (-ss/-to before -i) so the cut starts at t=0: with output seeking the fade-out "st" was read on the take's
         # clock and every line after a block's first came out silent (ep13 L05/L06, 2026-11-13)
         cmd = ["ffmpeg", "-v", "error", "-y", "-ss", f"{a:.3f}"] + (["-to", f"{b:.3f}"] if b else []) + ["-i", str(toma), "-af", bordes, "-c:a", "libmp3lame", "-b:a", "192k", str(vo / f"{l['id']}.mp3")]
@@ -116,7 +148,7 @@ for bloque in pj.get("bloques_voz", []):
 
 for ln in pj["lineas"]:
     # with Seedance the host lines' voice comes from the clip itself (then speech-to-speech): no TTS for them
-    if pj.get("motor_clips") == "seedance" and ln["tipo"] == "A":
+    if pj.get("motor_clips") in ("seedance", "kling") and ln["tipo"] == "A":
         continue
     mp3 = vo / f"{ln['id']}.mp3"
     if mp3.exists():
@@ -124,19 +156,7 @@ for ln in pj["lineas"]:
     tomas = []
     for intento in range(3):
         toma = vo / f"{ln['id']}_t{intento}.mp3"
-        modelo = VOZ.get("modelo", "eleven_v3")
-        texto = ln.get("tts", ln["texto"])
-        if modelo != "eleven_v3":   # solo v3 entiende [etiquetas]; en v2 se quitan (si no, las lee)
-            texto = re.sub(r"\s*\[[^\]]+\]\s*", " ", texto).strip()
-        ajustes = {"stability": VOZ.get("stability", 0.5)}
-        for k in ("speed", "similarity_boost", "style"):
-            if k in VOZ:
-                ajustes[k] = VOZ[k]
-        body = {"text": texto, "model_id": modelo, "voice_settings": ajustes}
-        r = json.load(urllib.request.urlopen(urllib.request.Request(
-            f"https://api.elevenlabs.io/v1/text-to-speech/{pj['voz']}/with-timestamps?output_format=mp3_44100_128",
-            data=json.dumps(body).encode(), headers=H), timeout=120))
-        toma.write_bytes(base64.b64decode(r["audio_base64"]))
+        toma.write_bytes(pedir_tts(ln.get("tts", ln["texto"])))   # same request as before; pedir_tts strips tags for non-v3
         oido, lang = texto_oido(toma)
         p = parecido(ln["texto"], oido) if lang == "en" else 0.0
         print(f"{ln['id']} toma {intento} {p:.2f} {lang} | {oido}", flush=True)

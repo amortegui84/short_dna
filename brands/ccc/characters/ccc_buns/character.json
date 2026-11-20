@@ -1,0 +1,46 @@
+{
+ "slug": "ccc_buns",
+ "nombre": "CCC presenter: Buns (H3)",
+ "descripcion": "A floating hyperreal 3D art-toy head of a young East Asian woman, no body, no neck, no hands: black hair in two high space buns with pink fluffy scrunchies and wispy flyaways, a centre part, clear transparent oversized glasses, smoky eyeliner, dark brown eyes, freckles, glossy deep-red lips, pale skin. Warm red-to-orange gradient background, darker at the top.",
+ "maestro": "master_x4.png",
+ "estado": "APPROVED by the user 2026-11-17. master_x4.png = the 322x577 board still upscaled 4x locally (4x-ClearRealityV1); no larger original exists in Figma.",
+ "sin_manos": true,
+ "fondo": {
+  "tipo": "gradient",
+  "de": "#B8231C",
+  "a": "#F2944A",
+  "nota": "red at the top to orange at the bottom (from the board still)"
+ },
+ "voz": {
+  "proveedor": "elevenlabs",
+  "tipo": "voice_design + speech_to_speech",
+  "estado": "CHOSEN 2026-11-17 (Voice Design cand 3)",
+  "descripcion": "American English, female, around twenty: hyper-curious art-nerd vlogger, giddy, quick-witted, a little chaotic, gasps and whispered asides",
+  "voice_id": "KhgAWZAIJNJfWsZK130H",
+  "modelo": "eleven_multilingual_v2",
+  "stability": 0.4,
+  "similarity_boost": 0.8,
+  "speed": 0.9,
+  "_speed_nota": "2026-11-20: was 1.15 then stretched 22-25 % with rubberband to ~195 wpm (user: sounded odd). 0.9 natively gives ~180-190 wpm with no stretch; keep ritmo_b 1.0 and no estirar",
+  "etiquetas": "none: multilingual_v2 reads [tags] aloud (tts.py strips them)",
+  "ritmo_objetivo": "~3.7 words a second (the 10 s test line runs 7.8 s)"
+ },
+ "identidad_fija": "Keep her identity exactly as in the image: black hair in two high space buns with pink fluffy scrunchies, clear oversized glasses, smoky eyeliner, freckles, glossy deep-red lips.",
+ "mirada": "She faces the lens; leans in toward it on the discoveries, glances aside for whispered asides, then back to the lens.",
+ "nunca": [
+  "body, neck, shoulders, hands, arms",
+  "camera movement or zoom inside the clip",
+  "the buns or scrunchies cut off by the frame",
+  "glasses disappearing or changing shape",
+  "subtitles or on-screen text",
+  "identity drift or face morphing",
+  "a static frozen face or stiff mouth"
+ ],
+ "kling": {
+  "elemento": "frontal image = maestro; reference_image_urls = up to 3 other approved views",
+  "voice_id_kling": null,
+  "wps": 3.7,
+  "voz": "young American woman around twenty, giddy hyper-curious art nerd, bright light voice, rapid-fire when excited, gasps and whispered asides"
+ },
+ "escena_base": "master_x4.png"
+}

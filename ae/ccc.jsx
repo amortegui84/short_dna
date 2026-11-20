@@ -116,7 +116,9 @@ var CCC = (function () {
     function spin(L, t0, sc, rot) { pop(L, t0, sc); keys(R(L), [t0, t0 + 0.467], [rot - 180, rot], [[17, 30], [90, 17]]); }
     // ---------------- the host plate (one precomp per host line)
     function placa(sec) {
-        var a = sec.ini, b = sec.fin, dur = b - a;
+        // +0.1 s: a 24 fps plate rounds its length down to whole frames, and the last 30 fps frame of the section showed the
+        // background without the head (v4 review 2026-11-17)
+        var a = sec.ini, b = sec.fin, dur = b - a + 0.1;
         var hi = imp(sec.mate || sec.clip), pc = app.project.items.addComp(D.comp + " plate " + (sec.id || a.toFixed(1)), W, H, 1, dur, (hi && hi.frameRate) ? hi.frameRate : 24); pc.parentFolder = fold;
         var bg = pc.layers.addSolid([0, 0, 0], "teal gradient", W, H, 1, dur); rampa(bg, 0, rgb(TEAL_TOP), 1920, rgb(TEAL_BOT));
         var tw = imp(D.type_wall);
@@ -139,6 +141,16 @@ var CCC = (function () {
             // H3 renders the head ~14% smaller and lower than the Seedance plate: scale it around (540, 640)
             var k = cover(it), hk = (D.estilo && D.estilo.cabeza && D.estilo.cabeza.escala_h3) || 1.06, kk = k / 100;
             A(L).setValue([it.width / 2, it.height / 2 + (640 - H / 2) / kk]); P(L).setValue([W / 2, 640]); S(L).setValue([k * hk, k * hk]);
+            // floating head: a slow, tiny drift (review 2026-11-17 "un wiggle flotante muy muy suave"); same seed on every plate
+            if (sec.norm) {
+                // same head size and place on every host line: scale by f around the plate's pivot, then move the head's
+                // median box (centre x, top y) onto the reference
+                var sN = k * hk / 100, f = sec.norm.f;
+                S(L).setValue([k * hk * f, k * hk * f]);
+                P(L).setValue([W / 2 + (sec.norm.rcx - 540) * sN - (sec.norm.cx - 540) * sN * f, 640 + (sec.norm.ry0 - 640) * sN - (sec.norm.y0 - 640) * sN * f]);
+            }
+            P(L).expression = "seedRandom(7, true); value + (wiggle(0.35, 5, 1, 0.5, time + " + a.toFixed(3) + ") - value);";
+            R(L).expression = "seedRandom(11, true); wiggle(0.25, 0.6, 1, 0.5, time + " + a.toFixed(3) + ");";
         }
         return pc;
     }
@@ -154,7 +166,7 @@ var CCC = (function () {
     function cortesDe(sec) {
         var out = [sec.fin], ob = sec.obras || [];
         if (sec.tipo === "gancho") return out;
-        for (var j = 0; j < ob.length; j++) out.push(Math.max(sec.ini + 1.2, finPalabra(ob[j].t) + 0.05));
+        for (var j = 0; j < ob.length; j++) out.push(Math.max(sec.ini + 1.5, finPalabra(ob[j].t) + 0.05));
         return out;
     }
     // the head's background without the head (teal gradient + coral type wall faded by its luma ramp): it replaces every black
@@ -178,7 +190,8 @@ var CCC = (function () {
         var L = c.layers.add(pc); L.name = "HOST " + sec.id; L.startTime = a; vida(L, a, b);
         var bc = fx(L, "ADBE Brightness & Contrast 2"); bc.property(1).setValue(18); bc.property(2).setValue(6);
         // wide (109->102), then close (144->134) and medium (122->114) in turn, 4 frames each, ease out 30 / in 90 then hold
-        var sl0 = sec.saltos || [[a, 1.0]], sc = S(L), f4 = 4 / FPS, LV = [[109, 102], [144, 134], [122, 114]], sl = [], ct = cortesDe(sec);
+        // review 2026-11-17 ("saltos raros en el avatar"): no land-big-and-settle pop on the cuts, the framing just holds
+        var sl0 = sec.saltos || [[a, 1.0]], sc = S(L), f4 = 4 / FPS, LV = [[102, 102], [134, 134], [114, 114]], sl = [], ct = cortesDe(sec);
         // drop a punch that would last less than 1 s before the host is cut away (Blake v1: a 4-frame close-up before "angels")
         for (var q0 = 0; q0 < sl0.length; q0++) { var ok = true; for (var c0 = 0; c0 < ct.length; c0++) if (q0 > 0 && ct[c0] > sl0[q0][0] && ct[c0] - sl0[q0][0] < 1.0) ok = false; if (ok) sl.push(sl0[q0]); }
         for (var q = 0; q < sl.length; q++) {
@@ -212,7 +225,10 @@ var CCC = (function () {
     }
     function obra(img, a, b, modo, foco) {
         var it = imp(img); if (!it || b - a < 0.2) return null;
-        var dur = b - a, land = it.width / it.height > W / H * 1.15;
+        var dur = b - a, land = it.width / it.height > W / H * 1.15, fijo = false;
+        // QA 2026-11-19 (A08 v5 4-10 s): the crops of a bust panned down to its chest; proyecto.json "focos" {stem: [x, y]} keeps
+        // every crop of that work on its subject
+        if (!foco && D.focos) { var st0 = String(img).replace(/^.*[\/\\]/, "").replace(/\.[^.]+$/, "").replace(/_h264$/, ""); if (D.focos[st0]) { foco = D.focos[st0]; fijo = true; } }
         if (modo === "revelado") {
             // zoom out from a detail to the whole work (template: 200% -> fit, anchor to the centre, ease 75/95)
             var L = plano(it, a, b, 2.0, 1.0, dentro(it, 2, foco || [0.5, 0.45]), [0.5, 0.5]);
@@ -227,19 +243,185 @@ var CCC = (function () {
                 // crops on alternate sides, 1.9x then 1.5x, panning 12% (landscape works sideways, tall ones downward)
                 var z = i % 2 ? 1.9 : 1.5, side = i % 2 ? 0.3 : 0.7, d = 0.12 * (i % 2 ? 1 : -1);
                 var fa = land ? [side, 0.45] : [0.5, side], fb = land ? [side + d, 0.45] : [0.5, side + d];
-                if (foco && i === 1) { fa = foco; fb = land ? [foco[0] + d, foco[1]] : [foco[0], foco[1] + d]; }
+                if (foco && (i === 1 || fijo)) { var dd = fijo ? d * 0.4 : d; fa = foco; fb = land ? [foco[0] + dd, foco[1]] : [foco[0], foco[1] + dd]; }
                 plano(it, s0, s1, z, z * 1.04, dentro(it, z, fa), dentro(it, z * 1.04, fb));
                 cue(s0, "tick", -18, "crop");
             }
         }
         return out;
     }
+    // ---------------- B block on a board (artist format, "obras_modo": "tablero"): the motion recipe of the collage templates
+    // (ae/collage.jsx v10c, approved by the user 2026-11-05; assets_motion_health_care/tests_ae/tratamientos2/RECETAS_tratamientos2.md).
+    // Every work sits on its own spot of a big board; a camera null CAM drifts (12/9 px/s, another direction per work) and slides
+    // 1.2 s to the next spot, so each work lands on the word that names it. Works are never altered: full bleed with a slow
+    // traverse (from +a to -a: 70 px/s x, 50 px/s y at most, as collage.jsx; +0.8 %/s) cropped to their own frame, or on a mat with kit tape when the file is too
+    // small for full bleed. A museum label (Instrument Serif title, mono date, tape) replaces the title under the captions;
+    // registration marks blink at 6 fps; diagonal strips in the brand colours cover the change from host to board and back.
+    // Review 2026-11-19: "no respetaste el estilo, el motion ... las recetas de los templates" (artist videos).
+    var nBoard = 0, FR = [], DERIVA = [[12, 9], [-12, 7], [10, -8], [-9, -9]];
+    function ellG(g, w, h) { g.addProperty("ADBE Vector Shape - Ellipse").property("ADBE Vector Ellipse Size").setValue([w, h]); }
+    function strokeG(g, col, w) { var s = g.addProperty("ADBE Vector Graphic - Stroke"); s.property("ADBE Vector Stroke Color").setValue(rgb(col)); s.property("ADBE Vector Stroke Width").setValue(w); return s; }
+    function lineaG(g, pts, cerrada) { var p = g.addProperty("ADBE Vector Shape - Group"), s = new Shape(); s.vertices = pts; s.closed = !!cerrada; p.property("ADBE Vector Shape").setValue(s); }
+    function multL(L, op) { L.blendingMode = BlendingMode.MULTIPLY; if (op !== undefined) O(L).setValue(op); return L; }
+    // collage "caer": lands small, overshoots 108 %, settles (7 frames)
+    function caerL(L, t) { var e = S(L), v = e.value; e.setValueAtTime(t, [v[0] * 0.6, v[1] * 0.6]); e.setValueAtTime(t + 4 / FPS, [v[0] * 1.08, v[1] * 1.08]); e.setValueAtTime(t + 7 / FPS, [v[0], v[1]]); return L; }
+    function kitLib() { var p = String(D.type_wall || ""), i = p.indexOf("/brands/"); return (i > 0 ? p.substr(0, i) : "D:/short_dna") + "/library/kit/"; }
+    // a layer on the board: placed in screen coordinates of its spot, moved by CAM; k > 1 = a little parallax in the slides
+    function tabla(L, sp, x, y, k) {
+        P(L).setValue([x + sp[0], y + sp[1]]);
+        P(L).expression = "var d=thisComp.layer('CAM').transform.position-[" + W / 2 + "," + H / 2 + "]; var s=[" + sp[0] + "," + sp[1] + "]; value-d-(d-s)*(" + ((k || 1) - 1).toFixed(3) + ");";
+        L.motionBlur = true; return L;
+    }
+    // a video work plays from its own start when its slot opens and loops (time remap), so it never runs out mid-slot
+    // (A01 porto cut-in at 43.8 s was empty: the clip had ended long before)
+    function vidaV(L, it, a, b) {
+        var vid = false; try { vid = !it.mainSource.isStill && it.duration > 0; } catch (e) {}
+        if (vid) { L.timeRemapEnabled = true; L.property("ADBE Time Remapping").expression = "Math.max(0, time - " + a.toFixed(3) + ") % Math.max(0.1, source.duration - 0.05);"; }
+        return vida(L, a, b);
+    }
+    function nuloT(n) { var L = c.layers.addNull(DUR); L.name = n; A(L).setValue([0, 0]); return L; }
+    function obraTablero(q, sp, t0, t1, idx) {
+        var oi = imp(q.img); if (!oi) return null;
+        var k = Math.max(W / oi.width, H / oi.height) * 1.12, ob = c.layers.add(oi); ob.name = "WORK " + oi.name; ob.audioEnabled = false; S(ob).setValue([k * 100, k * 100]);
+        var holgX = Math.max(0, oi.width * k - W) / 2, holgY = Math.max(0, oi.height * k - H) / 2, dir = [1, -1, -1, 1][idx % 4], diy = [1, 1, -1, -1][idx % 4];
+        // the subject stays in frame (proyecto.json "focos")
+        var fo = (D.focos && D.focos[q.stem]) || null, ox = 0, oy = 0;
+        if (fo) { ox = Math.max(-holgX, Math.min(holgX, (0.5 - fo[0]) * oi.width * k)); oy = Math.max(-holgY, Math.min(holgY, (0.5 - fo[1]) * oi.height * k)); }
+        var du = Math.max(0.5, t1 - t0), ax = Math.round(Math.max(0, Math.min((holgX - Math.abs(ox)) * 0.8, 35 * du))), ay = Math.round(Math.max(0, Math.min((holgY - Math.abs(oy)) * 0.6, 25 * du)));
+        P(ob).setValue([W / 2 + sp[0], H / 2 + sp[1]]);
+        P(ob).expression = "var d=thisComp.layer('CAM').transform.position-[" + W / 2 + "," + H / 2 + "]; var b=Math.max(0,time-" + t0.toFixed(3) + ")/" + du.toFixed(3) + "; [" + (W / 2 + sp[0] + Math.round(ox)) + "+" + dir + "*linear(b,0,1," + ax + ",-" + ax + ")," + (H / 2 + sp[1] + Math.round(oy)) + "+" + diy + "*linear(b,0,1," + ay + ",-" + ay + ")]-d;";
+        S(ob).expression = "var b=Math.max(0,time-" + t0.toFixed(3) + "); value*(1+0.008*b);";
+        ob.motionBlur = true; vidaV(ob, oi, t0, t1);
+        // cropped to its own frame: while the camera slides it never spills over the next work
+        var cu = c.layers.addSolid([1, 1, 1], "MATTE " + ob.name, W, H, 1, DUR); tabla(cu, sp, W / 2, H / 2, 1); cu.enabled = false; vida(cu, t0, t1);
+        ob.setTrackMatte(cu, TrackMatteType.ALPHA);
+        return ob;
+    }
+    function laminaTablero(q, sp, t0, t1, idx) {
+        var oi = imp(q.img); if (!oi) return null;
+        var e = Math.min(940 / oi.width, 1150 / oi.height), w = oi.width * e, h = oi.height * e, rot = idx % 2 ? -1 : 1, x = 540, y = 700;
+        var pp = shp("mat"), pg = grp(pp, "p"); rect(pg, w + 56, h + 56, 2); fill(pg, "#FBFBF6"); strokeG(pg, INK, 3); tabla(pp, sp, x, y, 0.98); R(pp).setValue(rot);
+        var ob = c.layers.add(oi); ob.name = "WORK " + oi.name; ob.audioEnabled = false; S(ob).setValue([e * 100, e * 100]); tabla(ob, sp, x, y, 0.98); R(ob).setValue(rot);
+        vida(pp, t0, t1); vidaV(ob, oi, t0, t1); caerL(pp, t0); caerL(ob, t0);
+        var tp = ["B_tape_yellow.png", "B_tape_pink_long.png"];
+        for (var i = 0; i < 2; i++) {
+            var ti = imp(D.kit + "/" + tp[i]); if (!ti) continue;
+            var L = c.layers.add(ti), kt = 150 / ti.width * 100; S(L).setValue([kt, kt]); tabla(L, sp, x + (i ? 1 : -1) * (w / 2 + 6), y - h / 2 - 10, 0.98); R(L).setValue(i ? 36 : -32); vida(L, t0, t1); caerL(L, t0 + 0.08);
+        }
+        return ob;
+    }
+    // museum label: title in Instrument Serif, date in mono, two pieces of kit tape; lands 92 -> 100 % in 5 frames
+    function cartelaT(sp, titulo, fecha, t, fin, rot) {
+        if (!titulo) return;
+        if (titulo.length > 22) { var cu = titulo.lastIndexOf(" ", Math.ceil(titulo.length / 2) + 3); if (cu > 0) titulo = titulo.substr(0, cu) + "\r" + titulo.substr(cu + 1); }
+        var x = 250, y = 1250, nul = nuloT("museum label");
+        var tt = texto(titulo, F_QUOTE, 46, INK), lt = texto(fecha || " ", "CascadiaMono-Roman", 34, INK);
+        var r1 = tt.sourceRectAtTime(0, false), r2 = lt.sourceRectAtTime(0, false), w = Math.max(r1.width, r2.width) + 64, h = r1.height + r2.height + 22 + 56;
+        if (x - w / 2 < 52) x = 52 + w / 2;
+        if (y + h / 2 > 1322) y = 1322 - h / 2;
+        tabla(nul, sp, x, y, 1); vida(nul, t, fin);
+        var hj = shp("label card"), hg = grp(hj, "h"); rect(hg, w, h, 4); fill(hg, "#FBFBF6"); strokeG(hg, INK, 2);
+        hj.parent = nul; P(hj).setValue([0, 0]);
+        tt.parent = nul; P(tt).setValue([-w / 2 + 32 - r1.left, -h / 2 + 28 - r1.top]);
+        lt.parent = nul; P(lt).setValue([-w / 2 + 32 - r2.left, -h / 2 + 28 + r1.height + 22 - r2.top]);
+        vida(hj, t, fin); vida(tt, t, fin); vida(lt, t, fin); tt.moveBefore(hj); lt.moveBefore(hj);
+        var tp = imp(D.kit + "/B_tape_yellow.png");
+        if (tp) for (var i = 0; i < 2; i++) { var pl = c.layers.add(tp), kt = 96 / tp.width * 100; pl.parent = nul; S(pl).setValue([kt, kt]); P(pl).setValue([(i ? 1 : -1) * (w / 2 - 10), -h / 2 + 4]); R(pl).setValue(i ? 38 : -34); O(pl).setValue(90); vida(pl, t + 0.1, fin); }
+        R(nul).setValue(rot || 0); S(nul).setValueAtTime(t, [92, 92]); S(nul).setValueAtTime(t + 5 / FPS, [100, 100]);
+        cue(t, "tick", -16, "museum label");
+    }
+    // keyword label on a work (collage "etiqueta": a slanted ink bar in a paper capsule, pops 0 -> 110 -> 100 % in 7 frames).
+    // QA 2026-11-19: the data carried them (judith "so he ran") but the board dropped them
+    function etiquetaT(sp, e, fin, idx) {
+        if (!e || !e.txt) return;
+        var t = e.t, x = e.x || 300, y = Math.max(230, e.y || 230), nul = nuloT("keyword " + e.txt);
+        var tl = texto(String(e.txt).toUpperCase(), F_LABEL, 54, "#FFFFFF"), r = centrar(tl), w = r.width + 70, h = r.height + 40;
+        if (x - (w + 34) / 2 < 60) x = 60 + (w + 34) / 2; if (x + (w + 34) / 2 > W - 60) x = W - 60 - (w + 34) / 2;
+        tabla(nul, sp, x, y, 1.02); vida(nul, t, fin);
+        var bar = shp("keyword bar"), bg = grp(bar, "b"); lineaG(bg, [[-w / 2, -h / 2], [w / 2, -h / 2], [w / 2 - 14, h / 2], [-w / 2 - 14, h / 2]], true); fill(bg, INK);
+        var cap = shp("keyword capsule"), cg = grp(cap, "c"); rect(cg, w + 34, h + 30, (h + 30) / 2); strokeG(cg, INK, 12); fill(cg, PAPER);
+        var ps = [cap, bar, tl]; for (var i = 0; i < 3; i++) { ps[i].parent = nul; P(ps[i]).setValue([0, 0]); vida(ps[i], t, fin); }
+        tl.moveToBeginning(); bar.moveAfter(tl); cap.moveAfter(bar);
+        R(nul).setValue(idx % 2 ? 3 : -3); S(nul).setValueAtTime(t, [0, 0]); S(nul).setValueAtTime(t + 4 / FPS, [110, 110]); S(nul).setValueAtTime(t + 7 / FPS, [100, 100]);
+        cue(t, "pop", -12, "keyword " + e.txt);
+    }
+    // registration marks in three corners, blinking at 6 fps
+    function registroT(sp, a, b, seed) {
+        var pos = [[70, 170], [1000, 170], [1010, 1330]];
+        for (var i = 0; i < pos.length; i++) {
+            var L = shp("registration"), g = grp(L, "x"); ellG(g, 34, 34); lineaG(g, [[-28, 0], [28, 0]]); strokeG(g, INK, 2.5);
+            var g2 = grp(L, "y"); lineaG(g2, [[0, -28], [0, 28]]); strokeG(g2, INK, 2.5);
+            tabla(L, sp, pos[i][0], pos[i][1], 1); vida(L, a, b); O(L).expression = "posterizeTime(6); seedRandom(" + (seed * 10 + i) + ",true); random()>0.12?100:30;";
+        }
+    }
+    // diagonal strips that sweep the frame at a change between host and board (collage "franjas", 0.8 s, ease 60)
+    function franjas(t) {
+        var cols = [TOP, "#CB2479", PAPER, INK];
+        for (var i = 0; i < 4; i++) {
+            var L = shp("strip wipe"), g = grp(L, "f"); lineaG(g, [[-170, -1500], [170, -1500], [530, 1500], [190, 1500]], true); fill(g, cols[i]);
+            var t0 = t - 0.5 + i * 0.06; P(L).setValueAtTime(t0, [-700 - i * 260, H / 2]); P(L).setValueAtTime(t0 + 0.8, [W + 900 + i * 120, H / 2]);
+            var es = new KeyframeEase(0, 60); P(L).setTemporalEaseAtKey(1, [es], [es]); P(L).setTemporalEaseAtKey(2, [es], [es]);
+            L.motionBlur = true; vida(L, Math.max(0, t0), t0 + 0.82); if (i === 3) multL(L, 70); FR.push(L);
+        }
+        cue(t - 0.35, "swish", -8, "strips");
+    }
+    // a work cut in during a host line (or a line without the face) on its own one-spot board, so the episode never mixes the
+    // old crops with the board (QA 2026-11-19: a01 goliath 37.9 s and porto 43.8 s still came in as hard-cut crops)
+    function tableroUno(img, stem, a, b) {
+        var tf = (D.titulos || {})[stem] || [];
+        return tablero([{ img: img, stem: stem, ini: a, fin: b, titulo: tf[0] || "", fecha: tf[1] || "", etqs: [] }]);
+    }
+    function tablero(run) {
+        nBoard++;
+        var a0 = run[0].ini, b0 = run[run.length - 1].fin, cS = c, n = run.length;
+        var pc = app.project.items.addComp(D.comp + " board " + nBoard, W, H, 1, DUR, FPS); pc.parentFolder = fold; pc.motionBlur = true; pc.shutterAngle = 90; pc.shutterPhase = -90;
+        c = pc;
+        try {
+            c.layers.addSolid(rgb(PAPER), "paper", W, H, 1, DUR);
+            var pa = imp(kitLib() + "imagenes/texturas/Paper001_2k.jpg");
+            if (pa) { var Lp = c.layers.add(pa), kp = cover(pa) * 1.05; S(Lp).setValue([kp, kp]); P(Lp).setValue([W / 2, H / 2]); multL(Lp, 35); }
+            // spots snake across the board (right, right, down, left, left, down ...): the slide changes direction
+            var SP = [];
+            for (var i = 0; i < n; i++) { var row = Math.floor(i / 3), col = row % 2 ? 2 - i % 3 : i % 3; SP.push([col * 1400, row * 2200]); }
+            // QA 2026-11-19 (triple QA): the camera never stops. It slides 0.55 s onto the first spot under the strips (collage:
+            // host -> work), drifts, slides 1.2 s between spots, and leaves the last spot under the exit strips
+            var cam = c.layers.addNull(DUR); cam.name = "CAM"; cam.enabled = false; var cp = P(cam), KT = [];
+            function ck(t, v, tipo) { cp.setValueAtTime(t, v); KT.push([t, tipo]); }
+            var ent = Math.min(0.55, (run[0].fin - a0) * 0.3), ox0 = (nBoard % 2 ? -1 : 1) * 280;
+            ck(a0, [W / 2 + SP[0][0] + ox0, H / 2 + SP[0][1] - 160], "sale");
+            ck(a0 + ent, [W / 2 + SP[0][0], H / 2 + SP[0][1]], "llega");
+            for (i = 1; i < n; i++) {
+                var qa = run[i - 1], qs = i === 1 ? a0 + ent : qa.ini, t1 = Math.max(qb0(i) - 1.2, qs + 0.05), dd = Math.min(5, t1 - qs), dv = DERIVA[(nBoard + i - 1) % 4];
+                ck(t1, [W / 2 + SP[i - 1][0] + dv[0] * dd, H / 2 + SP[i - 1][1] + dv[1] * dd], "sale");
+                ck(run[i].ini, [W / 2 + SP[i][0], H / 2 + SP[i][1]], "llega");
+                cue(t1, "swish", -12, "board slide");
+            }
+            function qb0(k) { return run[k].ini; }
+            var qL = n === 1 ? a0 + ent : run[n - 1].ini, tx = Math.max(qL + 0.3, b0 - 0.4), dl = Math.min(5, tx - qL), du0 = DERIVA[(nBoard + n - 1) % 4];
+            ck(tx, [W / 2 + SP[n - 1][0] + du0[0] * dl, H / 2 + SP[n - 1][1] + du0[1] * dl], "sale");
+            ck(b0, [W / 2 + SP[n - 1][0] + du0[0] * dl - ox0 * 0.8, H / 2 + SP[n - 1][1] + du0[1] * dl + 140], "llega");
+            var lent = new KeyframeEase(0, 33), sale = new KeyframeEase(0, 55), llega = new KeyframeEase(0, 60);
+            for (i = 1; i <= cp.numKeys; i++) { var par = false, tk0 = cp.keyTime(i); for (var zk = 0; zk < KT.length; zk++) if (Math.abs(KT[zk][0] - tk0) < 0.5 / FPS) par = KT[zk][1] === "sale"; cp.setTemporalEaseAtKey(i, [par ? lent : llega], [par ? sale : lent]); cp.setSpatialAutoBezierAtKey(i, false); cp.setSpatialContinuousAtKey(i, false); cp.setSpatialTangentsAtKey(i, [0, 0, 0], [0, 0, 0]); }
+            for (i = 0; i < n; i++) {
+                var q = run[i], t0 = i === 0 ? a0 : q.ini - 1.25, te = i === n - 1 ? b0 : q.fin + 0.1, oi = imp(q.img);
+                if (!oi) continue;
+                var sube = Math.max(W / oi.width, H / oi.height);
+                if (sube > 1.9) laminaTablero(q, SP[i], t0, te, nBoard + i); else obraTablero(q, SP[i], t0, te, nBoard + i);
+                cartelaT(SP[i], q.titulo, q.fecha, Math.max(t0, q.ini + 0.3), te, (nBoard + i) % 2 ? 1.5 : -1.5);
+                registroT(SP[i], t0, te, nBoard * 10 + i);
+                var eq = q.etqs || []; for (var ze = 0; ze < eq.length; ze++) if (eq[ze].t < te - 0.4) etiquetaT(SP[i], eq[ze], Math.min(te, eq[ze].fin || te), nBoard + i + ze);
+            }
+        } finally { c = cS; }
+        var Lb = c.layers.add(pc); Lb.name = "BOARD " + nBoard; Lb.audioEnabled = false; vida(Lb, a0, b0); Lb.motionBlur = true;
+        franjas(a0); franjas(b0);
+        return Lb;
+    }
     // (a slide comp must keep the name "Slide 0N ...": its expressions read N from thisComp.name.substr(6, 2))
     // ---------------- the template's art modules, reused as built (3D carousel, desk scroll of framed prints, slider, strip,
     // Ken Burns): the module comp is imported from the Bosch template, duplicated, its "(swap me)" images and titles replaced
     // with this artist's works, and its own timing control (Progress keys, Seconds per Artwork, slide keys) retimed so each work
     // is in focus when the voice names it. Kinds rotate across the episode so no two runs look the same.
-    var TPLF = null, nMod = 0, CLARA = {};
+    var TPLF = null, nMod = 0, CLARA = {}, SLIDERS = [];
     function plantilla() {
         if (TPLF) return TPLF;
         var f = new File(D.plantilla_aep || D.kit.replace(/kit[\/\\]bricolage[\/\\]?$/, "references/bosch_template/Cool-Culture-Club_template_Bosch.aep"));
@@ -257,7 +439,7 @@ var CCC = (function () {
     function setTexto(L, txt) { if (!L) return; var p = L.property("ADBE Text Properties").property("ADBE Text Document"), d = p.value; d.text = txt; p.setValue(d); }
     function sinSonido(comp) { for (var i = comp.numLayers; i >= 1; i--) { var L = comp.layer(i); if (/Motion DNA sound/.test(L.name)) L.remove(); } }
     function titulo(img) {
-        var stem = String(img).replace(/^.*[\/\\]/, "").replace(/\.[^.]+$/, ""), t = (D.titulos || {})[stem];
+        var stem = String(img).replace(/^.*[\/\\]/, "").replace(/\.[^.]+$/, "").replace(/_h264$/, ""), t = (D.titulos || {})[stem];
         return t ? [String(t[0]).toUpperCase(), String(t[1]).toUpperCase()] : [stem.toUpperCase(), ""];
     }
     function dos(i) { return (i < 10 ? "0" : "") + i; }
@@ -370,6 +552,7 @@ var CCC = (function () {
         var bk = capa(m, /^BG black/);
         if (bk) { var fcm = fondoCabeza(m.duration, a, D.comp + " module " + nMod + " background"); var Lf = m.layers.add(fcm); Lf.moveAfter(bk); bk.remove(); }
         var Lm = c.layers.add(m); Lm.name = "MODULE " + kind; Lm.startTime = a; vida(Lm, a, b);
+        if (kind === "slider" || kind === "carrusel") SLIDERS.push([a, b]);   // their card titles sit at y ~1550, under the captions (A01 v3 21.6-27.9 s: the carousel too)
         cue(a, "swish", -10, "module " + kind);
         for (var k = 1; k < marks.length; k++) cue(a + marks[k], "tick", -14, "next work");
         return Lm;
@@ -549,9 +732,21 @@ var CCC = (function () {
             d.applyStroke = true; d.strokeColor = rgb(STROKE); d.strokeWidth = 10; d.strokeOverFill = false;
             d.justification = ParagraphJustification.CENTER_JUSTIFY; d.tracking = 0; p.setValue(d);
             L.name = "CAP " + (i + 1); centrar(L);
-            var r = L.sourceRectAtTime(0, false); if (r.width > 940) { var k = 940 / r.width * 100; S(L).setValue([k, k]); }
+            var r = L.sourceRectAtTime(0, false);
+            // QA 2026-11-19 (A01/A04/A05/A09 v1): a long caption was shrunk to fit one line and read tiny; it breaks into two
+            // lines first (where the builder joined two captions, "br", else at the middle by characters), then shrinks if needed
+            if ((r.width > 940 || s.br) && ws.length > 1) {
+                var cut = s.br || 0;
+                if (!cut) { var tot = ws.join(" ").length, acc = 0, best = 1e9; for (var q = 1; q < ws.length; q++) { acc += ws[q - 1].length + 1; if (Math.abs(acc - tot / 2) < best) { best = Math.abs(acc - tot / 2); cut = q; } } }
+                d = p.value; d.text = ws.slice(0, cut).join(" ") + "\r" + ws.slice(cut).join(" "); p.setValue(d); centrar(L);
+                r = L.sourceRectAtTime(0, false);
+            }
+            if (r.width > 940) { var k = 940 / r.width * 100; S(L).setValue([k, k]); }
             var y = 1503;
             for (var f = 0; f < fichas.length; f++) if (s.ini >= fichas[f][0] - 0.05 && s.ini < fichas[f][1]) y = 1835;
+            // QA 2026-11-19 (A01 v2 22-28 s, A09 v1 27-33 s): the slider's work title and date sat on the caption: captions rise above them
+            // A01 v6: the carousel title sits at y ~1490 and a two-line caption at 1370 touched it: 1300
+            for (var sl0 = 0; sl0 < SLIDERS.length; sl0++) if (s.ini >= SLIDERS[sl0][0] - 0.05 && s.ini < SLIDERS[sl0][1]) y = 1300;
             P(L).setValue([W / 2, y]);
             var an = L.property("ADBE Text Properties").property("ADBE Text Animators").addProperty("ADBE Text Animator");
             an.name = "highlight"; an.property("ADBE Text Animator Properties").addProperty("ADBE Text Fill Color").setValue(rgb(AMBER));
@@ -590,8 +785,21 @@ var CCC = (function () {
         pill.moveAfter(L); pill.motionBlur = true; L.motionBlur = true;
         cue(t, "swish", -14, "CTA in"); cue(tp, "click", -8, "CTA press");
     }
+    // QA 2026-11-19 (triple QA: the artist card and the quote card sat dead for 4-9 s once built): every layer the card added
+    // hangs from a null that pushes in slowly (+0.6 %/s) and drifts ~2 px/s, so the frame never stops; the push hides the edges
+    function camaraViva(n0, a, b, k) {
+        var nu = c.layers.addNull(DUR); nu.name = "card camera " + k; nu.enabled = false; A(nu).setValue([0, 0]); P(nu).setValue([W / 2, H / 2]);
+        var du = Math.max(0.5, b - a), dx = (k % 2 ? 1 : -1) * Math.min(20, 2.2 * du), dy = -Math.min(16, 1.8 * du);
+        P(nu).expression = "var b=linear(time," + a.toFixed(3) + "," + b.toFixed(3) + ",0,1); value+[" + dx.toFixed(1) + "*b," + dy.toFixed(1) + "*b];";
+        S(nu).expression = "var b=Math.max(0,Math.min(time," + b.toFixed(3) + ")-" + a.toFixed(3) + "); value*(1+0.006*b);";
+        // AE adds new layers on top: the card's layers (and this null) are 1..numLayers-n0, not the bottom ones
+        var nNew = c.numLayers - n0, kids = [];
+        for (var z = 1; z <= nNew; z++) { var L = c.layer(z); if (L.name !== nu.name && !L.parent) kids.push(L); }
+        for (z = 0; z < kids.length; z++) { try { kids[z].parent = nu; } catch (e) {} }
+        vida(nu, a, b);
+    }
     function build(datos) {
-        D = datos; DUR = D.total; CUES = []; nCard = 0; nMod = 0; TPLF = null;
+        D = datos; DUR = D.total; CUES = []; nCard = 0; nMod = 0; TPLF = null; SLIDERS = []; nBoard = 0; FR = [];
         var tk = (D.estilo && D.estilo.tokens) || {}; CREAM = tk.texto || CREAM; AMBER = tk.acento || AMBER;
         // Poppins is the template font; this After Effects reads only fonts installed for all users, so fall back to Inter Tight
         function hay(ps) { try { var f = app.fonts.getFontsByPostScriptName(ps); return f && f.length > 0; } catch (e) { return true; } }
@@ -618,6 +826,11 @@ var CCC = (function () {
         for (i = 0; i < S0.length; i++) {
             var s = S0[i];
             if (i) cue(s.ini, "swish", -10, "cut to " + s.tipo);
+            if (s.sin_cara) {
+                // a host line without the face: its voice over the work it names, for the whole line
+                if (D.obras_modo === "tablero") tableroUno(s.obras[0].img, s.obras[0].stem, s.ini, s.fin); else obra(s.obras[0].img, s.ini, s.fin, "deriva"); cue(s.ini, "swish", -10, "work in (no face)");
+                continue;
+            }
             if (s.tipo === "gancho" || s.tipo === "cabeza") {
                 anfitrion(s);
                 // works named while she talks: cut to them (magnifier cards when the project marks details), then back
@@ -625,7 +838,8 @@ var CCC = (function () {
                 for (var j = 0; j < ob.length; j++) {
                     // cut to the work when the word that names it ENDS (Blake v1: "Look closely" was cut before "closely"), and keep
                     // at least 1.2 s of the host first
-                    var a = Math.max(s.ini + 1.2, finPalabra(ob[j].t) + 0.05), b = Math.min(s.fin - 0.4, j + 1 < ob.length ? ob[j + 1].t : 1e9);
+                    // QA 2026-11-19 (A01/A04/A05 v4: 1.2 s host shots): at least 1.5 s of the host, the rule for any shot
+                    var a = Math.max(s.ini + 1.5, finPalabra(ob[j].t) + 0.05), b = Math.min(s.fin - 0.4, j + 1 < ob.length ? ob[j + 1].t : 1e9);
                     var det = (D.detalles || {})[ob[j].stem];
                     if (det && det.length) {
                         b = s.fin;
@@ -638,22 +852,34 @@ var CCC = (function () {
                         continue;
                     } else {
                         if (b - a < 1.2) continue;
-                        obra(ob[j].img, a, Math.min(b, a + 2.4), "deriva"); cue(a, "swish", -10, "work in");
+                        // a cut-away that would leave less than 1.2 s of host before the next scene holds to the end of the
+                        // section (review 2026-11-17: the head flashed for half a second at 0:09)
+                        var bb = Math.min(b, a + 2.4); if (s.fin - bb < 1.2) bb = s.fin;
+                        if (D.obras_modo === "tablero") tableroUno(ob[j].img, ob[j].stem, a, bb); else obra(ob[j].img, a, bb, "deriva"); cue(a, "swish", -10, "work in");
                     }
                 }
                 if (i === S0.length - 1) {
                     for (var u = 0; u < D.subs.length && ctaT === null; u++) for (var w = 0; w < D.subs[u].words.length; w++) { var ww = D.subs[u].words[w]; if (ww.s >= s.ini && /comment/i.test(ww.w)) { ctaT = ww.s; break; } }
                     if (ctaT === null) ctaT = Math.max(s.ini, s.fin - 2.5);
                 }
-            } else if (s.tipo === "ficha") { bricolage(s); fichas.push([s.ini, s.fin]); }
-            else if (s.tipo === "cita") { cita(s); citas.push([s.ini, s.fin]); }
+            } else if (s.tipo === "ficha") { var nF = c.numLayers; bricolage(s); camaraViva(nF, s.ini, s.fin, i); fichas.push([s.ini, s.fin]); }
+            else if (s.tipo === "cita") { var nC = c.numLayers; cita(s); camaraViva(nC, s.ini, s.fin, i); citas.push([s.ini, s.fin]); }
             else if (s.img) {
                 if (s.revelado || (ultDet && s.stem === ultDet)) { obra(s.img, s.ini, s.fin, "revelado"); ultDet = null; continue; }
+                // the B block on a board with a camera (collage template recipe), the whole run of works at once
+                if (D.obras_modo === "tablero") {
+                    var runT = [s], jT = i + 1;
+                    while (jT < S0.length && S0[jT].img && S0[jT].tipo === "obra" && !S0[jT].revelado && S0[jT].ini - S0[jT - 1].fin < 0.05) { runT.push(S0[jT]); jT++; }
+                    tablero(runT); i = jT - 1; continue;
+                }
                 // a run of consecutive works becomes one of the template's art modules when it lasts 3 s or more
                 var run = [s], j2 = i + 1;
-                while (j2 < S0.length && S0[j2].img && S0[j2].tipo === "obra" && !S0[j2].revelado && S0[j2].ini - S0[j2 - 1].fin < 0.05) { run.push(S0[j2]); j2++; }
+                // a run never outlasts a template module (~10.8 s): past ~9 s the next works start a new run (A01 v1, 2026-11-17:
+                // a 23 s run left 12 s of empty background after the "tira" module ended)
+                while (j2 < S0.length && S0[j2].img && S0[j2].tipo === "obra" && !S0[j2].revelado && S0[j2].ini - S0[j2 - 1].fin < 0.05 && S0[j2].fin - run[0].ini <= 9.0) { run.push(S0[j2]); j2++; }
                 var rd = run[run.length - 1].fin - run[0].ini;
-                if (rd >= 3 && MODS.length) {
+                // one work alone is never a module (its neighbours flashed in for half a second at 0:42, review 2026-11-17)
+                if (rd >= 3 && MODS.length && run.length >= 2) {
                     var kind = MODS[(nRun++ + Math.max(0, (parseInt(D.numero, 10) || 1) - 1)) % MODS.length], ws = [], mk = [];
                     for (var r = 0; r < run.length; r++) { ws.push(run[r].img); mk.push(run[r].ini - run[0].ini); }
                     if (!modulo(kind, ws, mk, run[0].ini, run[run.length - 1].fin)) for (var r2 = 0; r2 < run.length; r2++) obra(run[r2].img, run[r2].ini, run[r2].fin, "deriva");
@@ -678,9 +904,32 @@ var CCC = (function () {
             try { if (lb.source && lb.source.mainSource instanceof SolidSource) continue; } catch (eB) {}
             try { lb.motionBlur = true; } catch (eB2) {}
         }
+        // the strips sweep over everything but the captions and the button
+        for (var zf = 0; zf < FR.length; zf++) FR[zf].moveToBeginning();
+        // board episodes: one grain over the whole frame (collage: Noise 6 on top), so it never switches on and off at the board
+        if (D.obras_modo === "tablero") { var gnC = c.layers.addSolid([0, 0, 0], "grain", W, H, 1, DUR); gnC.adjustmentLayer = true; fx(gnC, "ADBE Noise").property(1).setValue(5); gnC.moveToBeginning(); }
         subtitulos(fichas, citas);
-        boton(ctaT);
+        if (!D.sin_cta) boton(ctaT);
         for (i = 0; i < D.voces.length; i++) { var V = c.layers.add(imp(D.voces[i].wav)); V.name = D.voces[i].id + " voice"; V.startTime = D.voces[i].start; }
+        // QA 2026-11-19: the music was never placed (the 5 artist v1/v2 edits had none). elegida.wav is -27 LUFS; under every
+        // voice line it drops to musica_db_voz, in the pauses it sits at musica_db_pausa (build_collage measures both per edit),
+        // and it fades out over the last 0.6 s so the video ends with the words
+        var Mi = imp(D.musica);
+        if (Mi) {
+            var mu = c.layers.add(Mi); mu.name = "MUSIC"; mu.startTime = 0; mu.outPoint = DUR;
+            var al = mu.property("ADBE Audio Group").property("ADBE Audio Levels");
+            var dv = (D.musica_db_voz === null || D.musica_db_voz === undefined) ? -10 : D.musica_db_voz, dp = (D.musica_db_pausa === null || D.musica_db_pausa === undefined) ? dv + 6 : D.musica_db_pausa;
+            var tk = [[0, dp]], fade = 0.25;
+            for (var vi = 0; vi < D.voces.length; vi++) {
+                var v0 = D.voces[vi].start, v1 = v0 + (D.voces[vi].dur || 0), sig = vi + 1 < D.voces.length ? D.voces[vi + 1].start : DUR;
+                tk.push([Math.max(0, v0 - fade), dp]); tk.push([v0, dv]); tk.push([v1, dv]);
+                if (sig - v1 > 2 * fade + 0.3) { tk.push([v1 + fade, dp]); tk.push([sig - fade, dp]); }
+            }
+            tk.sort(function (p, q) { return p[0] - q[0]; });
+            var last = -1;
+            for (var ti = 0; ti < tk.length; ti++) if (tk[ti][0] < DUR - 0.6 && tk[ti][0] > last + 0.001) { al.setValueAtTime(tk[ti][0], [tk[ti][1], tk[ti][1]]); last = tk[ti][0]; }
+            al.setValueAtTime(Math.max(0, DUR - 0.6), [dv, dv]); al.setValueAtTime(DUR, [-48, -48]);
+        }
         return "ok " + c.numLayers + " layers\n" + CUES.join("\n");
     }
     return { build: build };

@@ -87,6 +87,23 @@ section the moment a review note arrives.
 - **Wikimedia downloads: 429 and 400**: full-size originals in a row hit the rate limit, and a hand-built thumbnail width
   (2000 px) answers 400. Fix: ask the Commons API for `thumburl` with `iiurlwidth=1920`, pause between files.
 
+- **Out of ElevenLabs credit (HTTP 401 on R22, 2026-11-19)** → local clone: `"motor_voz": "qwen3"` (engine/tts_local.py, Qwen3-TTS
+  0.6B Base from an 18 s reference in brands/<brand>/voces/<voice id>.wav + .txt). Speaker similarity matched real ElevenLabs lines
+  (0.99). Three things to know: ALL-CAPS emphasis words are spelled out ("EGYPT" came out as "Ichi Buiti") → tts_local lowercases them;
+  it runs a block's lines together with no pause, so a cut fell inside "preaching" → blocks are ElevenLabs-only; it speaks at
+  ~150 wpm, so `ritmo_a`/`ritmo_b` must be 1.05, not the 1.6 used for v3 (1.6 gave 220 wpm, a 53 s episode).
+
+- **Two night queues rendered the same episode at once** (R25, 2026-11-20): both chains ran `render_pub.sh r25`, and one
+  failed on `PermissionError` deleting `_reaccion_video.mp4` held by the other. Cause: each queue script owned the render.
+  Fix: one queue owns each render; before re-rendering, check no `reaccion.py` runs on that project.
+- **Editing shots_<key>.json changes nothing until planos.py runs again**: `render_pub.sh` reads the plan planos.py wrote.
+  After a subtitle (`cambiar`) or card fix, run `python planos.py <key>` then `render_pub.sh <slug>`.
+- **Card credits wider than ~34 characters run off the card** (R22, R25): shorten the `autor` ("NDRE radar expert (1984)").
+- **Applio on the embedded ComfyUI Python**: its training and index subprocesses could not import `data_utils`/`faiss`
+  (the ._pth file ignores the script folder and PYTHONPATH). Fix: `applio/run_script.py` wraps every `python <script>` call
+  from core.py. Its tensorboard 2.21 clashed with ComfyUI's protobuf 5.29: use ComfyUI's tensorboard 2.20.
+  A/B on R22: Qwen3 clone alone 0.987 speaker similarity, + RVC 0.989; Whisper equal. RVC adds little over the clone.
+
 ## After Effects build (collage style)
 - **~5 frames of empty green before an artwork** → the presenter's colour background lived until cut + 0.4 s above the artwork → end it at cut + 0.02.
 - **"The same painting split by a transition"** → a voice-over line was its own section with a camera move and stripes, although the
@@ -289,3 +306,43 @@ out of the frame while the footage plays ("fuera"). A 5-frame cross-dissolve was
 Symptom: "maybe it really was a kite, most of them are" plus kite comparison footage closed the case. Cause: the "fair
 counter-explanation" beat of generic commentary guides. Fix for Cult Pixel: the explanation is quoted as a claim and answered
 by the witness or the silence (BIBLE rule 15); no debunk footage; end on a question.
+
+### CCC reaction: host in the centre hid the video, some shots unreadable (2026-11-15)
+Symptom: "it does not work in the centre, it should be to one side so you can see the video"; "some shots are cuts where you
+cannot tell what it is". Cause: a 960 px head centred over full-frame crops of 16:9 news footage (a corner of a frame, a
+blurred crowd). Fix: head at x 0.26, 760 px, captions beside it (x_sub 0.68); 16:9 footage shown whole ("caja"); full crops
+only on a clear subject; check a contact sheet of every plan before rendering (docs/REACTION_FORMAT.md).
+
+### H3 lip-sync lines that invent words (2026-11-15)
+Symptom: a line says "the Pied of Thieves" or "or best came at?" that is not in the script. Cause: H3 improvises on long
+lines and on "X or Y?" questions. Fix: read the transcript `reaccion_voz.py` prints, simplify the line (shorter, one "or"),
+regenerate with new seeds, or trim a trailing murmur.
+
+## Kling 4.0 reference-to-video, first two CCC videos (2026-11-17: n01_comedian, a08_messerschmidt)
+| Symptom | Cause | Fix |
+|---|---|---|
+| fal 422 "An element needs either frontal_image_url with reference_image_urls, or video_url" | an element needs 1-3 extra views | `referencias_episodio` (other accessory seeds or a crop of the head) |
+| Name mangled ("Moatseo Cat-to-Lail-End") | the TTS respelling sent to Kling | Kling gets the plain name (`tts` without respelling for A lines); it said "Cattelan" right |
+| An extra phrase inserted / a phrase repeated at the end ("after he died. After he died.") | Kling pads to the requested duration | prompt "said exactly as written, nothing added or repeated"; a silent line is cut from the last word + mute audio |
+| The camera punches in at the second line of a clip, top of the head cropped | Kling's own shot change between lines | prompt "camera never zooms"; it still happens at line changes, where the edit cuts anyway (reads as the CCC jump) |
+| Hand insert starts with a raised middle finger | the board's hand still (H1_hand) is a middle finger, not an index | use the clip after 2 s; ask the user for an index-finger hand still |
+| Accessory edit with two mirrors | Qwen-Image-Edit doubles props | "ONE single ..., only one in the whole image"; 3 seeds, pick one |
+
+## 2026-11-17 · CCC news format in After Effects
+- Symptom: N01 was delivered as a Python render (reaccion.py). Cause: the reaction recipe only had a Python renderer. Fix: `engine/build_reaccion_ae.py` + `ae/ccc_reaccion.jsx` build the same reaccion.json in AE with Motion DNA (sound cues, check_layout); reaccion.py now writes `*_PREVIEW_python.mp4` only.
+- Symptom: a footage layer in AE showed nothing (hasVideo false). Cause: VP9 and AV1 files import as audio only. Fix: the builder makes an H.264 copy in `ae/media/footage/` (original untouched).
+- Symptom: A08 showed ~8 s of empty background (31-39 s). Cause: the quote line was not marked, so B works merged into one long art-module run longer than the template module. Fix: the quote line needs `"obras": ["__cita__"]` in timeline.json (and proyecto.json), which also brings the quote card in.
+- Symptom: the voice was cut at 12 s ("...thousand dollars") and 47 s ("reporters") in N01. Cause: line windows and Kling per-line cuts ended at Whisper's last word end (Whisper ends trailing words early) and a phantom early "and" moved the next cut forward. Fix: `comun.fin_habla` / `inicio_habla` (by sound) in sts.py, montaje.py and kling.py (`--recortar` re-cuts existing takes for free); `engine/qa_audio.py` is mandatory in render_ae.py.
+- Symptom: one frame with the background and no head right before a cut to a work (A08 v4 at 4.13 s). Cause: the host plate is a 24 fps precomp; AE rounds its duration down to whole frames, so the last 30 fps frame of the section fell past its end. Fix: `placa()` pads the plate by 0.1 s (the layer in the main comp is still trimmed to the section).
+- Symptom: run_jsx gets no answer though AE is open and responding (no dialog). The bridge stopped reading `bridge/inbox` (a request waits there). Deleting `outbox/_bridge_started.txt` makes the next call restart the bridge; if AE still does not answer, it is busy (one core at 100 %): ask the user to look at AE, never close it.
+
+## 2026-11-20 · CCC: voices, MiniMax heads, collects
+- Symptom: Buns' voices "suenan raro" (A04, N04, N09). Cause: multilingual_v2 at speed 1.15, then a 22-25 % rubberband stretch down to ~195 wpm. Fix: generate at speed 0.9 (`character.json`, per video `proyecto.json "voz_ajustes"`), ritmo_b 1.0, no `estirar`. Never fix pace with a stretch.
+- Symptom: a block's first line failed qa_lineas "cut at start" 5 times with the word whole ("Nine"). Cause: the take voices its first consonant from sample 0. Fix: tts.py puts 60 ms of air in front of a block's first line.
+- Symptom: N04/N09 renders lost the last line. Cause: AE kept the duration of the previous, shorter voz_reaccion.wav (same path). Fix: build_reaccion_ae.py hands AE a copy named after size+mtime.
+- Symptom: MiniMax reference-to-video cut to a new scene after ~1-4.5 s (a body, a leather jacket, a robot body). Cause: long clips and literal concept words ("robot dog") in a head prompt. Fix: one line per clip (≤ 6 s), structured prompt with "avoid: cuts, scene changes", longer lines through lip-sync.
+- Symptom: small head with cut ears/locks (N06 33 s, N09 7 s). Cause: MiniMax leans in during a clip, out of its own frame; the clip check only looked at the background. Fix: first frame with the head at 68 % (head pasted alone, no rectangle), side check on every clip, alpha edge check on every small-head span after the cut-out.
+- Symptom: the concept shot darkened at its end like a fade to black. Cause: the big-head darkening ramp started before the head was back. Fix: the darkening is 0 inside `fuera` spans.
+- Symptom: 0.4 s flash before N01's concept shot. Cause: inserting the shot left a sliver of the old plan. Fix: slivers under 1.2 s go to the neighbour plan.
+- Symptom: deleting "unused" files from a collect removed the sound track. Cause: AE returns file names URI-encoded (`%20`). Fix: compare `decodeURI(file.name)`; verify every collect by opening it and rendering it.
+- Symptom: WebM cut-outs (2 MB instead of 130) could not be used. Cause: this After Effects does not import WebM. Fix: ProRes 4444 10-bit qscale 9 (alpha lossless, colour ~54 dB, 2-4x lighter).

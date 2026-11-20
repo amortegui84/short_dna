@@ -15,10 +15,17 @@ from pathlib import Path
 import cv2
 import numpy as np
 
+sys.path.insert(0, str(Path(__file__).parent))
+from comun import ultimo_render  # noqa: E402
+
 carpeta = Path(sys.argv[1]).resolve()
 pj = json.loads((carpeta / "proyecto.json").read_text(encoding="utf-8"))
-video = Path(sys.argv[2]) if len(sys.argv) > 2 else carpeta / f"{pj['slug']}.mp4"
+video = Path(sys.argv[2]) if len(sys.argv) > 2 else ultimo_render(carpeta, pj["slug"])
 datos = json.loads((carpeta / "datos_ae.json").read_text(encoding="utf-8"))
+# news/reaction format (build_reaccion_ae.py): no host sections over a type wall; the head floats over the footage plans,
+# so checks 3-4 do not apply and the plan lengths are checked instead (review A08 v1: "no scene under ~1.5 s")
+REACCION = "secciones" not in datos and "planos" in datos
+datos.setdefault("secciones", [])
 cap = cv2.VideoCapture(str(video)); fps = cap.get(cv2.CAP_PROP_FPS) or 30
 G, C = [], []
 while True:
@@ -94,6 +101,21 @@ for s in datos["secciones"]:
 m = float(np.mean(mov)) if mov else 0.0
 if CCC and not 0.18 <= m <= 0.45:
     fallos.append(f"type wall motion {m:.2f} outside 0.18-0.45 (reference 0.24-0.36)")
+if REACCION:
+    pl = sorted(datos["planos"], key=lambda x: x["ini"])
+    for i, x in enumerate(pl):
+        largo = x["fin"] - x["ini"]
+        if largo < 1.5 and not (i == len(pl) - 1 and x["fin"] >= datos.get("total", dur) - 0.05 and largo >= 1.0):
+            fallos.append(f"plan {i + 1} at {x['ini']:.2f} s lasts {largo:.2f} s (min 1.5): {Path(x['src']).name}")
+    # a cut inside a plan is an edit inside the source clip itself: it must not leave a sliver
+    bordes = [x["ini"] for x in pl] + [pl[-1]["fin"]] if pl else []
+    propios = [c for c in cortes if all(abs(c - b) > 0.08 for b in bordes)]
+    for c in propios:
+        x = next((q for q in pl if q["ini"] <= c < q["fin"]), None)
+        if x:
+            antes, despues = c - max([x["ini"]] + [d for d in propios if d < c]), min([x["fin"]] + [d for d in propios if d > c]) - c
+            if min(antes, despues) < 1.0:
+                avisos.append(f"edit inside the source clip at {c:.2f} s leaves {min(antes, despues):.2f} s: {Path(x['src']).name}")
 if dur <= 0:
     fallos.append(f"{video.name} missing or empty: nothing was checked")
 res = {"video": video.name, "duracion_s": round(dur, 2), "cortes": len(cortes), "muro_movimiento": round(m, 3), "fallos": fallos, "avisos": avisos, "ok": not fallos}

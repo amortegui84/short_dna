@@ -8,16 +8,21 @@ Everything comes from <project>/reaccion.json (see docs/REACTION_FORMAT.md):
   host       {"clips": [{"mate": "mates/R01.mov", "ini": s, "fin": s, "desde": s}], "alto": px, "margen": px,
               "grande": [[ini, fin], ...]}   the cut-out clips in order; "grande" = the spans where he fills the frame
   planos     [{"src", "ini", "fin", "desde", "vel", "modo": "full"|"caja", "zoom": [a, b], "foco": [fx, fy], "foco_fin": [fx, fy], "congelar": s,
-              "audio": dB or null, "credito": "...", "marcas": [{"tipo": "circulo"|"flecha", "x", "y", "r", "t"}]}]
+              "audio": dB or null, "credito": "...", "marcas": [{"tipo": "circulo"|"flecha", "x", "y", "r", "t"}],
+              "cabeza": false = the host ducks out for this plan}]
   tarjetas   [{"tipo": "comentario"|"titular"|"cita", "texto", "autor", "fuente", "ini", "fin", "y"}]
+  titulo     {"texto": "THE ARK OF THE COVENANT", "y": 1130, "tam": 60} topic label on screen the whole video (hidden under cards)
+  cambiar    [[heard, right], ...] fixes a single misheard word in the subtitles; juntar [[a, b, right]] merges two
   y_sub      subtitle line centre (default 1140: above the host head, inside the clean area x 65-888, y 288-1248)
+  sub_bloque {"x": left px, "y": centre px, "ancho": px, "palabras": 9} a phrase as a block of lines beside a side host's
+             head (CCC, 2026-11-16); while he is big or ducked out the single centred line takes over
 Every time is in seconds of the final video. Footage is never filtered: the tape texture goes on the frame and the host only.
 Usage: python reaccion.py <project> [--hasta 12] [--cuadro 7.5 out.png]"""
 import json, math, subprocess, sys
 from pathlib import Path
 
 import numpy as np
-from PIL import Image, ImageDraw, ImageFilter, ImageFont
+from PIL import Image, ImageDraw, ImageFilter, ImageFont, ImageOps
 
 sys.path.insert(0, str(Path(__file__).parent))
 from comun import duracion, palabras  # noqa: E402
@@ -28,6 +33,19 @@ F_IMPACT = str(FONTS / "impact.ttf")
 F_MONO = str(FONTS / "courbd.ttf")
 F_SERIF = str(FONTS / "InstrumentSerif-Italic.ttf")
 TINTA, HUESO, AMARILLO, ROJO = (7, 22, 33), (232, 223, 200), (244, 224, 124), (186, 24, 51)
+# the look of a brand: reaccion.json "estilo" overrides any of these (Cult Pixel = these defaults: VHS tape, Impact captions;
+# Cool Culture Club = clean render, Poppins captions in amber, the head "lands big and settles" on every cut)
+ESTILO = {"sub_fuente": "impact.ttf", "sub_tam": 78, "sub_mayus": True, "sub_color": HUESO, "sub_activa": AMARILLO,
+          "sub_barra": (5, 5, 8, 215), "sub_borde": 3, "tinta": TINTA, "papel": HUESO, "acento": AMARILLO, "rojo": ROJO,
+          "titular_fuente": "impact.ttf", "mono_fuente": "courbd.ttf", "cita_fuente": "InstrumentSerif-Italic.ttf",
+          "textura": True, "cabecera": True, "corte": "punch"}
+
+
+def ruta_fuente(nombre):
+    for d in (FONTS, Path.home() / "AppData/Local/Microsoft/Windows/Fonts"):
+        if (d / nombre).exists():
+            return str(d / nombre)
+    return str(FONTS / nombre)
 
 
 def bezier(p1x, p1y, p2x, p2y):
@@ -131,18 +149,20 @@ def tarjeta_img(t):
     """A comment / headline / quote card as RGBA (paper card, tape strip, red rule), pre-rendered once."""
     ancho = 860
     if t["tipo"] == "titular":
-        f = fuente(F_IMPACT, 64); lineas = envolver(t["texto"].upper(), f, ancho - 80); lh = 70
-        cab = (t.get("fuente") or "").upper(); fc = fuente(F_MONO, 30)
+        TINTA, HUESO, AMARILLO, ROJO = ESTILO["tinta"], ESTILO["papel"], ESTILO["acento"], ESTILO["rojo"]
+        f = fuente(ruta_fuente(ESTILO["titular_fuente"]), 64); lineas = envolver(t["texto"].upper(), f, ancho - 80); lh = 70
+        cab = (t.get("fuente") or "").upper(); fc = fuente(ruta_fuente(ESTILO["mono_fuente"]), 30)
         alto = 70 + len(lineas) * lh + 60
         im = Image.new("RGBA", (ancho, alto), HUESO + (255,)); d = ImageDraw.Draw(im)
         d.rectangle([0, 0, ancho, 54], fill=TINTA); d.text((28, 12), cab, font=fc, fill=HUESO)
         for k, ln in enumerate(lineas):
             d.text((40, 76 + k * lh), ln, font=f, fill=TINTA)
     else:
-        f = fuente(F_SERIF, 58) if t["tipo"] == "cita" else fuente(F_MONO, 40)
+        TINTA, HUESO, AMARILLO, ROJO = ESTILO["tinta"], ESTILO["papel"], ESTILO["acento"], ESTILO["rojo"]
+        f = fuente(ruta_fuente(ESTILO["cita_fuente"]), 58) if t["tipo"] == "cita" else fuente(ruta_fuente(ESTILO["mono_fuente"]), 40)
         lh = 64 if t["tipo"] == "cita" else 50
         texto = ("\u201c" + t["texto"] + "\u201d") if t["tipo"] == "cita" else t["texto"]
-        lineas = envolver(texto, f, ancho - 90); fa = fuente(F_MONO, 30)
+        lineas = envolver(texto, f, ancho - 90); fa = fuente(ruta_fuente(ESTILO["mono_fuente"]), 30)
         alto = 50 + len(lineas) * lh + 80
         im = Image.new("RGBA", (ancho, alto), (250, 246, 236, 255) if t["tipo"] == "comentario" else TINTA + (255,))
         d = ImageDraw.Draw(im); col = TINTA if t["tipo"] == "comentario" else HUESO
@@ -158,11 +178,79 @@ def tarjeta_img(t):
     return np.array(im2.rotate(t.get("giro", -1.5), resample=Image.BICUBIC, expand=True))
 
 
+def titulo_img(tit):
+    """The topic label: Impact caps in bone white with a thick black stroke on a red tape strip (stays on screen)."""
+    f = fuente(ruta_fuente(ESTILO["titular_fuente"]), tit.get("tam", 60))
+    txt = texto_rgba(tit["texto"].upper(), f, tuple(ESTILO["papel"][:3]) + (255,), 5)
+    im = Image.new("RGBA", (txt.width + 56, txt.height + 26), tuple(ESTILO["rojo"][:3]) + (235,))
+    im.alpha_composite(txt, (28, 13))
+    return np.array(im.rotate(tit.get("giro", -1.0), resample=Image.BICUBIC, expand=True))
+
+
+class Mapa:
+    """A continuous zoom into a place from Google Maps screenshots (engine/mapa_capturas.py), all centred on the place:
+    {"tipo": "mapa", "ini", "fin", "capturas": [{"img": "mapa/mapa_mapa_z3.png", "z": 3}, ...], "z": [3, 17],
+     "etiqueta": "ISLA DE LAS MUNECAS", "sub": "Xochimilco, Mexico City", "credito": "MAP DATA (C) GOOGLE"}
+    The zoom level runs from z[0] to z[1] (Settle ease); the frame shown is the nearest screenshot below the current
+    zoom, scaled by 2^(z - its zoom), cross-fading into the next one; a red pin lands on the centre, then the label."""
+    foto = True; lec = None
+
+    def __init__(self, p, carpeta):
+        self.p = p; self.dur = p["fin"] - p["ini"]
+        self.caps = []
+        for c in sorted(p["capturas"], key=lambda c: c["z"]):
+            im = Image.open(carpeta / c["img"]).convert("RGB")
+            w, h = im.size; mx, my = int(w * 0.12), int(h * 0.12)   # trim the map UI on the edges, same ratio both axes
+            im = im.crop((mx, my, w - mx, h - my)).resize((W, H), Image.LANCZOS)
+            self.caps.append((c["z"], np.array(im)))
+
+    def vista(self, z):
+        i = max([k for k, (zz, _) in enumerate(self.caps) if zz <= z] or [0])
+        zz, img = self.caps[i]; s = 2 ** (z - zz)
+        cw, ch = int(W / s), int(H / s)
+        crop = img[(H - ch) // 2:(H - ch) // 2 + ch, (W - cw) // 2:(W - cw) // 2 + cw]
+        out = np.array(Image.fromarray(crop).resize((W, H), Image.BILINEAR))
+        if i + 1 < len(self.caps):   # cross-fade into the next screenshot over its last 0.6 zoom levels
+            zn = self.caps[i + 1][0]; a = min(1.0, max(0.0, (z - (zn - 0.6)) / 0.6))
+            if a > 0:
+                sn = 2 ** (z - zn); cw2, ch2 = int(W / sn), int(H / sn)
+                big = Image.fromarray(self.caps[i + 1][1]).resize((int(W * sn), int(H * sn)), Image.BILINEAR) if sn > 1 else None
+                if big is None:   # zoomed out from the next image: shrink it into the frame over the current one
+                    sm = np.array(Image.fromarray(self.caps[i + 1][1]).resize((max(2, int(W * sn)), max(2, int(H * sn))), Image.BILINEAR))
+                    y0, x0 = (H - sm.shape[0]) // 2, (W - sm.shape[1]) // 2
+                    nxt = out.copy(); nxt[y0:y0 + sm.shape[0], x0:x0 + sm.shape[1]] = sm
+                else:
+                    nxt = np.array(big)[(big.height - H) // 2:(big.height - H) // 2 + H, (big.width - W) // 2:(big.width - W) // 2 + W]
+                out = (out * (1 - a) + nxt * a).astype(np.uint8)
+        return out
+
+    def cuadro(self, t):
+        u = min(1.0, max(0.0, (t - self.p["ini"]) / max(self.dur * 0.85, 0.01)))
+        z0, z1 = self.p.get("z", [self.caps[0][0], self.caps[-1][0]])
+        z = z0 + (z1 - z0) * SETTLE(u)
+        base = self.vista(z)
+        if u > 0.8:   # the pin drops on the place
+            k = LAND(min(1.0, (u - 0.8) / 0.2)); im = Image.fromarray(base); d = ImageDraw.Draw(im)
+            cx, cy = W // 2, int(H / 2 - 40 * (1 - k)) ; r = 34
+            d.ellipse([cx - r, cy - 2 * r - 30, cx + r, cy - 30], fill=ESTILO["rojo"], outline=(255, 255, 255), width=5)
+            d.polygon([(cx - r * 0.7, cy - r - 22), (cx + r * 0.7, cy - r - 22), (cx, cy)], fill=ESTILO["rojo"])
+            d.ellipse([cx - 10, cy - r - 40, cx + 10, cy - r - 20], fill=(255, 255, 255))
+            if self.p.get("etiqueta"):
+                f = fuente(ruta_fuente(ESTILO["titular_fuente"]), 56); f2 = fuente(ruta_fuente(ESTILO["mono_fuente"]), 30)
+                tw = max(f.getlength(self.p["etiqueta"]), f2.getlength(self.p.get("sub", ""))) + 60
+                y = cy - 2 * r - 210
+                d.rectangle([cx - tw / 2, y, cx + tw / 2, y + 130], fill=tuple(ESTILO["tinta"]))
+                d.text((cx - tw / 2 + 30, y + 14), self.p["etiqueta"], font=f, fill=tuple(ESTILO["papel"]))
+                d.text((cx - tw / 2 + 30, y + 82), self.p.get("sub", ""), font=f2, fill=tuple(ESTILO["acento"]))
+            base = np.array(im)
+        return base, (0, 0, W, H)
+
+
 class Plano:
     def __init__(self, p, carpeta):
         self.p = p; src = carpeta / p["src"]; self.src = src
         self.dur = p["fin"] - p["ini"]; self.z = p.get("zoom", [1.0, 1.06]); self.foco = p.get("foco", [0.5, 0.5])
-        sw, sh = tam_video(src) if src.suffix.lower() not in (".jpg", ".png", ".jpeg", ".webp") else Image.open(src).size
+        sw, sh = tam_video(src) if src.suffix.lower() not in (".jpg", ".png", ".jpeg", ".webp") else ImageOps.exif_transpose(Image.open(src)).size   # phone photos carry their rotation in EXIF
         self.foto = src.suffix.lower() in (".jpg", ".png", ".jpeg", ".webp")
         self.modo = p.get("modo") or ("full" if sh / sw > 1.2 else "caja")
         zmax = max(self.z)
@@ -172,7 +260,7 @@ class Plano:
             s = W / sw * zmax
         self.tw, self.th = int(sw * s) // 2 * 2, int(sh * s) // 2 * 2
         if self.foto:
-            self.img = np.array(Image.open(src).convert("RGB").resize((self.tw, self.th), Image.LANCZOS)); self.lec = None
+            self.img = np.array(ImageOps.exif_transpose(Image.open(src)).convert("RGB").resize((self.tw, self.th), Image.LANCZOS)); self.lec = None
         else:
             self.lec = Lector(src, p.get("desde", 0), self.tw, self.th, vel=p.get("vel", 1.0))
         self.fondo = None
@@ -246,6 +334,17 @@ def subtitulos(voz, carpeta):
     else:
         ws = [list(w) for w in palabras(voz)]; cache.write_text(json.dumps(ws), encoding="utf-8")
     pequenas = {"a", "an", "the", "at", "of", "to", "in", "on", "is", "was", "and", "but", "or", "with", "into", "her", "it", "be"}
+    for par in json.loads((carpeta / "reaccion.json").read_text(encoding="utf-8")).get("cambiar", []):
+        # one misheard word: [heard, right] ("Lie." -> "Live."), punctuation kept
+        for w in ws:
+            if w[0].strip(".,?!").lower() == par[0].lower():
+                w[0] = par[1] + w[0][len(w[0].rstrip(".,?!")):]
+    for a, b, junto in json.loads((carpeta / "reaccion.json").read_text(encoding="utf-8")).get("juntar", []):
+        # names Whisper splits or mishears ("Sochi milko" -> "Xochimilco"): [first, second, replacement]
+        for i in range(len(ws) - 1):
+            if ws[i] and ws[i + 1] and ws[i][0].strip(".,").lower() == a.strip(".,").lower() and ws[i + 1][0].strip(".,").lower() == b.strip(".,").lower():
+                ws[i] = [junto + ws[i + 1][0][len(ws[i + 1][0].rstrip(".,")):], ws[i][1], ws[i + 1][2]]; ws[i + 1] = None
+        ws = [w for w in ws if w]
     grupos, cur = [], []
     for w in ws:   # chunks of up to 3 words, broken at punctuation; a chunk never ends on a small word (it carries on)
         cur.append(w)
@@ -258,15 +357,61 @@ def subtitulos(voz, carpeta):
     return grupos
 
 
+def bloques(ws_grupos, n_max=9):
+    """Phrases for the block layout: the 3-word chunks re-joined into phrases of up to n_max words, broken at sentence
+    ends (or a comma once the phrase has 5 words), never ending on a small word."""
+    ws = [w for g in ws_grupos for w in g]
+    pequenas = {"a", "an", "the", "at", "of", "to", "in", "on", "is", "was", "and", "but", "or", "with", "into", "her", "it", "be"}
+    out, cur = [], []
+    for w in ws:
+        cur.append(w); fin = w[0][-1:]
+        corta = fin in ".?!" or len(cur) >= n_max or (fin in ",;:" and len(cur) >= 5)
+        if corta and (w[0].lower().strip(".,?!:;") not in pequenas or fin in ".,?!:;"):
+            out.append(cur); cur = []
+    if cur:
+        out.append(cur)
+    return out
+
+
+def bloque_img(grupo, t, ancho):
+    """A phrase as a left-aligned block of lines (review 2026-11-16: "un bloque de líneas al lado derecho de la cabeza"):
+    words already said in the subtitle colour, the one being said in the accent, the ones still to come dimmed."""
+    E = ESTILO; tam = E.get("bloque_tam", E["sub_tam"]); f = fuente(ruta_fuente(E["sub_fuente"]), tam)
+    piezas = [((w[0].upper() if E["sub_mayus"] else w[0]).strip(";:"), w[1] <= t + 0.02) for w in grupo]
+    actual = max([i for i, (_, on) in enumerate(piezas) if on] or [-1])
+    lineas, cur = [], []
+    for i, (p, _) in enumerate(piezas):
+        if cur and f.getlength(" ".join(piezas[j][0] for j in cur + [i])) > ancho:
+            lineas.append(cur); cur = []
+        cur.append(i)
+    if cur:
+        lineas.append(cur)
+    alto_l = int(tam * 1.18)
+    im = Image.new("RGBA", (ancho + 40, alto_l * len(lineas) + 30), (0, 0, 0, 0)); d = ImageDraw.Draw(im)
+    for k, ln in enumerate(lineas):
+        x = 10
+        for i in ln:
+            p, on = piezas[i]
+            col = tuple(E["sub_activa"]) if i == actual else tuple(E["sub_color"]) if on else tuple(E["sub_color"])[:3] + (95,)
+            capa = Image.new("RGBA", im.size, (0, 0, 0, 0)); dc = ImageDraw.Draw(capa)
+            dc.text((x, 10 + k * alto_l), p, font=f, fill=col[:3] + (255,), stroke_width=E["sub_borde"], stroke_fill=(0, 0, 0))
+            if len(col) == 4:
+                capa.putalpha(capa.getchannel("A").point(lambda a: a * col[3] // 255))
+            im.alpha_composite(capa)
+            x += f.getlength(p + " ")
+    return np.array(im)
+
+
 def sub_img(grupo, t):
-    f = fuente(F_IMPACT, 78)
-    piezas = [(w[0].upper().strip(".,;:"), w[1] <= t + 0.02) for w in grupo]
+    E = ESTILO; f = fuente(ruta_fuente(E["sub_fuente"]), E["sub_tam"])
+    piezas = [((w[0].upper() if E["sub_mayus"] else w[0]).strip(".,;:"), w[1] <= t + 0.02) for w in grupo]
     ancho = sum(f.getlength(p + " ") for p, _ in piezas) + 40
     im = Image.new("RGBA", (int(ancho) + 20, 116), (0, 0, 0, 0)); d = ImageDraw.Draw(im)
-    d.rectangle([0, 10, im.width, 106], fill=(5, 5, 8, 215))
+    if E["sub_barra"]:
+        d.rectangle([0, 10, im.width, 106], fill=tuple(E["sub_barra"]))
     x = 30; actual = max([i for i, (_, on) in enumerate(piezas) if on] or [0])
     for i, (p, on) in enumerate(piezas):
-        d.text((x, 14), p, font=f, fill=AMARILLO if i == actual else HUESO, stroke_width=3, stroke_fill=(0, 0, 0))
+        d.text((x, 14), p, font=f, fill=tuple(E["sub_activa"]) if i == actual else tuple(E["sub_color"]), stroke_width=E["sub_borde"], stroke_fill=(0, 0, 0))
         x += f.getlength(p + " ")
     return np.array(im)
 
@@ -274,6 +419,8 @@ def sub_img(grupo, t):
 def textura(base, n, zona, mascara=None):
     """Tape texture on the host (only inside his silhouette when a mask is given: on the whole box it drew a dark
     rectangle around him, review 2026-11-15) and the frame edges: scanlines, a little noise, a rolling tracking line."""
+    if not ESTILO["textura"]:
+        return
     x, y, w, h = zona
     orig = base[y:y + h, x:x + w].copy()
     roi = base[y:y + h, x:x + w].astype(np.int16)
@@ -297,15 +444,17 @@ def borde_suave(arr, px=2):
 def main():
     carpeta = Path(sys.argv[1]).resolve()
     R = json.loads((carpeta / "reaccion.json").read_text(encoding="utf-8"))
+    ESTILO.update({k: (tuple(v) if isinstance(v, list) else v) for k, v in R.get("estilo", {}).items()})
     voz = carpeta / R["voz"]; total = R.get("duracion") or duracion(voz) + R.get("cola", 1.2)
     hasta = float(sys.argv[sys.argv.index("--hasta") + 1]) if "--hasta" in sys.argv else total
     cuadro_t = float(sys.argv[sys.argv.index("--cuadro") + 1]) if "--cuadro" in sys.argv else None
     grupos = subtitulos(voz, carpeta)
+    frases = bloques(grupos, R.get("sub_bloque", {}).get("palabras", 9))
     host = R["host"]; alto_p, margen = host.get("alto", 1000), host.get("margen", 24); alto_g = host.get("alto_grande", 1500)
     planos = sorted(R["planos"], key=lambda p: p["ini"]); abiertos = {}
     tarjetas = [dict(t, img=tarjeta_img(t)) for t in R.get("tarjetas", [])]
     clips = []
-    for c in host["clips"]:
+    for c in host.get("clips", []):
         mate = carpeta / c["mate"]
         if not mate.exists():   # stills before the cut-outs exist: footage and cards only
             print("no cut-out yet:", c["mate"]); continue
@@ -322,16 +471,28 @@ def main():
                 v = max(v, SETTLE((t - (a - SWEEP)) / SWEEP) if t < a else (SETTLE(((b + SWEEP) - t) / SWEEP) if t > b else 1.0))
         return v
 
-    fuera = host.get("fuera", [])
+    # hidden head: "fuera" spans plus every plan marked "cabeza": false (review 2026-11-16: "la cabeza no todo el tiempo,
+    # en algunos casos esconderla y en otros sacarla"); touching spans are merged so the head does not pop up between them
+    spans = sorted([list(s) for s in host.get("fuera", [])] + [[p["ini"], p["fin"]] for p in R["planos"] if p.get("cabeza") is False])
+    fuera = []
+    for a, b in spans:
+        if fuera and a <= fuera[-1][1] + 0.05:
+            fuera[-1][1] = max(fuera[-1][1], b)
+        else:
+            fuera.append([a, b])
 
-    def nivel_fuera(t):   # 0 = on screen, 1 = gone below the frame: he ducks out in 0.3 s and comes back up in 0.4 s
+    def nivel_fuera(t):   # 0 = on screen, 1 = gone. Default a hard cut (review 2026-11-16: "se va de una forma rara, debería
+        # ser un corte seco"); estilo "salida": "deslizar" keeps the old duck out (0.3 s) and back up (0.4 s)
         v = 0.0
         for a, b in fuera:
-            if a <= t <= b:
-                v = max(v, min(SETTLE((t - a) / 0.3), SETTLE((b - t) / 0.4)))
+            if a <= t < b:
+                v = 1.0 if ESTILO.get("salida", "corte") == "corte" else max(v, min(SETTLE((t - a) / 0.3), SETTLE((b - t) / 0.4)))
         return v
 
-    out = carpeta / f"{R['slug']}_reaccion.mp4" if cuadro_t is None else None
+    # PREVIEW ONLY: CCC rule, every delivered video is assembled in After Effects with Motion DNA
+    out = carpeta / f"{R['slug']}_PREVIEW_python.mp4" if cuadro_t is None else None
+    if cuadro_t is None:
+        print("WARNING: Python preview only. The delivered edit must be built in After Effects with Motion DNA.")
     tmp = carpeta / "_reaccion_video.mp4"
     enc = None if cuadro_t is not None else subprocess.Popen(
         ["ffmpeg", "-v", "error", "-y", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{W}x{H}", "-r", str(FPS), "-i", "-",
@@ -346,7 +507,7 @@ def main():
         for p in vivos[-2:]:
             key = id(p)
             if key not in abiertos:
-                abiertos[key] = Plano(p, carpeta)
+                abiertos[key] = Mapa(p, carpeta) if p.get("tipo") == "mapa" else Plano(p, carpeta)
                 if cuadro_t is not None and not abiertos[key].foto:   # one still: seek straight to it
                     abiertos[key].lec = Lector(abiertos[key].src, p.get("desde", 0) + (t - p["ini"]) * p.get("vel", 1.0),
                                                abiertos[key].tw, abiertos[key].th, vel=p.get("vel", 1.0))
@@ -365,7 +526,7 @@ def main():
         # credit of the footage on screen (top, small)
         cred = next((p.get("credito") for p in reversed(vivos) if p.get("credito")), None)
         if cred:
-            pegar(base, np.array(texto_rgba(cred.upper(), fuente(F_MONO, 26), HUESO + (235,), 3)), 40, 250)
+            pegar(base, np.array(texto_rgba(cred.upper(), fuente(ruta_fuente(ESTILO['mono_fuente']), 26), tuple(ESTILO['papel'][:3]) + (235,), 3)), 40, 250)
         # 2. cards
         for c in tarjetas:
             if c["ini"] <= t < c["fin"]:
@@ -373,6 +534,13 @@ def main():
                 img = c["img"]; sc = 0.86 + 0.14 * k
                 im = Image.fromarray(img).resize((int(img.shape[1] * sc), int(img.shape[0] * sc)), Image.BILINEAR)
                 pegar(base, np.array(im), W // 2 - im.width // 2, int(c.get("y", 560) + (1 - min(k, 1)) * 60), min(max(k, 0) * 1.4, 1.0) * salida)
+        # 2b. topic label that stays on screen the whole video (the talking-head news genre: "EL ARCA DE LA ALIANZA" under
+        # the picture; review 2026-11-16). {"texto", "y", "tam", "desde", "hasta"}; it hides while a card is up
+        tit = R.get("titulo")
+        if tit and tit.get("desde", 0) <= t < tit.get("hasta", 1e9) and not any(c["ini"] <= t < c["fin"] for c in tarjetas):
+            if "_img" not in tit:
+                tit["_img"] = titulo_img(tit)
+            ti = tit["_img"]; pegar(base, ti, W // 2 - ti.shape[1] // 2, int(tit.get("y", 1130) - ti.shape[0] / 2))
         # 3. host (cut-out), small in the corner or big
         g = nivel_grande(t)
         clip = next((c for c in clips if c["ini"] <= t < c["fin"]), None)
@@ -384,7 +552,11 @@ def main():
             fr = c["lec"].cuadro(n - c["n0"])
             if fr is None:
                 return
-            alto = int((alto_p + (alto_g - alto_p) * g) * (1.07 if c["k"] % 2 else 1.0))
+            if ESTILO["corte"] == "salto":   # lands 9 % big and settles to 2 % in 4 frames, then holds (CCC "salto_avatar")
+                esc = 1.02 + 0.07 * (1 - SETTLE(min((n - c["n0"]) / 4, 1.0)))
+            else:                            # every other clip punched in 7 %
+                esc = 1.07 if c["k"] % 2 else 1.0
+            alto = int((alto_p + (alto_g - alto_p) * g) * esc)
             im = Image.fromarray(fr).resize((int(c["gw"] * alto / c["gh"]), alto), Image.BILINEAR)
             x_peq, x_gr = int(W * host.get("x", 0.30)) - im.width // 2, W // 2 - im.width // 2
             x = int(x_peq + (x_gr - x_peq) * g); y = H - alto + int(alto * f)
@@ -407,12 +579,21 @@ def main():
                 dibujar_host(clip)
         # 4. subtitles
         gr = next((gp for gp in grupos if gp[0][1] - 0.05 <= t < gp[-1][2] + 0.12), None)
-        if gr:
-            si = sub_img(gr, t); ys = R.get("y_sub", 860) + (1560 - R.get("y_sub", 860)) * nivel_grande(t) * (1 - nivel_fuera(t))   # big host: below the mask
-            pegar(base, si, W // 2 - si.shape[1] // 2, int(ys) - 58)
+        bq = R.get("sub_bloque"); gb = nivel_grande(t)
+        if bq and gb < 0.5 and nivel_fuera(t) < 0.5:   # block of lines beside the head ({"x", "y", "ancho", "palabras"})
+            fr = next((b for b in frases if b[0][1] - 0.05 <= t < b[-1][2] + 0.25), None)
+            if fr:
+                bi = bloque_img(fr, t, bq.get("ancho", 480))
+                pegar(base, bi, bq.get("x", 540), int(bq.get("y", 1450) - bi.shape[0] / 2))
+        elif gr:
+            si = sub_img(gr, t); ys = R.get("y_sub", 860) + (R.get("y_sub_grande", 1560) - R.get("y_sub", 860)) * nivel_grande(t) * (1 - nivel_fuera(t))   # big host: below the mask
+            xs = R.get("x_sub", 0.5) + (0.5 - R.get("x_sub", 0.5)) * nivel_grande(t)   # side host: subtitles beside him
+            xi = min(max(int(W * xs) - si.shape[1] // 2, 40), W - 40 - si.shape[1])   # a long chunk never runs off the edge
+            pegar(base, si, xi, int(ys) - 58)
         # 5. tape header: REC dot + tape counter, top-left, always
         hdr = f"\u25cf REC  {R.get('cinta', 'CULT PIXEL REACTS')}  {int(t // 60):02d}:{int(t % 60):02d}:{n % FPS:02d}"
-        pegar(base, np.array(texto_rgba(hdr, fuente(F_MONO, 28), (255, 70, 80, 230) if n % 30 < 18 else HUESO + (200,), 3)), 40, 205)
+        if ESTILO["cabecera"]:
+            pegar(base, np.array(texto_rgba(hdr, fuente(F_MONO, 28), (255, 70, 80, 230) if n % 30 < 18 else HUESO + (200,), 3)), 40, 205)
         textura(base, n, (0, 0, W, 40)); textura(base, n, (0, H - 24, W, 24))
         if cuadro_t is not None:
             Image.fromarray(base).save(sys.argv[sys.argv.index("--cuadro") + 2]); print("frame", t); return
@@ -424,7 +605,7 @@ def main():
     ins, fil, k = ["-i", str(tmp), "-i", str(voz)], ["[1:a]aresample=48000,volume=1.0[v0]"], 2
     mezcla = ["[v0]"]
     for p in planos:
-        if p.get("audio") is None or Path(p["src"]).suffix.lower() in (".jpg", ".png", ".jpeg", ".webp"):
+        if p.get("audio") is None or p.get("tipo") == "mapa" or Path(p["src"]).suffix.lower() in (".jpg", ".png", ".jpeg", ".webp"):
             continue
         ins += ["-ss", f"{p.get('desde', 0):.3f}", "-t", f"{(p['fin'] - p['ini']) * p.get('vel', 1.0):.3f}", "-i", str(carpeta / p["src"])]
         tempo = f",atempo={max(0.5, p.get('vel', 1.0))}" if p.get("vel", 1.0) != 1 else ""

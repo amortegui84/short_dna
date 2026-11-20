@@ -24,3 +24,34 @@ By eye (`render_frame` in AE, or ffmpeg frames from the mp4):
 7. listen to the first line, one voice-over line, the music under the quote and the end.
 
 Say plainly in the delivery what was measured but not watched or heard.
+
+## Full bar, both CCC formats (re-QA of the 10 base edits, 2026-11-19)
+Every tool finds the delivered render itself (`comun.ultimo_render`: the highest `<slug>_vN.mp4`). Run, per project:
+`qa_audio.py`, `qc.py` (Whisper vs script + `qa_audio_render.py`, line by line in the final mix; silent `mudo` lines skipped),
+`qa_cortes.py` (flashes < 0.5 s; news format: every plan >= 1.5 s, and a warning for an edit inside the source clip that
+leaves a sliver), `qa_lectura.py` (captions merged across the reaction builder's per-frame layers; wpm), plus:
+- **music present**: `datos_ae.json` `musica` not empty (the 5 artist v1 edits had none: `build_collage.py` now makes
+  `musica/elegida.wav` from `proyecto.json` `musica`); silences under -45 dB inside the video = no music under a pause;
+- **voice gaps**: no silence over ~0.4 s between lines (a host line played without its face drops its take's lead-in air;
+  voice-over lines drop their trailing air);
+- **plans of a news clip** go through `engine/planos_limpios.py <project> [--aplicar]` before the build: a range that crosses the
+  source's own edit and leaves a piece under 1.5 s moves up to 3 s, plans under 1.5 s merge into a neighbour;
+- **one sheet per video by eye** (every shot at start / middle / end): subject in frame for the whole shot (a bust's head, a
+  person at the edge of a 16:9 source: set `foco`; artist works: `proyecto.json` `focos` {stem: [x, y]}), no burned-in text
+  cut, no seam of a collage image, cards and captions never overlapping (the reaction builder drops the caption under a
+  card; artist captions rise over the slider module's titles), captions never shrunk to a tiny single line (they break in
+  two first), no file name shown as a title (`_h264` copies keep the work's title), a portrait card that shows a face
+  (`retrato_bricolage.json` must describe the current png), the evidence clip's range shows what the line says.
+- **music in the mix, not only in the data**: `qa_lectura`'s "LU under the voice" is computed from datos_ae.json; check the
+  render itself (no silence under -45 dB mid-video). ccc.jsx never placed the music until 2026-11-19 (now ducked, levels per edit);
+- **source cuts inside the visible 9:16 window**: `planos_limpios.py` also scans the cropped window (scene 0.15) and keeps
+  0.06 s away from any cut at a plan's edge (one stray frame of another shot otherwise); after it, check that no two plans
+  reuse the same source range;
+- **burned-in text of the source** (BBC subtitles, CNN titles, TikTok captions) cut by the crop: pick another range;
+- **captions of the news format come from Whisper**: fix misheard names and split numbers with `reaccion.json`
+  `cambiar` / `juntar` (Sotheby's, Cattelan, "$100,000", "avant-garde");
+- artist format: the host holds >= 1.5 s before a work; the video ends 0.3 s after the last word (`cola_final_s`);
+  captions rise to y 1300 over the carousel and slider titles.
+- **voice speed** (user, 2026-11-19): ~195 wpm of speech (`qa_lectura` `wpm_medio`) is the target; over ~205 the voice is slowed
+  with `ritmo_b` = old × 195 / wpm and `estirar: "rubberband"` (Buns: TTS at 1.15 + montaje 1.08 ran ~275 wpm). Voices the
+  user already approved are left as they are.

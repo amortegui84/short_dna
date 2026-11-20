@@ -117,5 +117,7 @@
   280,
   850
  ],
- "_notas": {}
+ "_notas": {},
+ "salto_min": 99,
+ "_salto_min": "review 2026-11-17: 'muchos cortes innecesarios cuando habla': no reframes inside a host line"
 }

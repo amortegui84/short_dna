@@ -141,6 +141,67 @@ one entry per episode when its script is approved.
   every module from the .aep (`references/bosch_ae_rules.md`) and rebuild with those values. Rule: **before building a
   new brand's edit, dump its template project in full (values, keyframes, eases, expressions, fonts), not only the names.**
 
+- *(20 scripts, review 2026-11-16)* "The quote should be related to the topic; if not, better leave it out." Rule: **a
+  quote card stays only when the quote speaks to the episode's own mystery**; otherwise that beat becomes a story line
+  (the template allows it). A text inside the work (an inscription, a signature) can be the quote card.
+- *(20 scripts, review 2026-11-16)* "Careful with how the VO pronounces rare names." Rule: every episode lists its hard
+  names with a respelling (`VOICES.md` §4c, `proyecto.json` `pronunciacion`); the respelling goes into the TTS text and
+  the host's video dialogue, never into the captions; a mispronounced name fails the take.
+- *(20 scripts, review 2026-11-16)* "Remember the VO notes so the difference between the hosts' styles is felt." Rule:
+  the tone (§9.3) is filtered through the host's voice sheet (`VOICES.md` §4, §4b); two hosts never read alike.
+
+- *(20 scripts, review 2026-11-16)* "Lower the head's appearances to 50 % (it is what uses fal credits)." Rule: **the head is
+  on screen for ~50 % of the video: 5 A lines of 10**; the other lines are voice-over over the footage or the work
+  (TTS with the host's tags → speech-to-speech to the host's voice). Kling/fal is paid only for A lines. The hook and the
+  closing line stay A. Budget: `BUDGET_20_VIDEOS.md` §7.
+- *(20 scripts, review 2026-11-16)* "Don't do one line with the face and one without: split the VO in groups." Rule: **A and B
+  lines come in blocks, never alternated**: A block (hook + set-up, 2-3 lines) → B block (4-5 lines, cards always inside)
+  → A block (2-3 lines, payoff + ending). No block shorter than 2 lines, except a silent cold-open B line. Reorder lines
+  if a card would split a block.
+
+- *(A08 Messerschmidt + N01, review 2026-11-17)* "Everything is assembled in After as a rule"; "the voice is cut at 12 s /
+  at 47 s"; "this QA must be on your list". Rules: **both formats are built in AE with Motion DNA**; **`qa_audio.py` passes
+  before any delivery** (Claude cannot listen); line ends are found by sound, not only by Whisper. Artist format:
+  **the quote line is marked `"obras": ["__cita__"]` in proyecto.json and timeline.json** (unmarked, the B works merged
+  into one art-module run longer than the template module and ~8 s showed only the background); a silent host beat is
+  `"mudo": true` with `"dur_montaje"` (montaje.py makes its silent audio). STS adds a loud breath before the first word:
+  montaje.py mutes the line until 60 ms before the speech onset.
+
+- *(A08 Messerschmidt v2, review 2026-11-17)* "At the end he looks like he is saying something, it doesn't close well";
+  "many unnecessary cuts while he talks, or very short ones between scenes"; "the avatar has odd jumps". Causes: the silent
+  L10 kept the part of the take where Kling talks again; reframes every 2.4 s inside host lines with a land-big-and-settle
+  pop; per-line cuts crossing Kling's own camera cuts; the same work split in two scenes. Rules: **a silent ending uses only
+  closed-mouth frames of the take** (cut the talking part out, `nota_corte` in proyecto.json); **no reframes inside a host
+  line** (style `salto_min` 99) and no pop; **at most one cut-away to a work per host line, only when the line names it**
+  and it lasts 2 s or more; **a work never appears as two consecutive scenes**; the head floats very softly (wiggle
+  0.35 Hz / 5 px, 0.6 deg).
+
+- *(A08 Messerschmidt v1, review 2026-11-17)* "At 4 s a weird jump"; "at 0:09 something appears for a split second";
+  "at 0:42 the statue shows for a second, it should come earlier"; "at 0:54 he stays silent instead of cutting to the
+  face"; "at 57 nothing is said, the video should end"; "from now on name them v1, v2". Rules: **every host line shows the
+  head at the same size and place** (median head box per line normalized, `sec.norm`); **no scene under ~1.5 s**: a
+  cut-away that would leave under 1.2 s of host holds to the end, one work alone is never an art module (its neighbours
+  flash in), a work named at the end of a host line starts on the word that names it ("mirror"); **a silent beat is cut
+  to the gesture only** and **the video ends when nothing more is said** (`cola_final_s` 0.3, `sin_cta` when the ending is
+  a gesture); renders are `<slug>_vN.mp4`, the previous version goes to `old/`.
+
+- *(N01 v2 + plan, user 2026-11-17)* "Remove the hand scene, fill it with footage of what is being said; remove the hand
+  from the prompts of all videos"; "linking the element to the character works, but make it interactive through the
+  prompt"; "stop generating faces, edit everything with the material, a static image where the face goes". Rules: **no
+  hand inserts**; **theme objects interact with the head by prompt** (they roll around it, he bites one) instead of being
+  edited into the still; **edit first**: every video is cut with its material and voice, the host still as placeholder,
+  before any Kling spend.
+
+- *(re-QA of the 10 base edits, user 2026-11-19: "redo QA on every edit, going through our QA bar thoroughly")*. Found:
+  the 5 artist edits had **no music** (the track was chosen but never reached the build); 0.2-0.47 s **flashes** where a
+  news plan crossed the source clip's own edit (N01, N04, X01) and plans under 1.5 s; a **test clip shown as a work** with its
+  file name as title (A05 "PRUEBA_H264", a black frame instead of the infrared scan); a **portrait card zoomed into the
+  hair** (A09: stale face measurements); 1.3 s of **dead air** at 4 s in A08 (the take's lead-in kept on a faceless line);
+  **cards over captions** (X01), **work titles under captions** (artist slider), **tiny one-line captions**, a **bust
+  cropped to its chest** (A08), a person half out of frame (X01 Shkreli), a collage seam (N09). Rules: the full bar in
+  `docs/QA.md` runs on every render, plus a sheet of every shot by eye; nothing is reported as done from the build log
+  alone ("all have their music" was said without checking `datos_ae.json`).
+
 ## 7. Adding a rule
 Every review note becomes a line in the matching section with the episode in *(italics)*.
 

@@ -5,11 +5,11 @@ from pathlib import Path
 from PIL import Image, ImageStat
 
 sys.path.insert(0, str(Path(__file__).parent))
-from comun import duracion, parecido, proyecto, texto_oido  # noqa: E402
+from comun import duracion, parecido, proyecto, texto_oido, ultimo_render  # noqa: E402
 
 carpeta = Path(sys.argv[1])
 pj = proyecto(carpeta)
-v = carpeta / f"{pj['slug']}.mp4"
+v = ultimo_render(carpeta, pj["slug"])
 guion = " ".join(l["texto"] for l in pj["lineas"])
 oido, lang = texto_oido(v)
 lufs = re.findall(r"I:\s+(-?[\d.]+) LUFS", subprocess.run(["ffmpeg", "-i", str(v), "-af", "ebur128", "-f", "null", "-"],

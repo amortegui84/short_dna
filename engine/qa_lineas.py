@@ -45,8 +45,8 @@ def revisar(carpeta, audio=False):
     fallas, filas = [], []
     for ln in pj["lineas"]:
         f = carpeta / ("audio" if audio else "vo") / (f"{ln['id']}.wav" if audio else f"{ln['id']}.mp3")
-        if not f.exists():
-            continue   # a host line voiced by its own clip (Seedance) has no file here
+        if not f.exists() or ln.get("mudo"):
+            continue   # a host line voiced by its own clip (Seedance) has no file here; a silent line is silent on purpose
         x = leer(f)
         r = {"id": ln["id"], "dur": round(len(x) / SR, 2), "problemas": []}
         habla = x[np.abs(x) > 0.02]
@@ -61,9 +61,14 @@ def revisar(carpeta, audio=False):
             e0, e1, margen = (int(0.002 * SR), int(0.012 * SR), 10) if audio else (int(0.01 * SR), int(0.04 * SR), 15)
             ini, fin = db(x[e0:e1]), db(x[-e1:-e0])
             r["bordes"] = [round(ini, 1), round(fin, 1), round(nivel, 1)]
-            if ini > nivel - margen:
+            # inside a voice block (bloques_voz) a line is cut at a gap of continuous speech, so its first/last ms can be loud
+            # without a cut word (2026-11-17, N04): there only the Whisper word checks below decide
+            bl = next((b for b in pj.get("bloques_voz", []) if ln["id"] in b), None)
+            dentro_ini = bl is not None and bl[0] != ln["id"]
+            dentro_fin = bl is not None and bl[-1] != ln["id"]
+            if ini > nivel - margen and not dentro_ini:
                 r["problemas"].append(f"cut at start ({ini:.0f} dB vs speech {nivel:.0f})")
-            if fin > nivel - margen:
+            if fin > nivel - margen and not dentro_fin:
                 r["problemas"].append(f"cut at end ({fin:.0f} dB vs speech {nivel:.0f})")
             guion = norm(ln["texto"])
             if r["dur"] < 0.12 * len(guion):
@@ -79,10 +84,13 @@ def revisar(carpeta, audio=False):
             if r["parecido"] < 0.8:
                 r["problemas"].append(f"words missing (match {r['parecido']})")
             # the edges of the line must be spoken: v3 skipped "His price?" at the start of ep13 L06 and the line still matched 0.88
+            # names count when close: Whisper writes "frank gaudio" for "Franck Goddio" however it is said (R22, 2026-11-19)
+            cerca = lambda w, ws: any(SequenceMatcher(None, w, v).ratio() >= 0.75 for v in ws)
             if len(a) >= 3 and len(b) >= 2:
-                if not (set(a[:2]) & set(b[:4]) or "".join(a[:2]) in "".join(b[:4]) or a[0] in "".join(b[:3])):
+                if not (set(a[:2]) & set(b[:4]) or "".join(a[:2]) in "".join(b[:4]) or a[0] in "".join(b[:3])
+                        or (len(a[0]) >= 4 and cerca(a[0], b[:3]))):
                     r["problemas"].append(f"first words not heard ('{' '.join(a[:2])}')")
-                if a[-1] not in "".join(b[-3:]):
+                if a[-1] not in "".join(b[-3:]) and not (len(a[-1]) >= 4 and cerca(a[-1], b[-3:])):
                     r["problemas"].append(f"last word not heard ('{a[-1]}')")
         filas.append(r)
         if r["problemas"]:

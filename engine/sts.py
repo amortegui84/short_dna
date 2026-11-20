@@ -9,13 +9,13 @@ import json, shutil, sys, urllib.request, uuid
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
-from comun import clave_eleven, palabras, proyecto, run  # noqa: E402
+from comun import clave_eleven, palabras, proyecto, run, fin_habla, inicio_real  # noqa: E402
 
 carpeta = Path(sys.argv[1])
 pj = proyecto(carpeta)
 aud = carpeta / "audio"
 aud.mkdir(exist_ok=True)
-KEY = clave_eleven()
+KEY = clave_eleven(pj)
 # conversion settings: the character's voz.sts_ajustes if any (CCC: style 0.6, stability 0.35, a livelier read)
 from comun import personaje  # noqa: E402
 AJ = (personaje(pj).get("voz", {}) if pj.get("personaje") else {}).get("sts_ajustes", {"stability": 0.5, "similarity_boost": 0.85, "style": 0.3})
@@ -52,14 +52,14 @@ if "--vo" in sys.argv:
         # keep the montaged length exactly (STS can differ by a few ms): pad or trim to the TTS line
         run(["ffmpeg", "-y", "-v", "error", "-i", str(mp3), "-i", str(tts), "-filter_complex", "[0]apad[a];[a][1]amix=inputs=2:weights='1 0':duration=shortest", "-ar", "48000", str(aud / f"{lid}_sinigualar.wav")])
         print(lid, "VO convertida con STS", flush=True)
-for ln in [l for l in pj["lineas"] if l["tipo"] == "A"]:
+for ln in [l for l in pj["lineas"] if l["tipo"] == "A" and not l.get("mudo")]:   # a silent beat has no voice to convert
     lid = ln["id"]
     out = aud / f"{lid}_sts.mp3"
     if out.exists():
         continue
     clip = carpeta / "clips" / f"{lid}.mp4"
     ws = palabras(clip)
-    t0, t1 = max(0.0, ws[0][1] - 0.12), ws[-1][2] + 0.18
+    t0, t1 = max(0.0, inicio_real(clip, ws[0][1]) - 0.12), fin_habla(clip, ws[-1][2]) + 0.18   # by sound: Whisper ends trailing words early
     src = aud / f"{lid}_h3.wav"
     run(["ffmpeg", "-y", "-v", "error", "-ss", f"{t0:.3f}", "-to", f"{t1:.3f}", "-i", str(clip), "-vn", "-ac", "1", "-ar", "44100", str(src)])
     b = uuid.uuid4().hex

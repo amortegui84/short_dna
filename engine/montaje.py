@@ -10,7 +10,7 @@ from pathlib import Path
 import numpy as np
 
 sys.path.insert(0, str(Path(__file__).parent))
-from comun import duracion, palabras, personaje, proyecto, run  # noqa: E402
+from comun import duracion, palabras, personaje, proyecto, run, fin_habla, inicio_real, inicio_habla, apretar_pausas  # noqa: E402
 
 
 PJ_ESTIRAR = None
@@ -68,16 +68,26 @@ def main(carpeta):
             pal = tiempos_guion(ln["texto"], ws, ws[0][1], ws[-1][2], sus)
             segs.append({"id": lid, "tipo": "A", "clip": str(clip), "t0": 0.0, "dur": duracion(wav), "pal": pal, "wav": str(wav), "atempo": "voz"})
             continue
-        if ln["tipo"] == "A":
+        if ln["tipo"] == "A" and ln.get("mudo"):
+            # a silent host beat (a grimace, a look): no words, silent audio for "dur_montaje" s (default the clip's length)
+            clip = carpeta / "clips" / f"{lid}.mp4"
+            dm = float(ln.get("dur_montaje") or (duracion(clip) if clip.exists() else ln.get("dur_mudo", 2.0)))
+            run(["ffmpeg", "-y", "-v", "error", "-f", "lavfi", "-i", "anullsrc=r=48000:cl=stereo", "-t", f"{dm:.3f}", str(wav)])
+            segs.append({"id": lid, "tipo": "A", "clip": str(clip), "t0": 0.0, "dur": dm, "pal": [], "wav": str(wav), "atempo": "mudo"})
+            continue
+        if ln["tipo"] == "A" and not pj.get("cabeza_placeholder"):
             clip = carpeta / "clips" / f"{lid}.mp4"
             ws = palabras(clip)
-            t0, t1 = max(0.0, ws[0][1] - 0.12), ws[-1][2] + 0.18
+            t0, t1 = max(0.0, inicio_real(clip, ws[0][1]) - 0.12), fin_habla(clip, ws[-1][2]) + 0.18   # by sound: Whisper ends trailing words early
             ventana = t1 - t0
             sts = aud / f"{lid}_sts.mp3"
             if sts.exists():
                 # el habla de H3 (labios perfectos) con el timbre de la voz del video (sts.py): mismo ritmo, mismas pausas
+                # STS turns the take's room tone before the first word into a loud breath/hiss (A08 L09 2026-11-17, 70 dB): mute the
+                # audio until 60 ms before the speech onset in the clip (timing untouched, so the lips stay in sync)
+                pre = max(0.0, inicio_habla(clip, t0, umbral=45.0) - t0 - 0.06)
                 run(["ffmpeg", "-y", "-v", "error", "-i", str(sts), "-af",
-                     f"apad=whole_dur={ventana:.3f},atrim=0:{ventana:.3f},loudnorm=I=-20:TP=-2:LRA=7", "-ac", "2", "-ar", "48000", str(wav)])
+                     f"afade=t=in:st={pre:.3f}:d=0.05,apad=whole_dur={ventana:.3f},atrim=0:{ventana:.3f},loudnorm=I=-20:TP=-2:LRA=7", "-ac", "2", "-ar", "48000", str(wav)])
                 f = "sts"
             else:
                 # sin STS: la VO cabe en la ventana de los labios con atempo (0.8-1.25); el lipsync queda aproximado
@@ -86,16 +96,40 @@ def main(carpeta):
                      f"atempo={f:.4f},adelay=60|60,apad=whole_dur={ventana:.3f},atrim=0:{ventana:.3f},loudnorm=I=-20:TP=-2:LRA=7",
                      "-ar", "48000", str(wav)])
             pal = [(p, a - t0, b - t0) for p, a, b in tiempos_guion(ln["texto"], ws, ws[0][1], ws[-1][2], sus)]
+            if lid in (pj.get("sin_cara") or []):
+                # QA 2026-11-19 (A08 v5, 4.2-5.6 s): a host line played without its face kept the take's 1.1 s of air before the
+                # first word. No lips on screen, so the air goes: start 0.06 s before the speech onset
+                lead = max(0.0, inicio_habla(wav, 0.0, umbral=45.0) - 0.06)
+                if lead > 0.15:
+                    tmp = wav.with_name(f"{lid}_sinaire.wav")
+                    run(["ffmpeg", "-y", "-v", "error", "-ss", f"{lead:.3f}", "-i", str(wav), "-af", "afade=t=in:d=0.01", str(tmp)])
+                    tmp.replace(wav); t0 += lead; ventana -= lead
+                    pal = [(p, a - lead, b - lead) for p, a, b in pal]
+                    print(lid, f"sin_cara: {lead:.2f} s of air cut before the first word", flush=True)
             segs.append({"id": lid, "tipo": "A", "clip": str(clip), "t0": t0, "dur": ventana, "pal": pal, "wav": str(wav),
                          "atempo": f if f == "sts" else round(f, 3)})
         else:
             # la voz en off va a 1.08; las cabezas flotantes piden mas ritmo (sin labios en estas lineas, se puede acelerar)
             ritmo_b = pj.get("ritmo_b") or (1.2 if pj.get("cabeza") else 1.08)   # proyecto.json "ritmo_b" manda (avatar v10b: 1.05, para ver las obras)
-            run(["ffmpeg", "-y", "-v", "error", "-i", str(limpia), "-af", f"{tempo(ritmo_b)},apad=pad_dur=0.15,loudnorm=I=-20:TP=-2:LRA=7",
+            # 90 % rule: the gaps between words go first (no speed change), then the line's tempo
+            apretada = aud / f"{lid}_apretada.wav"
+            antes, despues = apretar_pausas(limpia, apretada)
+            # safety: the tightened line must keep every word Whisper heard before (a lost word = the cut ate a sound)
+            w0, w1 = len(palabras(limpia)), len(palabras(apretada))
+            if w1 < w0:
+                print(f"{lid} pauses: tightening lost {w0 - w1} word(s), kept the original", flush=True)
+            else:
+                print(f"{lid} pauses: {antes:.2f} s -> {despues:.2f} s ({despues / max(antes, 0.01) * 100:.0f} %)", flush=True)
+                limpia = apretada
+            # QA 2026-11-19 (A09 v1: 0.6 s of silence between voice-over lines): the line's own trailing air goes (0.10 s kept),
+            # like the news format's reaccion_aire_b; the leading air is already cut by apretar_pausas
+            aire = "areverse,silenceremove=start_periods=1:start_threshold=-50dB:start_silence=0.10,areverse"
+            run(["ffmpeg", "-y", "-v", "error", "-i", str(limpia), "-af", f"{aire},{tempo(ritmo_b)},apad=pad_dur=0.05,loudnorm=I=-20:TP=-2:LRA=7",
                  "-ar", "48000", str(wav)])
             ws = palabras(wav)
             pal = tiempos_guion(ln["texto"], ws, ws[0][1], ws[-1][2], sus)
-            segs.append({"id": lid, "tipo": "B", "dur": duracion(wav), "pal": pal, "wav": str(wav), "obras": ln.get("obras", [])})
+            # edit-first (user 2026-11-17): with "cabeza_placeholder" a host line is voiced like a voice-over line and keeps its tipo
+            segs.append({"id": lid, "tipo": ln["tipo"], "dur": duracion(wav), "pal": pal, "wav": str(wav), "obras": ln.get("obras", [])})
 
     # the first word must not sit on frame 0: players and phones swallow the first ~100 ms, and silenceremove leaves no breath
     # before it ("the Cooper audio is cut at the start", review 2026-11-13). The first line gets a 0.35 s lead-in.
@@ -119,7 +153,7 @@ def main(carpeta):
                 if (p[-1] in ".:;?!" and b - ult > 1.8) or b - ult > 3.2:   # saltos de zoom al final de frase, 1,8 s minimo
                     cortes.append(b)
                     ult = b
-            d.update(t0=round(s["t0"], 3), cortes=[round(t + c, 3) for c in cortes], niveles=NIVELES)
+            d.update(t0=round(s.get("t0", 0.0), 3), cortes=[round(t + c, 3) for c in cortes], niveles=NIVELES)
         linea.append(d)
         t += s["dur"] + (pj.get("pausa_b", GAP) if s["tipo"] == "B" else GAP)   # "pausa_b": la obra se queda un momento despues de la voz en off
     (carpeta / "timeline.json").write_text(json.dumps({"total": round(t, 3), "gap": GAP, "segmentos": linea}, indent=1,

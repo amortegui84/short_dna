@@ -29,7 +29,15 @@ G = KIT
 COMP = pj.get("comp") or f"{pj['numero']:02d} {pj['artista']} {pj['slug']}"
 # aerender hangs before launching AE when the -comp name has an apostrophe (2026-11-15, ep23 "Byrd's"): keep names plain.
 COMP = COMP.replace("'", "").replace("’", "")
-MUSICA = (carpeta / "musica" / "elegida.wav").as_posix() if (carpeta / "musica" / "elegida.wav").exists() else ""   # musica.py la deja ahi (-27 LUFS)
+# QA 2026-11-19: the 5 artist edits shipped with no music: musica_eleven.py writes proyecto.json "musica" (an mp3), not
+# musica/elegida.wav. Any chosen track is normalised to -27 LUFS as elegida.wav here, like musica.py does
+_mus = carpeta / "musica" / "elegida.wav"
+if pj.get("musica") and (carpeta / pj["musica"]).exists() and (not _mus.exists() or _mus.stat().st_mtime < (carpeta / pj["musica"]).stat().st_mtime):
+    subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", str(carpeta / pj["musica"]), "-af", "loudnorm=I=-27:TP=-3:LRA=9", "-ar", "48000",
+                    "-ac", "2", str(_mus)], check=True)
+MUSICA = _mus.as_posix() if _mus.exists() else ""   # musica.py la deja ahi (-27 LUFS)
+if not MUSICA:
+    print("WARN: no music for this edit (musica/elegida.wav or proyecto.json musica)", flush=True)
 # silence before the first B line while the title card shows alone; Cult Pixel uses 0.4 and lets the card sit over the voice
 # (review 2026-11-13: "the voice cuts out around 14-17 s" was this 1.8 s hole after the first narrator line)
 FZ = float(pj.get("ficha_pausa", 1.8))
@@ -63,13 +71,22 @@ total = round(tl["total"] + FZ, 3)
 # the ending breathes: the reference holds ~1.5-2 s after the last word (button, host still alive); the style asks for it
 _est = Path(__file__).parent.parent / "brands" / str(pj.get("marca", "")) / "styles" / f"{pj.get('estilo', '')}.json"
 if pj.get("marca") and _est.exists():
-    total = round(total + float(json.loads(_est.read_text(encoding="utf-8")).get("cola_final_s", 0)), 3)
+    total = round(total + float(pj.get("cola_final_s", json.loads(_est.read_text(encoding="utf-8")).get("cola_final_s", 0))), 3)   # the project can shorten the tail
 
 
 def ev(stem):
     """Evidence file for a stem: archival footage (obras/<stem>.mp4, downloaded real video) wins over the still (review
     2026-11-12: "download the images and videos we find")."""
     v = carpeta / "obras" / f"{stem}.mp4"
+    if v.exists():
+        # After Effects reads no VP9/AV1 (imports them as audio only): an H.264 copy next to it (2026-11-17, A01)
+        cod = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries", "stream=codec_name", "-of", "csv=p=0", str(v)],
+                             capture_output=True, text=True).stdout.strip()
+        if cod not in ("h264", "hevc", "prores", "mpeg4", "mjpeg"):
+            h = carpeta / "obras" / f"{stem}_h264.mp4"
+            if not h.exists():
+                subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", str(v), "-an", "-c:v", "libx264", "-crf", "16", "-preset", "fast", "-pix_fmt", "yuv420p", str(h)], check=True)
+            v = h
     return (v if v.exists() else carpeta / "obras" / f"{stem}.jpg").as_posix()
 
 
@@ -234,7 +251,8 @@ for sec in secciones:
         sec["corte"] = None   # la ultima linea la cierra ella (llamada a comentar): sin corte, las obras como tarjetas
         continue
     if sec["tipo"] == "cabeza" and sec.get("obras"):
-        c0 = max(sec["obras"][0]["t"], sec["ini"] + 1.2)
+        # QA 2026-11-19 (A01/A04/A05 v3: 1.2 s of host before the work): the host holds at least 1.5 s, the rule for any shot
+        c0 = max(sec["obras"][0]["t"], sec["ini"] + 1.5)
         sec["corte"] = round(c0, 3) if c0 < sec["fin"] - 0.8 else None
     else:
         sec["corte"] = None
@@ -500,6 +518,22 @@ for s in subs:
     for t0, t1, yy in pj.get("subs_y", []):
         if t0 <= s["ini"] < t1:
             s["y"] = yy
+# a host line shown without the face (review 2026-11-17: "cut right after the first sentence, the rest without the face"):
+# proyecto.json "sin_cara": ["L02"]; its voice stays, the picture is the work it names (momentos_a)
+for _i, _s in enumerate(secciones):
+    if _s.get("id") in pj.get("sin_cara", []) and _s.get("obras"):
+        _s["sin_cara"] = True
+        # cut 0.1 s after the previous host line's last word, before Kling's end-of-line blink / pull-back (review
+        # 2026-11-17: "antes de que parpadee como que se esta retirando debemos cortarlo")
+        _pv = secciones[_i - 1] if _i else None
+        _sg = next((g for g in segs if _pv and g["id"] == _pv.get("id")), None)
+        if _sg and _sg.get("words"):
+            from comun import fin_habla as _fh
+            _wav = Path(_sg["wav"]) if Path(_sg["wav"]).is_absolute() else Path.cwd() / _sg["wav"]
+            _fin = _fh(_wav, max(w["e"] for w in _sg["words"]) - _sg["start"])   # by sound: Whisper ends "his" 0.26 s early
+            _corte = round(_sg["start"] + _fin + 0.04, 3)
+            if _pv["ini"] + 1.0 < _corte < _s["ini"]:
+                _pv["fin"] = _corte; _s["ini"] = _corte
 DATA = {"retrato": RETRATO, "obrasArtista": OBRAS_ARTISTA, "piezasRelleno": piezas(ENJAMBRE, 18) + piezas(CORRIENTE, 8), "comp": COMP, "total": total, "secciones": secciones, "subs": subs, "yBarra": Y_BARRA, "marcos": marcos, "numero": f"{pj['numero']:02d}",
         "artista": pj["artista"], "fechas": pj["fechas"], "lema": pj["lema"], "barrido": fz0, "musica": MUSICA,
         "voces": [{"id": s["id"], "wav": voz_unica(Path(s["wav"]) if Path(s["wav"]).is_absolute() else Path.cwd() / s["wav"]), "start": s["start"], "dur": s["dur"]} for s in segs], "desaturar": 0, "kit": KIT,
@@ -527,10 +561,22 @@ if ESTILO.get("builder") in ("cinta", "ccc"):   # "Night Transmission" (ae/cinta
     _mk = marca_dir(pj.get("marca")) if pj.get("marca") else None
     _fx = lambda n: ((_mk / "kit" / "fx" / f"{n}.mp4").as_posix() if _mk and (_mk / "kit" / "fx" / f"{n}.mp4").exists() else "")
     _brand = json.loads((_mk / "brand.json").read_text(encoding="utf-8")) if _mk and (_mk / "brand.json").exists() else {}
-    DATA.update({"claves": [k[1] for k in pj.get("palabras_clave", []) if len(k) > 1], "titulos": pj.get("titulos", {}), "handle": _brand.get("handle", ""),
+    DATA.update({"obras_modo": pj.get("obras_modo") or ESTILO.get("obras_modo"),   # "tablero": the B block on a board with a camera (ccc.jsx)
+                 "sin_cta": bool(pj.get("sin_cta")), "claves": [k[1] for k in pj.get("palabras_clave", []) if len(k) > 1], "titulos": pj.get("titulos", {}), "handle": _brand.get("handle", ""),
                  "fx_humo": _fx("humo_volutas") if ESTILO.get("humo_narrador", True) else None,   # off in Cult Pixel: smoke over his mask (review 2026-11-12)
                  "fx_estatica": _fx("estatica_rafaga"), "glitch": ESTILO.get("glitch"),
                  "musica_db_voz": ESTILO.get("musica_db_voz"), "musica_db_pausa": ESTILO.get("musica_db_pausa", 0)})
+    # QA 2026-11-19: ccc.jsx never placed the music. Now it does, ducked: under a line the music sits 17 LU below the mean of
+    # the voice lines (qa_lectura's 14-22 LU), in the pauses 6 dB higher. Measured per edit, so a quiet Kling take is covered too
+    if MUSICA and DATA.get("musica_db_voz") is None:
+        def _lu(f):
+            r = subprocess.run(["ffmpeg", "-hide_banner", "-i", str(f), "-af", "ebur128", "-f", "null", "-"], capture_output=True, text=True)
+            m = re.findall(r"I:\s+(-?[\d.]+) LUFS", r.stderr); return float(m[-1]) if m else None
+        _vz = [x for x in (_lu(v["wav"]) for v in DATA.get("voces", []) if Path(v["wav"]).exists()) if x is not None and x > -60]
+        if _vz:
+            DATA["musica_db_voz"] = round(max(-18.0, min(-4.0, (sum(_vz) / len(_vz) - 17.0) - (-27.0))), 1)
+            DATA["musica_db_pausa"] = round(DATA["musica_db_voz"] + 6.0, 1)
+            print(f"music: {DATA['musica_db_voz']} dB under the voice, {DATA['musica_db_pausa']} dB in the pauses", flush=True)
     _fin = carpeta / "final" / "autodestruccion.mp4"   # the generated self-destruct (engine/final.py)
     if _fin.exists():
         _d = float(subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", str(_fin)], capture_output=True, text=True).stdout.strip() or 5.17)
@@ -544,7 +590,7 @@ if ESTILO.get("builder") in ("cinta", "ccc"):   # "Night Transmission" (ae/cinta
         # zoom jumps (ep05 v2 review: "reframes, the jumps we used"): while he is on screen the edit cuts between framings at
         # sentence ends (at least SALTO_MIN s apart), punching in toward his head (median head box of his talking clip)
         if sec.get("tipo") in ("gancho", "cabeza"):
-            SALTO_MIN, NIV = 2.4, [1.0, 1.3, 1.12, 1.4]
+            SALTO_MIN, NIV = ESTILO.get("salto_min", 2.4), [1.0, 1.3, 1.12, 1.4]   # CCC 2026-11-17: no reframes while he talks (99)
             fins = sorted(w["e"] for g in tl["segmentos"] for i, w in enumerate(g["words"])
                           if w["w"][-1:] in ".?!:" and i < len(g["words"]) - 1 or (i == len(g["words"]) - 1))
             cortes, ult = [], sec["ini"]
@@ -552,6 +598,20 @@ if ESTILO.get("builder") in ("cinta", "ccc"):   # "Night Transmission" (ae/cinta
                 if sec["ini"] + 1.5 < e < sec["fin"] - 1.6 and e - ult >= SALTO_MIN:
                     cortes.append(round(e + 0.05, 3)); ult = e
             sec["saltos"] = [[sec["ini"], NIV[0]]] + [[t, NIV[(i + 1) % len(NIV)]] for i, t in enumerate(cortes)]
+            # same head size and place on every host line (review 2026-11-17: at 4 s "a weird jump": Kling framed L02 wider
+            # and lower than L01): median box per line vs the median over all host lines
+            def _med(lid):
+                bs = [c["caja"] for c in CAJAS.get(lid, [])]
+                if not bs:
+                    return None
+                import statistics as _st
+                return [_st.median(b[k] for b in bs) for k in range(4)]
+            _todas = [m for m in (_med(x) for x in CAJAS) if m]
+            _m = _med(sec.get("id"))
+            if _m and _todas and ESTILO.get("normalizar_cabeza", True):
+                import statistics as _st
+                rw = _st.median(b[2] - b[0] for b in _todas); rcx = _st.median((b[0] + b[2]) / 2 for b in _todas); ry0 = _st.median(b[1] for b in _todas)
+                sec["norm"] = {"f": round(rw / max(1, _m[2] - _m[0]), 4), "cx": (_m[0] + _m[2]) / 2, "y0": _m[1], "rcx": rcx, "ry0": ry0}
             cj = sorted(CAJAS.get(sec.get("id"), []), key=lambda c: c["caja"][1])
             if cj:
                 x0, y0, x1, y1 = cj[len(cj) // 2]["caja"]
@@ -569,7 +629,7 @@ if ESTILO.get("builder") in ("cinta", "ccc"):   # "Night Transmission" (ae/cinta
         for stem, ds in (pj.get("detalles") or {}).items():
             _det[stem] = [dict(d, t=_t(d["palabra"])) for d in ds]
         DATA.update({"kit": (_mk / "kit" / "bricolage").as_posix(), "type_wall": (_mk / "kit" / "loops" / "kinetic_type_wall.mp4").as_posix(),
-                     "retrato_bricolage": (carpeta / "retrato_bricolage.png").as_posix(), "detalles": _det, "etiqueta": pj.get("etiqueta_nombre", pj["artista"])})
+                     "retrato_bricolage": (carpeta / "retrato_bricolage.png").as_posix(), "detalles": _det, "focos": pj.get("focos", {}), "etiqueta": pj.get("etiqueta_nombre", pj["artista"])})
     (carpeta / "datos_ae.json").write_text(json.dumps(DATA, indent=1), encoding="utf-8")
     _obj = "CCC" if BUILDER == "ccc" else "CINTA"
     r = M.run_jsx((HERE.parent / "ae" / f"{BUILDER}.jsx").read_text(encoding="utf-8") + chr(10) + f"var r = {_obj}.build({json.dumps(DATA)}); app.project.save(); return r;", timeout=1800, includes=())

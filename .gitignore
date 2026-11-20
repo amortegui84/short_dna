@@ -32,3 +32,8 @@ brands/ccc/proyectos/*/*
 !brands/ccc/proyectos/*/research.md
 !brands/ccc/proyectos/*/COSTOS.md
 !brands/ccc/proyectos/*/costos.json
+brands/ccc/ejemplos/
+brands/ccc/entregas/
+brands/ccc/revision/
+brands/ccc/pruebas/
+*.bak_*

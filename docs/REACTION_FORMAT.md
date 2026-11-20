@@ -30,7 +30,7 @@ reviewed; every rule below comes from those reviews or from the research on the 
 | 7 | Narrator | `inicios.py` (start frames from `"inicios_variantes"`, each with the lav mic), `vo/voz_ref.wav` (8 s of the voice), `CLIPS_SEEDS=23 clips.py`, `mates.py` | look at the start-frame sheet and the clip sheet: same mask, facing the lens, mic visible, no table edge in the chest crop |
 | 8 | Plan | `reaccion.json` (schema below): footage cut on the words, cards, `grande` and `fuera` spans | stills: `python engine/reaccion.py <project> --cuadro <s> out.png` at every cut and card |
 | 9 | Music | `musica.py <project> --dur 70` (local ACE-Step); `"musica": "musica/elegida.wav", "musica_db": -10` | voice clearly above it on a phone speaker |
-| 10 | Render | `python engine/reaccion.py <project>` (~8 min for 60 s), then two-pass loudnorm to -14 LUFS, crf 22 -> `<slug>_pub.mp4` | ebur128 -14.0, `blackdetect=d=0.04` = 0, contact sheet, a sheet around one jump cut and one exit |
+| 10 | Render | **Delivered edit: After Effects with Motion DNA (rule).** Preview only: `python engine/reaccion.py <project>` -> `<slug>_PREVIEW_python.mp4` (~8 min for 60 s), then two-pass loudnorm to -14 LUFS, crf 22 -> `<slug>_pub.mp4` | ebur128 -14.0, `blackdetect=d=0.04` = 0, contact sheet, a sheet around one jump cut and one exit |
 | 11 | Publish | `tools/publish_release.py`, posts.md entry (caption with credits + "the narrator is AI-generated"), IG Reel + IG Story, YouTube (AI label), TikTok | only after the user saw the cut or said to publish it |
 
 ## reaccion.json
@@ -108,3 +108,136 @@ its -27 LUFS file; master -14 LUFS, -1.5 dBTP. Strip any broadcast music from ne
 Sources of the genre research (2026-11-15): YouTube reused-content and Shorts help pages; Instagram original-content
 updates (2025-2026); vidIQ and CapCut reaction guides; Shorts/Reels safe-zone specs. Numbers are working defaults: tune them
 with retention data.
+
+## Brand looks (reaccion.json "estilo")
+The compositor defaults are Cult Pixel (VHS texture on the host, Impact captions, REC header). Any brand overrides them:
+```json
+"estilo": {"sub_fuente": "Poppins-SemiBold.ttf", "sub_tam": 58, "sub_mayus": false, "sub_color": [246,232,215],
+           "sub_activa": [227,147,54], "sub_barra": null, "sub_borde": 5, "tinta": [30,23,20], "papel": [240,232,221],
+           "acento": [227,147,54], "rojo": [250,86,57], "titular_fuente": "Poppins-Bold.ttf",
+           "mono_fuente": "InterTight-Medium.ttf", "cita_fuente": "InstrumentSerif-Italic.ttf",
+           "textura": false, "cabecera": false, "corte": "salto"}
+```
+`corte` "salto" = Cool Culture Club's cut: every new host clip lands 9 % big and settles to 2 % in 4 frames. "punch" =
+every other clip 7 % bigger (Cult Pixel). CCC has no music in the export (it is added in the app).
+
+## Host with a mouth (lip sync, Cool Culture Club)
+- No TTS: `clips.py` makes H3 speak each line (up to 3 seeds, transcript QC), `sts.py` turns that speech into the series
+  voice, `montaje.py` cuts each line's window (`t0`), `mates.py` cuts the head out.
+- `reaccion_voz.py --slots` starts every clip exactly on its line from its `t0`, and when a clip ends more than 0.3 s
+  before the next line, the host ducks out (`fuera`) instead of freezing with a still mouth. Manual spans go in
+  `host.fuera_manual`.
+- Read the transcript it prints: H3 sometimes inserts words ("the Pied of Thieves") or stutters a line with two options
+  ("or best came at?"). Simplify the line and regenerate it (`CLIPS_SEEDS=31,32,33 clips.py <project> L08`), or trim a
+  murmur after the last word with ffmpeg `-t`. Keep lines under ~18 words; a voice at 2.6 words/s cannot be sped up.
+- Layout for a head (review 2026-11-15: "in the centre it does not work, it should be to one side so the video shows"):
+  `"host": {"alto": 760, "x": 0.26, "pecho": 1.0}` with `"y_sub": 1300, "x_sub": 0.68` (captions beside the head) and
+  cards at y ~835. Prefer `"modo": "caja"` for 16:9 news footage: the whole frame reads ("some shots are cuts where you
+  cannot tell what it is"); crop to "full" only on a clear subject (a painting, a face), never on a corner of a frame.
+
+## Haunted places (Cult Pixel; 2026-11-15)
+The reaction layout with the narrator small in the bottom-left corner (`alto` 720, `x` 0.24, `pecho` 0.62), plus a map:
+1. `python engine/mapa_capturas.py <project>/mapa <lat> <lng> --z 3 5 7 9 11 13 15 17 18` (Google Maps, no login, cookies
+   rejected, UI hidden; one 1080x1920 screenshot per zoom, map and satellite).
+2. A plan `{"tipo": "mapa", "ini", "fin", "z": [3, 18], "etiqueta": "ISLA DE LAS MUNECAS", "sub": "Xochimilco, Mexico City",
+   "credito": "MAP DATA (C) GOOGLE", "capturas": [map z3..z9, satellite z11..z18]}` zooms continuously into the place and
+   drops a red pin with the name. Give it 3.5-4 s; the satellite z3 has a side panel (start the satellite at z11).
+3. Story beats: hook (what is there), where (map), who and when (real archive of the person), the legend, the detail that
+   makes it worse, the date it ended, what nobody has proven, his idea, "it is still there", and "Would you go?".
+4. `"juntar": [["Sochi", "milko", "Xochimilco"]]` fixes place names Whisper splits in the captions.
+
+## Side host: text as a block beside the head (review 2026-11-16)
+When the host sits to one side (CCC), one 3-word line under the footage read poorly; the user asked for "un bloque de
+líneas al lado derecho de la cabeza". Set `"sub_bloque": {"x": 540, "y": 1440, "ancho": 480, "palabras": 9}` (and
+`estilo.bloque_tam`): each phrase (up to 9 words, broken at sentence ends) wraps left-aligned beside the head, the word
+being said in the accent, said words in the subtitle colour, words still to come dimmed. While the host is big or ducked
+out the single centred line takes over. Misheard words: `cambiar` [[heard, right]] for one word, `juntar` for two.
+Cult Pixel (corner narrator): no big host at the end; he stays small to the last frame (same review).
+
+## Hiding the head on a shot (review 2026-11-16)
+"La cabeza no todo el tiempo: en algunos casos esconderla y en otros sacarla." Put `"cabeza": false` on a plan: the host
+ducks out when that plan starts and comes back when it ends; touching hidden plans (and `host.fuera` spans) merge into one
+exit, so the head never pops up between them. Hide it where the shot is the story (the object, the witness clip, a replay,
+a freeze); show it for the hook, reactions, jokes, the verdict and the question.
+
+## The talking-head news voice (three reference Shorts, review 2026-11-16)
+The user sent three Spanish talking-head Shorts (CIA astral-projection guide, the Ark guardian of Aksum, the "dinosauroid")
+and asked us to learn how they tell the news and how they are cut. What carries them:
+1. **A dare in the first line.** "Are you sure X doesn't exist? Stay, this will blow your mind." / "OK, this one is going
+   to blow your mind: the Ark of the Covenant." The topic is named in the first 3 s.
+2. **Receipts, shown and named.** The official source on screen (the cia.gov page, the document title, the scientist and
+   the year) and said aloud: "straight from the CIA's own website, so it's not a hoax". He reads one line out ("I'll read
+   it to you") while the text is on screen.
+3. **An escalation ladder.** Each beat raises the stakes with a spoken hinge: "and here's the wildest part", "and what
+   finishes blowing my mind". The strangest detail is saved for the last third (the guardians' cataracts).
+4. **The ending opens it wider.** The last idea zooms out ("if dinosaurs could have become us... why not somewhere else?"),
+   then a direct question: "Did you know this? Tell me in the comments."
+5. **Images that land on the idea.** Each image appears exactly on the word it proves (the document when he says
+   "document", the diagram when he says "diagrams"), stays 2-3 s, and the strangest one fills the screen alone.
+**Our own layout stays** (user, same day: "el nuestro funciona"): borrow the storytelling and the image timing, not
+their cut. The optional `"titulo"` label exists in reaccion.json but is not part of the Cult Pixel look.
+Keep Cult Pixel's own voice (calm, ominous, the masked narrator) and rule 15 (open mystery): borrow the structure, not the
+catchphrases or the sign-off.
+
+## Less rational, more open (review 2026-11-16, Reacts 03 v1)
+"No ser tan racionales: preguntas abiertas, que realmente nos indique que algo podría suceder." Lines like "Not proof of
+anything, just a reminder" or "Maybe it's just age" deflate the story. Replace the hedge with a question that leans toward
+the possibility ("What if the mystics weren't imagining it? What if they saw it coming?", "What if it isn't age?") and
+end on something that could still happen ("the sun is waking up again"). Facts stay true; claims stay claims.
+
+## Hard cuts and variety (review 2026-11-16, Reacts 03 v1)
+- "Nuestro personaje se va de una forma rara, debería ser un corte seco": the host now leaves and comes back on a hard cut
+  (default `estilo.salida` = "corte"); the old slide down/up is `"salida": "deslizar"`.
+- "Que no sea tan monótono": the v1 cut used one candle photo six times and one eclipse clip five times. Aim for 20-28
+  shots a minute, 1.5-3 s each, no asset more than twice, moving footage over stills, and a wider b-roll hunt (blackouts,
+  engravings, archive TV) before planning.
+
+## CCC news (N01 test, 2026-11-17): rules from the review
+- **Assembled in After Effects with Motion DNA**: `engine/build_reaccion_ae.py <project> --render` (`ae/ccc_reaccion.jsx`).
+  `reaccion.py` only makes `*_PREVIEW_python.mp4`, never delivered.
+- **Footage is always 9:16 full screen** ("todavía es 16:9"): every plan `"modo": "full"` with a `foco` chosen per shot
+  (where the subject is), `"subir": false`. No boxed 16:9 over a blurred copy.
+- **No burned-in text cut by the crop**: a news clip with captions or lower thirds (BBC, Guardian, Global News, France 3,
+  tweets) is pushed in from the top (`"foco": [x, 0.0], "y_obj": 0.0`, zoom 1.18 for a lower third at the very bottom,
+  1.36 for captions at ~80 % height). Check every plan on a still before building.
+- **VP9/AV1 footage** gets an H.264 copy for AE automatically (AE imports them as audio only).
+- **The head stays to the end of its line** ("se va la cabeza antes de cerrar la escena"): host slots follow the voice
+  (`reaccion_voz.py --slots`), the last clip runs to the end of the video, no duck-out at the close.
+- **Audio QA is mandatory** (`qa_audio.py`, inside `render_ae.py`): no line ends in speech, no hard drop in the voice
+  track. Line windows and Kling per-line cuts are found by sound (`comun.fin_habla`, `inicio_habla`, `inicio_real`);
+  re-cut existing takes for free with `kling.py <project> --recortar`.
+- **After a line changes length**, every time in reaccion.json moves with the words (map old -> new word times), never
+  by hand.
+- **Rhythm** ("muchos vacíos y silencios"): `proyecto.json` `"reaccion_hueco": 0.05` between lines; voice-over lines lose
+  their leading/trailing air (`reaccion_voz.py`); a long pause inside a host line is cut with `"reaccion_recortes":
+  {"L09": [[a, b]]}` (line seconds) and the host clip is split there. Consecutive host lines from the same Kling take join
+  with `"reaccion_huecos": {"L02": -0.05}` so the take plays on without a jump. No shot under 1.5 s.
+- **Every shot shows its subject from start to end**: check each plan at its start, middle and end on the 9:16 crop
+  (a news clip has its own edits inside: a range can start on an empty wall or a ceiling). Pick `desde` and `foco` per
+  plan from a sheet of candidate moments.
+- **The head never pops**: no scale "landing" on the cuts; a very soft float instead (position wiggle 0.35 Hz / 5 px,
+  rotation 0.25 Hz / 0.6 deg, same seed on every clip). Per-line Kling cuts snap to Kling's own camera cuts
+  (`kling.py`, scene detection) so a clip never shows 2-10 frames of the other framing; the sound runs on to the end of
+  the last syllable over the held frame.
+- **The video ends on the head**: the last host clip closes the video (no duck-out at the end).
+- Open (asked 2026-11-17): ~28 s of voice-over without the head felt long; whether the head stays (listening) during B
+  lines or the scripts spread the A lines more is the user's call.
+
+## MiniMax heads (CCC, 2026-11-20): rules from the review
+Full process: `brands/ccc/NEWS_PROCESS.md`. Tool: `engine/minimax_cabeza.py <project> [--pagar] [--solo L02] [--montar]`,
+direction in `<project>/minimax.json` ({"acting": {"L01": "..."}, "concepto": {"linea", "ref", "prompt"}}).
+- **One MiniMax generation per host line with our voice pinned** (`target_audio_url`); the prompt has the exact words,
+  the delivery and the acting. Lines up to 6 s: reference-to-video; longer: lip-sync (longer reference-to-video clips
+  change scene).
+- **The head never touches the clip sides** ("cortas las orejas", N06 33 s, N09 7 s): first frame = the head alone at
+  68 % on its own gradient; every clip is checked (sides, background, scene cuts) and retried, then lip-sync; after the
+  cut-out, every small-head span is checked on the alpha before delivery.
+- **Big head with clip edges**: scaled until the clip's edges sit on the video's (no straight cut lines).
+- **Darkening behind the big head only while the head is on screen**: the ramp toward the next big head darkened the end
+  of the concept shot like a fade to black.
+- **No slivers around an inserted shot**: a piece under 1.2 s goes to its neighbour.
+- **No jump between two plans of the same subject** (N04 13 s: two Picasso-dog shots from different moments): one
+  continuous plan inside one source shot.
+- **A re-recorded voice gets a new file name for AE** (`voz_reaccion_ae_<size>_<mtime>.wav`): AE kept the old, shorter
+  length of a same-path wav and cut the last line.
+- After the voice changes, `fuera` is rebuilt from `fuera_manual` (it kept the old times in N04/N09).

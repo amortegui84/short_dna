@@ -23,6 +23,16 @@ fallos, avisos, med = [], [], {}
 
 # 1. captions
 cortos, rapidos = [], []
+# the reaction builder splits one caption into a layer per frame while it slides with the head (y changes); on screen it
+# is one caption, so consecutive items with the same words and touching times are read as one
+subs = []
+for s in d.get("subs", []):
+    txt = " ".join(w["w"] for w in s["words"])
+    if subs and subs[-1]["_t"] == txt and abs(s["ini"] - subs[-1]["fin"]) < 0.05:
+        subs[-1]["fin"] = s["fin"]
+    else:
+        subs.append({**s, "_t": txt})
+d["subs"] = subs
 for s in d.get("subs", []):
     txt = " ".join(w["w"] for w in s["words"]); dur = s["fin"] - s["ini"]
     if dur < 0.6:
